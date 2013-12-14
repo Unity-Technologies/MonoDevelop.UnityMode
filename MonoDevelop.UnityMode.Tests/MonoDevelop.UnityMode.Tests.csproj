@@ -36,6 +36,9 @@
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
     </Reference>
+    <Reference Include="UnitTests">
+      <HintPath>..\..\monodevelop\main\build\tests\UnitTests.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProjectUpdaterTests.cs" />
