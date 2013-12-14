@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\monodevelop\main\build\Addins\</OutputPath>
+    <OutputPath>..\..\monodevelop\main\build\Addins\</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\monodevelop\main\build\Addins\</OutputPath>
+    <OutputPath>..\..\monodevelop\main\build\Addins\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
