@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{54833F06-FF38-483A-A1F5-43DF9CE0375F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MonoDevelop.UnityMode</RootNamespace>
+    <AssemblyName>MonoDevelop.UnityMode</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\monodevelop\main\build\Addins\</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\monodevelop\main\build\Addins\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.TextEditor">
+      <HintPath>..\..\monodevelop\main\build\bin\Mono.TextEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Core">
+      <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoDevelop.Ide">
+      <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Ide.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.NRefactory.CSharp">
+      <HintPath>..\..\monodevelop\main\build\bin\ICSharpCode.NRefactory.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.NRefactory">
+      <HintPath>..\..\monodevelop\main\build\bin\ICSharpCode.NRefactory.dll</HintPath>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Manifest.addin.xml">
+      <Gettext-ScanForTranslations>False</Gettext-ScanForTranslations>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitySolution.cs" />
+    <Compile Include="StartupHandler.cs" />
+    <Compile Include="UnityProjectServiceExtension.cs" />
+    <Compile Include="AssetsFolderPad\AssetsFolderPad.cs" />
+    <Compile Include="AssetsFolderPad\Folder.cs" />
+    <Compile Include="AssetsFolderPad\FolderNodeBuilder.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService\MonoDevelop.UnityMode.RestService.csproj">
+      <Project>{B3AA406F-BD2C-41F2-947C-B16271DF516D}</Project>
+      <Name>MonoDevelop.UnityMode.RestService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.UnityRestClient\MonoDevelop.UnityMode.UnityRestClient.csproj">
+      <Project>{54F9E087-EB68-4E06-A297-99885F7DA415}</Project>
+      <Name>MonoDevelop.UnityMode.UnityRestClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
+      <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
+      <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AssetsFolderPad\" />
+  </ItemGroup>
+</Project>

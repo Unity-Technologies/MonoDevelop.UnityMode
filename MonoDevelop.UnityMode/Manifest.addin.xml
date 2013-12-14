@@ -1,0 +1,32 @@
+<Addin id = "MonoDevelop.UnityMode"
+       name	     = "Unity Mode Addin"
+       author	 = "Lucas Meijer"
+       url       = "http://github.com/Unity-Technologies/MonoDevelop.UnityMode"
+       description = "Open a dynamic project by connecting to a running Unity instance"
+       copyright   = "MIT X11"
+       category = "Unity"
+       version   = "4.2">
+
+	<Dependencies>
+		<Addin id="MonoDevelop.Ide" version="4.0.1"/>
+		<Addin id="MonoDevelop.Core" version="4.0.1"/>
+	</Dependencies>
+	
+	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">
+		<Class class = "MonoDevelop.UnityMode.UnityProjectServiceExtension" id="UnityProjectServiceExtension" insertafter="FinalStep"/>
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/Ide/StartupHandlers">
+  		<Class class="MonoDevelop.UnityMode.StartupHandler" />  
+	</Extension>
+    
+    <Extension path = "/MonoDevelop/Ide/Pads">
+	    <SolutionPad id = "UnitySolutionPad" _label = "UnitySolution2" icon = "md-solution" class = "MonoDevelop.UnityMode.UnitySolutionPad" defaultLayout="*" defaultPlacement = "Left">
+			<!---<NodeBuilder class = "MonoDevelop.Projects.Unity.FileNodeBuilder"/>-->
+			<NodeBuilder class = "MonoDevelop.Ide.Gui.Pads.ProjectPad.ProjectFileNodeBuilder"/>
+			<NodeBuilder class = "MonoDevelop.UnityMode.FolderNodeBuilder"/>
+		</SolutionPad>
+	</Extension>
+
+</Addin>
+

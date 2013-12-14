@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MyClass.cs">
+    <Files>
+      <File FileName="Manifest.addin.xml" Line="1" Column="1" />
+      <File FileName="MyClass.cs" Line="137" Column="3" />
+      <File FileName="FolderNodeBuilder.cs" Line="1" Column="1" />
+      <File FileName="Folder.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
