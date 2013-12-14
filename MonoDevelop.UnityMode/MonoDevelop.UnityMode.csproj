@@ -65,6 +65,7 @@
     <Compile Include="AssetsFolderPad\AssetsFolderPad.cs" />
     <Compile Include="AssetsFolderPad\Folder.cs" />
     <Compile Include="AssetsFolderPad\FolderNodeBuilder.cs" />
+    <Compile Include="ProjectUpdater.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
