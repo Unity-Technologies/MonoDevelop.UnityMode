@@ -7,11 +7,23 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 	[Route("/solution")]
 	public class SolutionUpdate
 	{
+		public SolutionUpdate()
+		{
+			Projects = new List<ProjectUpdate> ();
+		}
+
 		public List<ProjectUpdate> Projects { get; set; }
 	}
 
 	public class ProjectUpdate
 	{
+		public ProjectUpdate()
+		{
+			Files = new List<string>();
+			Defines = new List<string>();
+			References = new List<string>();
+		}
+
 		public string Name { get; set; }
 		public string Language { get; set; }
 		public List<string> Files { get; set; }

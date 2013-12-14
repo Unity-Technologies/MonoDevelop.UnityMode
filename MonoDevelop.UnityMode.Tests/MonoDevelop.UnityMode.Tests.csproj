@@ -39,6 +39,9 @@
     <Reference Include="UnitTests">
       <HintPath>..\..\monodevelop\main\build\tests\UnitTests.dll</HintPath>
     </Reference>
+    <Reference Include="MonoDevelop.CSharpBinding">
+      <HintPath>..\..\monodevelop\main\build\AddIns\BackendBindings\MonoDevelop.CSharpBinding.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProjectUpdaterTests.cs" />

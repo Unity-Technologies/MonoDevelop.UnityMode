@@ -15,6 +15,10 @@ namespace MonoDevelop.UnityMode
 
 			project.Files.RemoveRange (toRemove);
 			project.AddFiles (toAdd.Select(f => new FilePath(f)));
+
+			var s = ((DotNetProjectConfiguration)project.DefaultConfiguration).CompilationParameters;
+			foreach(var define in update.Defines)
+				s.AddDefineSymbol (define);
 		}
 	}
 }
