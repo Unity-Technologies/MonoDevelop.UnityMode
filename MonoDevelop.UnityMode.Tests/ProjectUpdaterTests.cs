@@ -9,11 +9,12 @@ using MonoDevelop.CSharp.Project;
 
 namespace MonoDevelop.UnityMode.Tests
 {
-	[TestFixture ()]
+	[TestFixture]
 	public class ProjectUpdaterTests : UnitTests.TestBase
 	{
 		DotNetAssemblyProject _project;
 		ProjectUpdater _projectUpdater;
+		ProjectUpdate _update;
 
 		[SetUp]
 		public void TestSetup()
@@ -24,38 +25,56 @@ namespace MonoDevelop.UnityMode.Tests
 			_project.DefaultConfiguration = config;
 
 			_projectUpdater = new ProjectUpdater ();
+			_update = new ProjectUpdate ();
 		}
 
-		[Test ()]
+		[Test]
 		public void UpdateWithNewFileGetsAdded ()
 		{
-			var update = new ProjectUpdate () { Files = new List<string> { "/file.cs" } };
-			_projectUpdater.Update (_project, update);
+			_update.Files.Add ("/file.cs");
+			DoUpdate ();
 			AssertProjectFilesEquals (new[] {"/file.cs"});
 		}
 
-		[Test ()]
+		[Test]
 		public void UpdateWithoutFileGetsRemoved ()
 		{
-			var update = new ProjectUpdate () { Files = new List<string> {} };
 			_project.AddFile ("somefile");
-			_projectUpdater.Update (_project, update);
+			DoUpdate ();
 			AssertProjectFilesEquals (new string[0] );
 		}
 
-		[Test ()]
+		[Test]
 		public void UpdateWithNewDefinesGetsAdopted ()
 		{
-			var update = new ProjectUpdate () { Files = new List<string> {}, Defines = new List<string>() { "UNITY_EDITOR" }};
-			_projectUpdater.Update (_project, update);
+			_update.Defines.Add ("UNITY_EDITOR");
+			DoUpdate ();
+			Assert.IsTrue (CompilationParameters.HasDefineSymbol ("UNITY_EDITOR"));
+		}
 
-			var config = (DotNetProjectConfiguration)_project.DefaultConfiguration;
-			Assert.IsTrue (config.CompilationParameters.HasDefineSymbol ("UNITY_EDITOR"));
+		[Test]
+		public void UpdateWithoutDefinesRemovesExistingOnes ()
+		{
+			CompilationParameters.AddDefineSymbol ("UNITY_EDITOR");
+			DoUpdate ();
+			Assert.IsFalse (CompilationParameters.HasDefineSymbol ("UNITY_EDITOR"));
 		}
 
 		void AssertProjectFilesEquals (string[] expected)
 		{
 			CollectionAssert.AreEqual (expected, _project.Files.Select (p => p.FilePath.ToString ()).ToArray ());
+		}
+
+		ConfigurationParameters CompilationParameters {
+			get {
+				var config = (DotNetProjectConfiguration)_project.DefaultConfiguration;
+				return config.CompilationParameters;
+			}
+		}
+
+		void DoUpdate ()
+		{
+			_projectUpdater.Update (_project, _update);
 		}
 	}
 }
