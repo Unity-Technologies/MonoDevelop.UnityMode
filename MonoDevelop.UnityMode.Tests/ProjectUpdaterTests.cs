@@ -60,6 +60,33 @@ namespace MonoDevelop.UnityMode.Tests
 			Assert.IsFalse (CompilationParameters.HasDefineSymbol ("UNITY_EDITOR"));
 		}
 
+		[Test]
+		public void UpdateWithNewReferenceGetsAdopted ()
+		{
+			var reference = "someassembly.dll";
+			_update.References.Add (reference);
+			DoUpdate ();
+			Assert.IsNotNull (_project.References.SingleOrDefault(r => r.Reference == reference));
+		}
+
+		[Test]
+		public void UpdateWithoutReferenceRemovesExisting()
+		{
+			_project.References.Add (new ProjectReference (ReferenceType.Assembly, "myassembly.dll"));
+			DoUpdate ();
+			Assert.IsEmpty (_project.References);
+		}
+
+		[Test]
+		public void UpdateWithReferenceThatAlreadyExistDoesNotCreateDuplicate()
+		{
+			var reference = "myassembly.dll";
+			_project.References.Add (new ProjectReference (ReferenceType.Assembly, reference));
+			_update.References.Add (reference);
+			DoUpdate ();
+			Assert.IsNotNull (_project.References.SingleOrDefault(r => r.Reference == reference));
+		}
+
 		void AssertProjectFilesEquals (string[] expected)
 		{
 			CollectionAssert.AreEqual (expected, _project.Files.Select (p => p.FilePath.ToString ()).ToArray ());
