@@ -66,7 +66,7 @@ namespace MonoDevelop.UnityMode.Tests
 			var reference = "someassembly.dll";
 			_update.References.Add (reference);
 			DoUpdate ();
-			Assert.IsNotNull (_project.References.SingleOrDefault(r => r.Reference == reference));
+			Assert.IsNotNull (_project.References.SingleOrDefault(r => r.Reference == reference && r.ReferenceType == ReferenceType.Assembly));
 		}
 
 		[Test]

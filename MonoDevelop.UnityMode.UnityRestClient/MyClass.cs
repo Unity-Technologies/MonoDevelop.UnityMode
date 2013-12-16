@@ -25,6 +25,12 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class RestClient2
 	{
+		public static void SendSolutionInformationRequest ()
+		{
+			var client = new JsonServiceClient("http://localhost:1340/");
+			client.Get<IReturnVoid>("/sendsolutioninformation");
+		}
+
 		public static CompilationResult CompileScripts()
 		{
 			var client = new JsonServiceClient("http://localhost:1340/");

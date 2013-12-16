@@ -4,7 +4,7 @@ using ServiceStack.ServiceHost;
 
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
-	[Route("/solution")]
+	[Route("/solutioninformation")]
 	public class SolutionUpdate
 	{
 		public SolutionUpdate()
@@ -13,8 +13,10 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		}
 
 		public List<ProjectUpdate> Projects { get; set; }
+		public string BaseDirectory { get; set; }
 	}
 
+	[Route("/project")]
 	public class ProjectUpdate
 	{
 		public ProjectUpdate()
@@ -29,6 +31,7 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		public List<string> Files { get; set; }
 		public List<string> Defines { get; set; }
 		public List<string> References { get; set; }
+		public string BaseDirectory { get; set; }
 	}
 }
 

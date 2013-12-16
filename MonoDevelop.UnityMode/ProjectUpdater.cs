@@ -11,14 +11,36 @@ namespace MonoDevelop.UnityMode
 	{
 		public void Update (DotNetAssemblyProject project, ProjectUpdate update)
 		{
+			if (update.BaseDirectory != project.BaseDirectory)
+				project.BaseDirectory = update.BaseDirectory;
+
 			ProcessFiles (project, update);
 			ProcessDefines (project, update);
+			ProcessReferences (project, update);
+			project.Name = update.Name;
 
-			var toAdd = update.References.Where (r => !project.References.Any (r2 => r2.Reference == r)).ToArray ();
-			project.References.AddRange (toAdd.Select(r => new ProjectReference(ReferenceType.Assembly, r)));
+			var dotNetProjectConfiguration = ((DotNetProjectConfiguration)project.DefaultConfiguration);
+			dotNetProjectConfiguration.OutputAssembly = project.Name + ".dll";
+		}
 
-			var toRemove = project.References.Where (r => !update.References.Any (r2 => r.Reference == r2)).ToArray ();
-			project.References.RemoveRange (toRemove);
+		static void ProcessReferences (DotNetAssemblyProject project, ProjectUpdate update)
+		{
+			var referencesToAdd = update.References.Where (r => !project.References.Any (r2 => r2.Reference == r)).ToArray ();
+			foreach (var reference in referencesToAdd)
+				project.References.Add (ProjectReferenceFor (reference));
+
+			var referencesToRemove = project.References.Where (r => !update.References.Any (r2 => r.Reference == r2)).ToArray ();
+			project.References.RemoveRange (referencesToRemove);
+		}
+
+		static ProjectReference ProjectReferenceFor (string reference)
+		{
+			return new ProjectReference (IsAssemblyReference(reference) ? ReferenceType.Assembly : ReferenceType.Project, reference);
+		}
+
+		static bool IsAssemblyReference(string reference)
+		{
+			return System.IO.Path.GetExtension (reference).ToLower () == ".dll";
 		}
 
 		static void ProcessDefines (DotNetAssemblyProject project, ProjectUpdate update)

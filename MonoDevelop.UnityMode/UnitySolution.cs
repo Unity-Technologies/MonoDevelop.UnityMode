@@ -12,6 +12,15 @@ namespace MonoDevelop.UnityMode
 		public UnitySolution()
 		{
 			Singleton = this;
+			var config = new UnitySolutionConfiguration ();
+			config.Id = "UnitySolutionConfiguration";
+			Configurations.Add (config);
+			DefaultConfiguration = config;
+		}
+
+		public override SolutionConfiguration GetConfiguration (ConfigurationSelector configuration)
+		{
+			return DefaultConfiguration;
 		}
 
 		protected override BuildResult OnBuild (MonoDevelop.Core.IProgressMonitor monitor, ConfigurationSelector configuration)
@@ -24,5 +33,12 @@ namespace MonoDevelop.UnityMode
 			return result;
 		}
 	}
-	
+
+	public class UnitySolutionConfiguration : SolutionConfiguration
+	{
+		public override bool BuildEnabledForItem (SolutionEntityItem item)
+		{
+			return true;
+		}
+	}
 }
