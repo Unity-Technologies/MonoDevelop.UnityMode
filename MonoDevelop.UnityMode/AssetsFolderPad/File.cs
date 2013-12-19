@@ -1,30 +1,29 @@
 using System;
 using MonoDevelop.Ide.Gui.Components;
-using MonoDevelop.Core;
 using Gdk;
-using MonoDevelop.Ide.Gui;
+using MonoDevelop.Core;
+using MonoDevelop.UnityMode;
 
 namespace MonoDevelop.UnityMode
 {
-	public class Folder
+	public class File
 	{
 		public FilePath Path { get; set; }
-		public UnitySolution UnitySolution { get; set; }
 	}
 
-	class FolderNodeBuilder: TypeNodeBuilder
+	class FileNodeBuilder: TypeNodeBuilder
 	{
 		public override Type NodeDataType {
-			get { return typeof(Folder); }
+			get { return typeof(File); }
 		}
 
 		public override Type CommandHandlerType {
-			get { return typeof(FolderNodeCommandHandler); }
+			get { return typeof(FileNodeCommandHandler); }
 		}
 
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
-			var file = (Folder) dataObject;
+			var file = (File) dataObject;
 			return file.Path.FileName + "LUCAS";
 		}
 
@@ -32,13 +31,17 @@ namespace MonoDevelop.UnityMode
 		{
 			base.BuildNode (treeBuilder, dataObject, ref label, ref icon, ref closedIcon);
 
-			var file = (Folder) dataObject;
+			var file = (File) dataObject;
 			label = file.Path.FileName;
-			icon = Context.GetIcon (Stock.ClosedFolder);
+		}
+
+		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
+		{
+			return true;
 		}
 	}
 
-	class FolderNodeCommandHandler: NodeCommandHandler
+	class FileNodeCommandHandler: NodeCommandHandler
 	{
 	}
 }

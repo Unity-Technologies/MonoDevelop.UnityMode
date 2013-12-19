@@ -54,6 +54,15 @@
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.Cecil.dll</HintPath>
     </Reference>
+    <Reference Include="MonoDevelop.Debugger">
+      <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger\MonoDevelop.Debugger.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Debugging">
+      <HintPath>..\..\monodevelop\main\external\debugger-libs\Mono.Debugging\bin\Debug\Mono.Debugging.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins">
+      <HintPath>..\..\monodevelop\main\build\bin\Mono.Addins.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Manifest.addin.xml">
@@ -69,10 +78,13 @@
     <Compile Include="StartupHandler.cs" />
     <Compile Include="UnityProjectServiceExtension.cs" />
     <Compile Include="AssetsFolderPad\AssetsFolderPad.cs" />
-    <Compile Include="AssetsFolderPad\Folder.cs" />
-    <Compile Include="AssetsFolderPad\FolderNodeBuilder.cs" />
     <Compile Include="ProjectUpdater.cs" />
     <Compile Include="SolutionUpdater.cs" />
+    <Compile Include="Debugging.cs" />
+    <Compile Include="StartupOptions.cs" />
+    <Compile Include="AssetsFolderPad\File.cs" />
+    <Compile Include="AssetsFolderPad\Folder.cs" />
+    <Compile Include="UnityModeAddin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -88,8 +100,15 @@
       <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
       <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.csproj">
+      <Project>{42407518-6F18-401E-BDA2-730BE36DFF26}</Project>
+      <Name>MonoDevelop.Debugger.Soft.Unity</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AssetsFolderPad\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Mono.Options.cs" />
   </ItemGroup>
 </Project>

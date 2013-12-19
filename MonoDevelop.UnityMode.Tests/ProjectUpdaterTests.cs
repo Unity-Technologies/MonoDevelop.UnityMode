@@ -14,7 +14,7 @@ namespace MonoDevelop.UnityMode.Tests
 	{
 		DotNetAssemblyProject _project;
 		ProjectUpdater _projectUpdater;
-		ProjectUpdate _update;
+		MonoIsland _update;
 
 		[SetUp]
 		public void TestSetup()
@@ -25,7 +25,7 @@ namespace MonoDevelop.UnityMode.Tests
 			_project.DefaultConfiguration = config;
 
 			_projectUpdater = new ProjectUpdater ();
-			_update = new ProjectUpdate ();
+			_update = new MonoIsland ();
 		}
 
 		[Test]

@@ -30,36 +30,24 @@ namespace MonoDevelop.UnityMode
 			IdeApp.Workspace.FileRemovedFromProject += Refresh;
 			IdeApp.Workspace.FileRenamedInProject += Refresh;
 			IdeApp.Workspace.WorkspaceItemOpened += Refresh;
-			IdeApp.Workbench.ActiveDocumentChanged += OnWindowChanged;
+			//IdeApp.Workbench.ActiveDocumentChanged += OnWindowChanged;
 			Refresh (null, null);
-		}
-
-		public class TreeViewBuilder : MonoDevelop.UnityMode.FolderNodeBuilder.IBuilder
-		{
-			ExtensibleTreeView view;
-
-			public TreeViewBuilder(ExtensibleTreeView view)
-			{
-				this.view = view;
-			}
-			public void AddChild (object o)
-			{
-				view.AddChild (o);
-			}
 		}
 
 		public void Refresh(object bah, EventArgs args)
 		{
-			base.TreeView.Clear ();
+			TreeView.Clear ();
+			var unitySolution = IdeApp.Workspace.GetAllSolutions ().FirstOrDefault () as UnitySolution;
+			if (unitySolution == null)
+				return;
 
-			MonoDevelop.UnityMode.FolderNodeBuilder.BuildChildNodes2 (new TreeViewBuilder(TreeView), new Folder ("/Users/lucas/monodevelop/monodevelop/main/build/bin/MyDir",null));
-
-			//foreach (ProjectFile file in project.Files) {
-			//		MonoDevelop.Core.LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info,"File: " + file.FilePath.FileName);
-			//		TreeView.AddChild (file);
-			//	}
+			TreeView.AddChild(new File() { Path = "MyFilez.cs" } );
+			TreeView.AddChild(new File() { Path = "MyFilez2.cs" } );
+			TreeView.AddChild (new Folder () { Path = "MyFolder", UnitySolution = unitySolution});
+			TreeView.AddChild(new File() { Path = "MyFilez3.cs" } );
 		}
 
+		/*
 		void OnWindowChanged (object ob, EventArgs args)
 		{
 			Gtk.Application.Invoke (delegate {
@@ -87,7 +75,7 @@ namespace MonoDevelop.UnityMode
 
 			nav.ExpandToNode ();
 			nav.Selected = true;
-		}
+		}*/
 	}
 	
 }

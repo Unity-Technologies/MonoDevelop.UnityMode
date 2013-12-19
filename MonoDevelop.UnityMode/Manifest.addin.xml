@@ -20,13 +20,24 @@
   		<Class class="MonoDevelop.UnityMode.StartupHandler" />  
 	</Extension>
     
+
     <Extension path = "/MonoDevelop/Ide/Pads">
 	    <SolutionPad id = "AssetsFolderPad" _label = "AssetsFolderPad" icon = "md-solution" class = "MonoDevelop.UnityMode.AssetsFolderPad" defaultLayout="*" defaultPlacement = "Left">
-			<!---<NodeBuilder class = "MonoDevelop.Projects.Unity.FileNodeBuilder"/>-->
-			<NodeBuilder class = "MonoDevelop.Ide.Gui.Pads.ProjectPad.ProjectFileNodeBuilder"/>
-			<NodeBuilder class = "MonoDevelop.UnityMode.FolderNodeBuilder"/>
+			<NodeBuilder id="File" class = "MonoDevelop.UnityMode.FileNodeBuilder"/>
+			<NodeBuilder id="Folder" class = "MonoDevelop.UnityMode.FolderNodeBuilder"/>
 		</SolutionPad>
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/Ide/Commands">
+		<Command id = "MonoDevelop.UnityMode.DebugCommands.DebugEditor"
+				defaultHandler = "MonoDevelop.UnityMode.DebugEditorHandler"
+				_label = "Debug Editor"
+				_description = "Debug Editor"
+				icon="md-pause-debug"/>
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Ide/MainMenu/Run">
+		<CommandItem id = "MonoDevelop.UnityMode.DebugCommands.DebugEditor"/>
 	</Extension>
 
 </Addin>
-

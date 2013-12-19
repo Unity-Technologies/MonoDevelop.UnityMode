@@ -3,7 +3,6 @@ using MonoDevelop.UnityMode.UnityRestClient;
 
 namespace MonoDevelop.UnityMode
 {
-
 	//this class relays all build commands on projects, to the main build command on the solution.
 	public class UnitySolution : Solution
 	{
@@ -36,9 +35,6 @@ namespace MonoDevelop.UnityMode
 
 	public class UnitySolutionConfiguration : SolutionConfiguration
 	{
-		public override bool BuildEnabledForItem (SolutionEntityItem item)
-		{
-			return true;
-		}
+
 	}
 }

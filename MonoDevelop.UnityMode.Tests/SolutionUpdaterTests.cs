@@ -14,20 +14,20 @@ namespace MonoDevelop.UnityMode.Tests
 	{
 		UnitySolution _solution;
 		SolutionUpdater _solutionUpdater;
-		SolutionUpdate _update;
+		UnityProjectState _update;
 
 		[SetUp]
 		public void TestSetup()
 		{
 			_solution = new UnitySolution ();
 			_solutionUpdater = new SolutionUpdater ();
-			_update = new SolutionUpdate ();
+			_update = new UnityProjectState ();
 		}
 
 		[Test]
 		public void UpdateWithNewProjectGetsAdded ()
 		{
-			_update.Projects.Add (new ProjectUpdate () { Name = "p1", Language = "C#" });
+			_update.MonoIslands.Add (new MonoIsland () { Name = "p1", Language = "C#" });
 			DoUpdate ();
 
 			var projects = _solution.GetAllProjects ();
@@ -47,11 +47,11 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void UpdateWithProjectThatReferencesOtherProject()
 		{
-			var project1 = new ProjectUpdate () { Name = "p1", Language = "C#" };
-			_update.Projects.Add (project1);
+			var project1 = new MonoIsland () { Name = "p1", Language = "C#" };
+			_update.MonoIslands.Add (project1);
 
-			var project2 = new ProjectUpdate () { Name = "p2", Language = "C#", References = new List<string> { "p1" } };
-			_update.Projects.Add (project2);
+			var project2 = new MonoIsland () { Name = "p2", Language = "C#", References = new List<string> { "p1" } };
+			_update.MonoIslands.Add (project2);
 
 			DoUpdate ();
 

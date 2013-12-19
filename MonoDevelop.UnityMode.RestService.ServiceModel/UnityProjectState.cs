@@ -5,21 +5,22 @@ using ServiceStack.ServiceHost;
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
 	[Route("/solutioninformation")]
-	public class SolutionUpdate
+	public class UnityProjectState
 	{
-		public SolutionUpdate()
+		public UnityProjectState()
 		{
-			Projects = new List<ProjectUpdate> ();
+			MonoIslands = new List<MonoIsland> ();
+			Files = new List<string> ();
 		}
 
-		public List<ProjectUpdate> Projects { get; set; }
+		public List<MonoIsland> MonoIslands { get; set; }
 		public string BaseDirectory { get; set; }
+		public List<string> Files { get; set; }
 	}
 
-	[Route("/project")]
-	public class ProjectUpdate
+	public class MonoIsland
 	{
-		public ProjectUpdate()
+		public MonoIsland()
 		{
 			Files = new List<string>();
 			Defines = new List<string>();

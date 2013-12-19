@@ -9,7 +9,7 @@ namespace MonoDevelop.UnityMode
 {
 	public class ProjectUpdater
 	{
-		public void Update (DotNetAssemblyProject project, ProjectUpdate update)
+		public void Update (DotNetAssemblyProject project, MonoIsland update)
 		{
 			if (update.BaseDirectory != project.BaseDirectory)
 				project.BaseDirectory = update.BaseDirectory;
@@ -23,7 +23,7 @@ namespace MonoDevelop.UnityMode
 			dotNetProjectConfiguration.OutputAssembly = project.Name + ".dll";
 		}
 
-		static void ProcessReferences (DotNetAssemblyProject project, ProjectUpdate update)
+		static void ProcessReferences (DotNetAssemblyProject project, MonoIsland update)
 		{
 			var referencesToAdd = update.References.Where (r => !project.References.Any (r2 => r2.Reference == r)).ToArray ();
 			foreach (var reference in referencesToAdd)
@@ -43,7 +43,7 @@ namespace MonoDevelop.UnityMode
 			return System.IO.Path.GetExtension (reference).ToLower () == ".dll";
 		}
 
-		static void ProcessDefines (DotNetAssemblyProject project, ProjectUpdate update)
+		static void ProcessDefines (DotNetAssemblyProject project, MonoIsland update)
 		{
 			var compilationParameters = (CSharpCompilerParameters)((DotNetProjectConfiguration)project.DefaultConfiguration).CompilationParameters;
 			var toAdd = update.Defines.Where (d => !compilationParameters.HasDefineSymbol (d)).ToArray ();
@@ -54,7 +54,7 @@ namespace MonoDevelop.UnityMode
 				compilationParameters.RemoveDefineSymbol (define);
 		}
 
-		static void ProcessFiles (DotNetAssemblyProject project, ProjectUpdate update)
+		static void ProcessFiles (DotNetAssemblyProject project, MonoIsland update)
 		{
 			var toRemove = project.Files.Where (f => !update.Files.Any (f2 => f.FilePath.ToString () == f2)).ToArray ();
 			var toAdd = update.Files.Where (f => !project.Files.Any (f2 => f2.FilePath.ToString () == f)).ToArray ();
