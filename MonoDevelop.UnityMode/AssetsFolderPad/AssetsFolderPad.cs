@@ -9,12 +9,15 @@ using System.Linq;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Pads.ProjectPad;
 using MonoDevelop.Projects;
+using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode
 {
 	public class AssetsFolderPad : TreeViewPad
 	{
 		public static AssetsFolderPad Singleton;
+
+		Folder _rootFolder;
 
 		public AssetsFolderPad ()
 		{
@@ -25,27 +28,33 @@ namespace MonoDevelop.UnityMode
 		{
 			base.Initialize (builders, options, contextMenuPath);
 
+			/*
 			IdeApp.Workspace.ItemAddedToSolution += Refresh;
 			IdeApp.Workspace.FileAddedToProject += Refresh;
 			IdeApp.Workspace.FileRemovedFromProject += Refresh;
 			IdeApp.Workspace.FileRenamedInProject += Refresh;
 			IdeApp.Workspace.WorkspaceItemOpened += Refresh;
-			//IdeApp.Workbench.ActiveDocumentChanged += OnWindowChanged;
-			Refresh (null, null);
+			//IdeApp.Workbench.ActiveDocumentChanged += OnWindowChanged;*/
+			Refresh (UnityModeAddin.UnityProjectState);
+
+			UnityModeAddin.UnityProjectStateChanged += Refresh;
 		}
 
-		public void Refresh(object bah, EventArgs args)
+		public void Refresh(object bah, UnityProjectStateChangedEventArgs args)
+		{
+			Refresh (args.State);
+		}
+
+
+		public void Refresh(UnityProjectState state)
 		{
 			TreeView.Clear ();
-			var unitySolution = IdeApp.Workspace.GetAllSolutions ().FirstOrDefault () as UnitySolution;
-			if (unitySolution == null)
-				return;
 
-			TreeView.AddChild(new File() { Path = "MyFilez.cs" } );
-			TreeView.AddChild(new File() { Path = "MyFilez2.cs" } );
-			TreeView.AddChild (new Folder () { Path = "MyFolder", UnitySolution = unitySolution});
-			TreeView.AddChild(new File() { Path = "MyFilez3.cs" } );
+			_rootFolder = new FileSystemTreeBuilder (state.AssetDatabase).Create ();
+
+			TreeView.AddChild (_rootFolder);
 		}
+
 
 		/*
 		void OnWindowChanged (object ob, EventArgs args)

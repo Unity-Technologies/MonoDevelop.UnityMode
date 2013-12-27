@@ -85,6 +85,8 @@
     <Compile Include="AssetsFolderPad\File.cs" />
     <Compile Include="AssetsFolderPad\Folder.cs" />
     <Compile Include="UnityModeAddin.cs" />
+    <Compile Include="FileSystemTreeBuilder.cs" />
+    <Compile Include="AssetDatabaseDTO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

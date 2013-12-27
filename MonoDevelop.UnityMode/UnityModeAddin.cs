@@ -26,13 +26,7 @@ namespace MonoDevelop.UnityMode
 
 		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
 
-		public delegate void UnityProjectStateChangedHandler(object sender, UnityProjectStateChangedEventArgs e);
-
-		public class UnityProjectStateChangedEventArgs : EventArgs
-		{
-			public UnityProjectState State;
-		}
-
+	
 		public static UnityProjectState UnityProjectState 
 		{
 			get { return _unityProjectState; }
@@ -42,8 +36,14 @@ namespace MonoDevelop.UnityMode
 					UnityProjectStateChanged (null, new UnityProjectStateChangedEventArgs() { State = value });
 			}
 		 }
-
-	
 	}
+
+	public delegate void UnityProjectStateChangedHandler(object sender, UnityProjectStateChangedEventArgs e);
+
+	public class UnityProjectStateChangedEventArgs : EventArgs
+	{
+		public UnityProjectState State;
+	}
+
 }
 

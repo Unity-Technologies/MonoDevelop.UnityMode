@@ -120,7 +120,15 @@ namespace MonoDevelop.UnityMode
 
 			var state = new UnityProjectState ();
 			state.MonoIslands.Add (new MonoIsland () { Files = new List<string>(){"test.cs"}, Language = "C#", Name = "BLA"});
-			state.Files.AddRange (new[] {"test.cs", "test2.cs", "lucas.cs"});
+
+			var assetDatabaseDTO = new AssetDatabaseDTO () { Files = new List<string> () {
+					"test.cs",
+					"sub1/test2.cs",
+					"sub1/lucas.cs",
+					"sub1/sub2/bla.cs"
+				} };
+
+			state.AssetDatabase = assetDatabaseDTO;
 			UnityModeAddin.UnityProjectState = state;
 
 			new RestService (unityProjectState => {
