@@ -2,6 +2,7 @@ using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode.Tests
 {

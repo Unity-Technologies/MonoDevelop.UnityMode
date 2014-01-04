@@ -14,10 +14,11 @@ namespace MonoDevelop.UnityMode
 		{
 		}
 
-		public File(FilePath p)
+		public File(string path)
 		{
-			Path = p;
+			RelativePath = path;
 		}
+
 	}
 
 	class FileNodeBuilder: TypeNodeBuilder
@@ -33,7 +34,7 @@ namespace MonoDevelop.UnityMode
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
 			var file = (File) dataObject;
-			return file.Path.FileName;
+			return file.Name;
 		}
 
 		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, ref string label, ref Pixbuf icon, ref Pixbuf closedIcon)
@@ -41,8 +42,8 @@ namespace MonoDevelop.UnityMode
 			base.BuildNode (treeBuilder, dataObject, ref label, ref icon, ref closedIcon);
 
 			var file = (File) dataObject;
-			label = file.Path.FileName;
-			icon = DesktopService.GetPixbufForFile (file.Path, Gtk.IconSize.Menu);
+			label = file.Name;
+			icon = DesktopService.GetPixbufForFile (file.RelativePath, Gtk.IconSize.Menu);
 		}
 
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)
@@ -59,13 +60,14 @@ namespace MonoDevelop.UnityMode
 		{
 			base.RenameItem (newName);
 			var file = (File) CurrentNode.DataItem;
-			file.Path = new FilePath (newName+"LLL");
+
+			FileService.RenameFile (new FilePath(UnityModeAddin.UnityProjectState.BaseDirectory+"/"+file.RelativePath), newName);
 		}
 
 		public override void ActivateItem ()
 		{
 			var file = (File) CurrentNode.DataItem;
-			IdeApp.Workbench.OpenDocument (new FileOpenInformation (file.Path, null));
+			IdeApp.Workbench.OpenDocument (new FileOpenInformation (UnityModeAddin.UnityProjectState.BaseDirectory+"/"+file.RelativePath, null));
 		}
 	}
 }

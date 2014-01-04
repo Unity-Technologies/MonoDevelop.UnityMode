@@ -9,12 +9,9 @@ using System.Linq;
 namespace MonoDevelop.UnityMode
 {
 	public abstract class FileSystemEntry {
-		public FilePath Path { get; set; }
 
-		public string PathString()
-		{
-			return Path.ToString ();
-		}
+		public string RelativePath { get; set; }
+		public string Name { get { return System.IO.Path.GetFileName (RelativePath); } }
 	}
 
 	public class Folder : FileSystemEntry
@@ -26,9 +23,9 @@ namespace MonoDevelop.UnityMode
 			Children = new List<FileSystemEntry>();
 		}
 
-		public Folder(FilePath path) : this()
+		public Folder(string path) : this()
 		{
-			Path = path;
+			RelativePath = path;
 		}
 
 		public void Add(FileSystemEntry child)
@@ -47,7 +44,7 @@ namespace MonoDevelop.UnityMode
 		}
 
 		public bool IsRoot {
-			get { return Path.ToString ().Length == 0; }
+			get { return RelativePath.Length == 0; }
 		}
 	}
 
@@ -64,15 +61,15 @@ namespace MonoDevelop.UnityMode
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
 			var file = (Folder) dataObject;
-			return file.Path + "LUCAS";
+			return file.Name;
 		}
 
 		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, ref string label, ref Pixbuf icon, ref Pixbuf closedIcon)
 		{
 			base.BuildNode (treeBuilder, dataObject, ref label, ref icon, ref closedIcon);
 
-			var file = (Folder) dataObject;
-			label = file.Path;
+			var folder = (Folder) dataObject;
+			label = folder.Name;
 			icon = Context.GetIcon (Stock.ClosedFolder);
 		}
 
@@ -83,9 +80,9 @@ namespace MonoDevelop.UnityMode
 			var folder = (Folder)dataObject;
 
 			foreach (var file in folder.GetFiles())
-				treeBuilder.AddChild (new File () { Path = file.Path });
+				treeBuilder.AddChild (file);
 			foreach (var subfolder in folder.GetFolders())
-				treeBuilder.AddChild (new Folder() { Path = subfolder.Path, Children = folder.Children });
+				treeBuilder.AddChild (subfolder);
 		}
 
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
@@ -114,7 +111,7 @@ namespace MonoDevelop.UnityMode
 			if (file == null)
 				return;
 
-			file.Path = new FilePath (file.Path.FileName + "Q");
+			//file.Path = new FilePath (file.Path.FileName + "Q");
 		}
 
 	}

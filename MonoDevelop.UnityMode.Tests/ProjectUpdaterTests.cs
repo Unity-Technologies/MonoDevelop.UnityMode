@@ -26,14 +26,15 @@ namespace MonoDevelop.UnityMode.Tests
 
 			_projectUpdater = new ProjectUpdater ();
 			_update = new MonoIsland ();
+			_update.BaseDirectory = "/mybase";
 		}
 
 		[Test]
 		public void UpdateWithNewFileGetsAdded ()
 		{
-			_update.Files.Add ("/file.cs");
+			_update.Files.Add ("file.cs");
 			DoUpdate ();
-			AssertProjectFilesEquals (new[] {"/file.cs"});
+			AssertProjectFilesEquals (new[] {"/mybase/file.cs"});
 		}
 
 		[Test]

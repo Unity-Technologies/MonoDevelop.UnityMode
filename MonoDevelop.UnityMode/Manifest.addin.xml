@@ -40,4 +40,7 @@
 		<CommandItem id = "MonoDevelop.UnityMode.DebugCommands.DebugEditor"/>
 	</Extension>
 
+	<Extension path = "/MonoDevelop/Core/FileSystemExtensions">
+		<Class class = "MonoDevelop.UnityMode.UnityModeFileSystemExtension" insertbefore = "MidStep" />
+	</Extension>
 </Addin>

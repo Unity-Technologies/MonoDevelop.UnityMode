@@ -11,8 +11,10 @@ namespace MonoDevelop.UnityMode
 	{
 		public void Update (DotNetAssemblyProject project, MonoIsland update)
 		{
+
 			if (update.BaseDirectory != project.BaseDirectory)
 				project.BaseDirectory = update.BaseDirectory;
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "project.BaseDirectory are: " + project.BaseDirectory + " and "+update.BaseDirectory);
 
 			ProcessFiles (project, update);
 			ProcessDefines (project, update);
@@ -56,11 +58,18 @@ namespace MonoDevelop.UnityMode
 
 		static void ProcessFiles (DotNetAssemblyProject project, MonoIsland update)
 		{
-			var toRemove = project.Files.Where (f => !update.Files.Any (f2 => f.FilePath.ToString () == f2)).ToArray ();
-			var toAdd = update.Files.Where (f => !project.Files.Any (f2 => f2.FilePath.ToString () == f)).ToArray ();
+			var updateFiles = update.Files.Select (f => project.BaseDirectory + "/" + f);
+
+			var toRemove = project.Files.Where (f => !updateFiles.Any (f2 => f.FilePath.ToString() == f2)).ToArray ();
+			var toAdd = updateFiles.Where (f => !project.Files.Any (f2 => f2.FilePath.ToString () == f)).ToArray ();
 			project.Files.RemoveRange (toRemove);
 			project.AddFiles (toAdd.Select (f => new FilePath (f)));
+
+			//			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "toAdd are: " + toAdd [0]);
+			//LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "toAdd are: " + new FilePath(toAdd.First()));
+			//LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Files are: " + project.Files.First ().FilePath.ToString ());
 		}
+
 	}
 }
 

@@ -63,6 +63,9 @@
     <Reference Include="Mono.Addins">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.Addins.dll</HintPath>
     </Reference>
+    <Reference Include="MonoDevelop.Debugger.Soft.Unity">
+      <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Manifest.addin.xml">
@@ -87,30 +90,31 @@
     <Compile Include="UnityModeAddin.cs" />
     <Compile Include="FileSystemTreeBuilder.cs" />
     <Compile Include="AssetDatabaseDTO.cs" />
+    <Compile Include="UnityModeFileSystemExtension.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService\MonoDevelop.UnityMode.RestService.csproj">
-      <Project>{B3AA406F-BD2C-41F2-947C-B16271DF516D}</Project>
-      <Name>MonoDevelop.UnityMode.RestService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoDevelop.UnityMode.UnityRestClient\MonoDevelop.UnityMode.UnityRestClient.csproj">
-      <Project>{54F9E087-EB68-4E06-A297-99885F7DA415}</Project>
-      <Name>MonoDevelop.UnityMode.UnityRestClient</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
-      <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
-      <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.csproj">
-      <Project>{42407518-6F18-401E-BDA2-730BE36DFF26}</Project>
-      <Name>MonoDevelop.Debugger.Soft.Unity</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <Folder Include="AssetsFolderPad\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Mono.Options.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
+      <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
+      <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.UnityRestClient\MonoDevelop.UnityMode.UnityRestClient.csproj">
+      <Project>{54F9E087-EB68-4E06-A297-99885F7DA415}</Project>
+      <Name>MonoDevelop.UnityMode.UnityRestClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MonoDevelop.UnityMode.RestService\MonoDevelop.UnityMode.RestService.csproj">
+      <Project>{B3AA406F-BD2C-41F2-947C-B16271DF516D}</Project>
+      <Name>MonoDevelop.UnityMode.RestService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\monodevelop\main\src\core\MonoDevelop.Core\MonoDevelop.Core.csproj">
+      <Project>{7525BB88-6142-4A26-93B9-A30C6983390A}</Project>
+      <Name>MonoDevelop.Core</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

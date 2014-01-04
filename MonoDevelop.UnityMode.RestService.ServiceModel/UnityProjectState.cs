@@ -4,7 +4,7 @@ using ServiceStack.ServiceHost;
 
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
-	[Route("/solutioninformation")]
+	[Route("/unityprojectstate")]
 	public class UnityProjectState
 	{
 		public UnityProjectState()
@@ -37,8 +37,8 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 
 	public class AssetDatabaseDTO
 	{
-		public List<string> Files;
-		public List<string> EmptyFolders;
+		public List<string> Files { get; set; }
+		public List<string> EmptyFolders { get; set; }
 
 		public AssetDatabaseDTO()
 		{

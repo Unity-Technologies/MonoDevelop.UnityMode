@@ -119,7 +119,18 @@ namespace MonoDevelop.UnityMode
 			UnityModeAddin.Initialize ();
 
 			var state = new UnityProjectState ();
-			state.MonoIslands.Add (new MonoIsland () { Files = new List<string>(){"test.cs"}, Language = "C#", Name = "BLA"});
+			state.BaseDirectory = "/Users/lucas/test";
+			state.MonoIslands.Add (
+				new MonoIsland () { 
+					Files = new List<string>(){"test.cs"}, 
+					Language = "C#", 
+					Name = "BLA", 
+					BaseDirectory = state.BaseDirectory,
+					References = new List<string>() 
+					{ "/Users/lucas/unity/build/MacEditor/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll",
+						"/Users/lucas/unity/build/MacEditor/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll"
+					}
+				});
 
 			var assetDatabaseDTO = new AssetDatabaseDTO () { Files = new List<string> () {
 					"test.cs",

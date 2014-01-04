@@ -31,7 +31,7 @@ namespace MonoDevelop.UnityMode
 			{
 				if (folder.IsRoot)
 					continue;
-				FindParent (folder.Path.ToString ()).Add (folder);
+				FindParent (folder.RelativePath).Add (folder);
 			}
 		}
 

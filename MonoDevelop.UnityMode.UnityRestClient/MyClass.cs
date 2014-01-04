@@ -23,18 +23,29 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public List<LogEntry> Output { get; set; }
 	}
 
+	public class RenameAssetRequest
+	{
+		public string OldPath { get; set; }
+		public string NewPath { get; set; }
+	}
+
 	public class RestClient2
 	{
+		static JsonServiceClient _client = new JsonServiceClient("http://localhost:1340/");
+
 		public static void SendSolutionInformationRequest ()
 		{
-			var client = new JsonServiceClient("http://localhost:1340/");
-			client.Get<IReturnVoid>("/sendsolutioninformation");
+			_client.Get<IReturnVoid>("/sendsolutioninformation");
 		}
 
 		public static CompilationResult CompileScripts()
 		{
-			var client = new JsonServiceClient("http://localhost:1340/");
-			return client.Get<CompilationResult>("/assetpipeline/compilescripts");
+			return _client.Get<CompilationResult>("/assetpipeline/compilescripts");
+		}
+
+		public static void RenameAssetRequest(RenameAssetRequest r)
+		{
+			_client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
 		}
 	}
 }

@@ -51,8 +51,8 @@ namespace MonoDevelop.UnityMode
 			TreeView.Clear ();
 
 			_rootFolder = new FileSystemTreeBuilder (state.AssetDatabase).Create ();
-
-			TreeView.AddChild (_rootFolder);
+			foreach(var child in _rootFolder.Children)
+				TreeView.AddChild (child);
 		}
 
 

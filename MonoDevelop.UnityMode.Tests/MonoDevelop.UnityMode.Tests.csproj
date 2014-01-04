@@ -49,7 +49,6 @@
   <ItemGroup>
     <Compile Include="ProjectUpdaterTests.cs" />
     <Compile Include="SolutionUpdaterTests.cs" />
-    <Compile Include="FolderTests.cs" />
     <Compile Include="FileSystemTreeBuilderTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

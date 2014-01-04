@@ -23,6 +23,8 @@ namespace MonoDevelop.UnityMode
 
 				new ProjectUpdater ().Update (existing, projectUpdate);
 			}
+
+			s.BaseDirectory = update.BaseDirectory;
 		}
 
 		DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate)
@@ -37,7 +39,8 @@ namespace MonoDevelop.UnityMode
 					break;
 			}
 		
-			solution.RootFolder.AddItem (p);
+			var rootFolder = solution.RootFolder;
+			rootFolder.AddItem (p);
 			solution.DefaultConfiguration.AddItem (p).Build = true;
 			return p;
 		}
