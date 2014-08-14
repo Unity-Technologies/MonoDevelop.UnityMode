@@ -37,13 +37,14 @@ namespace MonoDevelop.UnityMode
 			return file.Name;
 		}
 
-		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, ref string label, ref Pixbuf icon, ref Pixbuf closedIcon)
+		public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
 		{
-			base.BuildNode (treeBuilder, dataObject, ref label, ref icon, ref closedIcon);
+			base.BuildNode(treeBuilder, dataObject, nodeInfo);
 
-			var file = (File) dataObject;
-			label = file.Name;
-			icon = DesktopService.GetPixbufForFile (file.RelativePath, Gtk.IconSize.Menu);
+			var file = (File)dataObject;
+
+			nodeInfo.Label = file.Name;
+			nodeInfo.Icon = DesktopService.GetIconForFile(file.RelativePath);
 		}
 
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)

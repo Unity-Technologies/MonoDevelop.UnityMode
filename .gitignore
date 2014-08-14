@@ -6,3 +6,4 @@ MonoDevelop.UnityMode.RestService.ServiceModel/obj
 MonoDevelop.UnityMode/obj
 MonoDevelop.UnityMode.Tests/bin
 MonoDevelop.UnityMode.Tests/obj
+*.suo

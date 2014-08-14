@@ -20,16 +20,16 @@ namespace MonoDevelop.UnityMode
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
 
-			IdeApp.CommandService.CommandEntrySetPostProcessor += MyPostProcessor;
+			//IdeApp.CommandService.CommandEntrySetPostProcessor += MyPostProcessor;
 
-			((DefaultWorkbench)IdeApp.Workbench.RootWindow).RecreateMenu ();
+			//((DefaultWorkbench)IdeApp.Workbench.RootWindow).RecreateMenu ();
 
 			InitializeUnitySolution ();
 			IdeApp.Workbench.ShowCommandBar ("UnityDebugging");
 
 			Workbench wb = IdeApp.Workbench;
 			WorkbenchWindow ww = wb.RootWindow;
-			var dw = (DefaultWorkbench)ww;
+			//var dw = (DefaultWorkbench)ww;
 
 			/*
 			Gtk.HBox contentBox = dw.Toolbar.ContentBox;
@@ -64,8 +64,8 @@ namespace MonoDevelop.UnityMode
 				if (isBlackListed (id))
 					toRemove.Add (ce);
 			}
-			foreach (var r in toRemove)
-				input.Remove (r);
+//			foreach (var r in toRemove)
+//				input.Remove (r);
 
 			return input;
 		}

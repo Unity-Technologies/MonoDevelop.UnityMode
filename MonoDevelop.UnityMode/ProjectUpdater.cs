@@ -49,7 +49,7 @@ namespace MonoDevelop.UnityMode
 		{
 			var compilationParameters = (CSharpCompilerParameters)((DotNetProjectConfiguration)project.DefaultConfiguration).CompilationParameters;
 			var toAdd = update.Defines.Where (d => !compilationParameters.HasDefineSymbol (d)).ToArray ();
-			var toRemove = compilationParameters.AllDefineSymbols.Where (d => !update.Defines.Contains (d)).ToArray ();
+			var toRemove = compilationParameters.GetDefineSymbols().Where (d => !update.Defines.Contains (d)).ToArray ();
 			foreach (var define in toAdd)
 				compilationParameters.AddDefineSymbol (define);
 			foreach (var define in toRemove)

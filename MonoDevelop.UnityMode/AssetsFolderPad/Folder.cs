@@ -64,13 +64,13 @@ namespace MonoDevelop.UnityMode
 			return file.Name;
 		}
 
-		public override void BuildNode (ITreeBuilder treeBuilder, object dataObject, ref string label, ref Pixbuf icon, ref Pixbuf closedIcon)
+		public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
 		{
-			base.BuildNode (treeBuilder, dataObject, ref label, ref icon, ref closedIcon);
+			base.BuildNode(treeBuilder, dataObject, nodeInfo);
 
-			var folder = (Folder) dataObject;
-			label = folder.Name;
-			icon = Context.GetIcon (Stock.ClosedFolder);
+			var folder = (Folder)dataObject;
+			nodeInfo.Label = folder.Name;
+			nodeInfo.Icon = Context.GetIcon(Stock.ClosedFolder);
 		}
 
 		public override void BuildChildNodes (ITreeBuilder treeBuilder, object dataObject)
