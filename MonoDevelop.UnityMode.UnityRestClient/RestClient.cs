@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MonoDevelop.UnityMode.RestServiceModel;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
 
@@ -9,18 +10,19 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 	{
 	}
 
-	public class LogEntry
+	public class CompilationMessage
 	{
-		public string LogString { get; set; }
-		public string StackTrace { get; set; }
+		public string Type { get; set; }
 		public string File { get; set; }
+		public string Message { get; set; }
 		public int Line { get; set; }
+		public int Column { get; set; }
 	}
 
 	public class CompilationResult
 	{
-		public CompilationResult() { Output = new List<LogEntry>(); }
-		public List<LogEntry> Output { get; set; }
+		public CompilationResult() { Messages = new List<CompilationMessage>(); }
+		public List<CompilationMessage> Messages { get; set; }
 	}
 
 	public class RenameAssetRequest
@@ -31,16 +33,16 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class RestClient2
 	{
-		static JsonServiceClient _client = new JsonServiceClient("http://localhost:1340/");
+		static JsonServiceClient _client = new JsonServiceClient("http://localhost:4040/");
 
-		public static void SendSolutionInformationRequest ()
+		public static UnityProjectState SendSolutionInformationRequest ()
 		{
-			_client.Get<IReturnVoid>("/sendsolutioninformation");
+			return _client.Get<UnityProjectState>("/unity/projectstate");
 		}
 
 		public static CompilationResult CompileScripts()
 		{
-			return _client.Get<CompilationResult>("/assetpipeline/compilescripts");
+			return _client.Post<CompilationResult>("unity/scripts", "{\"action\":\"recompile\"}");
 		}
 
 		public static void RenameAssetRequest(RenameAssetRequest r)

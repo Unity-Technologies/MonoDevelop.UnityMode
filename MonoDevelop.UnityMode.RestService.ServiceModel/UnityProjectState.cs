@@ -9,11 +9,11 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 	{
 		public UnityProjectState()
 		{
-			MonoIslands = new List<MonoIsland> ();
+			Islands = new List<MonoIsland> ();
 			AssetDatabase = new AssetDatabaseDTO ();
 		}
 
-		public List<MonoIsland> MonoIslands { get; set; }
+		public List<MonoIsland> Islands { get; set; }
 		public string BaseDirectory { get; set; }
 		public AssetDatabaseDTO AssetDatabase { get; set; }
 	}

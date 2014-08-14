@@ -118,30 +118,6 @@ namespace MonoDevelop.UnityMode
 		{
 			UnityModeAddin.Initialize ();
 
-			var state = new UnityProjectState ();
-			state.BaseDirectory = "/Users/lucas/test";
-			state.MonoIslands.Add (
-				new MonoIsland () { 
-					Files = new List<string>(){"test.cs"}, 
-					Language = "C#", 
-					Name = "BLA", 
-					BaseDirectory = state.BaseDirectory,
-					References = new List<string>() 
-					{ "/Users/lucas/unity/build/MacEditor/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll",
-						"/Users/lucas/unity/build/MacEditor/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll"
-					}
-				});
-
-			var assetDatabaseDTO = new AssetDatabaseDTO () { Files = new List<string> () {
-					"test.cs",
-					"sub1/test2.cs",
-					"sub1/lucas.cs",
-					"sub1/sub2/bla.cs"
-				} };
-
-			state.AssetDatabase = assetDatabaseDTO;
-			UnityModeAddin.UnityProjectState = state;
-
 			new RestService (unityProjectState => {
 				UnityModeAddin.UnityProjectState = unityProjectState;
 			}, fileOpenRequest => {
@@ -153,7 +129,7 @@ namespace MonoDevelop.UnityMode
 
 			DispatchService.BackgroundDispatch (() => {
 				LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "SendingInfoRequest");
-				RestClient2.SendSolutionInformationRequest ();
+				UnityModeAddin.UnityProjectState = RestClient2.SendSolutionInformationRequest();
 			});
 		}
 	}

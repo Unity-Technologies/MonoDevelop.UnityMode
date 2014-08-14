@@ -24,11 +24,11 @@ namespace MonoDevelop.UnityMode
 
 		protected override BuildResult OnBuild (MonoDevelop.Core.IProgressMonitor monitor, ConfigurationSelector configuration)
 		{
-			var rest_result = RestClient2.CompileScripts ();
+			var restResult = RestClient2.CompileScripts ();
 			var result = new BuildResult ();
 
-			foreach (var item in rest_result.Output)
-				result.AddError (item.File, item.Line, 0, "", item.LogString);
+			foreach (var message in restResult.Messages)
+				result.AddError(message.File, message.Line, message.Column, "", message.Message);
 			return result;
 		}
 	}

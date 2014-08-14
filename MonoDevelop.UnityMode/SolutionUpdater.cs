@@ -11,11 +11,11 @@ namespace MonoDevelop.UnityMode
 		{
 			var existingProjects = s.GetAllProjects ();
 
-			var toRemoves = existingProjects.Where (p => !update.MonoIslands.Any (p2 => p.Name == p2.Name)).ToArray ();
+			var toRemoves = existingProjects.Where (p => !update.Islands.Any (p2 => p.Name == p2.Name)).ToArray ();
 			foreach (var toRemove in toRemoves)
 				s.RootFolder.Items.Remove (toRemove);
 
-			foreach (var projectUpdate in update.MonoIslands)
+			foreach (var projectUpdate in update.Islands.Where(i => i.Language == "C#"))
 			{
 				var existing = existingProjects.OfType<DotNetAssemblyProject>().SingleOrDefault (p => p.Name == projectUpdate.Name);
 				if (existing == null)
