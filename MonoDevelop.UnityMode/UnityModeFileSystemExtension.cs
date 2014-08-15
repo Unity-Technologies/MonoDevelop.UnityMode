@@ -58,7 +58,7 @@ namespace MonoDevelop.UnityMode
 
 			var newPath = relativeParent + "/" + newName;
 
-			UnityRestClient.RestClient2.RenameAssetRequest (new MonoDevelop.UnityMode.UnityRestClient.RenameAssetRequest () {
+			UnityRestClient.RestClient.RenameAssetRequest (new MonoDevelop.UnityMode.UnityRestClient.RenameAssetRequest () {
 				OldPath = relativePath,
 				NewPath = System.IO.Path.GetFileNameWithoutExtension(newPath)
 			});

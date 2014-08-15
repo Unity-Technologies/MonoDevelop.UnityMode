@@ -29,6 +29,9 @@ namespace MonoDevelop.UnityMode
 
 			Workbench wb = IdeApp.Workbench;
 			WorkbenchWindow ww = wb.RootWindow;
+
+			ww.FocusInEvent += WorkbenchFocusInEvent;
+
 			//var dw = (DefaultWorkbench)ww;
 
 			/*
@@ -127,10 +130,21 @@ namespace MonoDevelop.UnityMode
 			}
 			);
 
-			DispatchService.BackgroundDispatch (() => {
-				LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "SendingInfoRequest");
-				UnityModeAddin.UnityProjectState = RestClient2.SendSolutionInformationRequest();
+			UpdateUnityProject();
+		}
+
+		static void UpdateUnityProject()
+		{
+			DispatchService.BackgroundDispatch(() =>
+			{
+				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "SendingInfoRequest");
+				UnityModeAddin.UnityProjectState = RestClient.GetUnityProjectState();
 			});
+		}
+
+		private void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
+		{
+			UpdateUnityProject();
 		}
 	}
 }

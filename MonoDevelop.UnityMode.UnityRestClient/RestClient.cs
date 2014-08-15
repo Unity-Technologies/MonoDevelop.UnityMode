@@ -36,11 +36,11 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public string NewPath { get; set; }
 	}
 
-	public class RestClient2
+	public class RestClient
 	{
 		static JsonServiceClient _client = new JsonServiceClient("http://localhost:4040/");
 
-		public static UnityProjectState SendSolutionInformationRequest ()
+		public static UnityProjectState GetUnityProjectState ()
 		{
 			return _client.Get<UnityProjectState>("/unity/projectstate");
 		}

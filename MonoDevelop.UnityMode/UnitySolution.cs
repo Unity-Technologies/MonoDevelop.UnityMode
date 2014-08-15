@@ -24,7 +24,7 @@ namespace MonoDevelop.UnityMode
 
 		protected override BuildResult OnBuild (MonoDevelop.Core.IProgressMonitor monitor, ConfigurationSelector configuration)
 		{
-			var restResult = RestClient2.CompileScripts ();
+			var restResult = RestClient.CompileScripts ();
 			var result = new BuildResult ();
 
 			foreach (var message in restResult.Messages)
