@@ -17,6 +17,7 @@ namespace MonoDevelop.UnityMode
 		protected override void Run ()
 		{
 			SetupStartupOptions ();
+			RestClient.SetServerUrl(StartupOptions.UnityRestServerUrl);
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
 
@@ -102,18 +103,22 @@ namespace MonoDevelop.UnityMode
 			var args = Environment.GetCommandLineArgs ();
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProcessId=", "unityProcessId", (int i) => StartupOptions.UnityProcessId = i);
+			p.Add ("unityProcessId=", "Unity Process Id", (int i) => StartupOptions.UnityProcessId = i);
+			p.Add("unityRestServerUrl=", "Unity REST Server URL", s => StartupOptions.UnityRestServerUrl = s);
 
 			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "ARGS: " + String.Join("!",args));
 
-			try {
+			try 
+			{
 				p.Parse (args);
-			} catch(Mono.Options.OptionException e)
+			} 
+			catch(Mono.Options.OptionException e)
 			{
 				LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "OptionException: " + e.ToString());
 			}
 
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "ProcessID: " + StartupOptions.UnityProcessId);
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Unity Process ID: " + StartupOptions.UnityProcessId);
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
 		}
 
 		//if (Environment.GetCommandLineArgs ().Contains ("--unityMode"))

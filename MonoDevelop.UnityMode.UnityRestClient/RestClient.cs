@@ -38,21 +38,26 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class RestClient
 	{
-		static JsonServiceClient _client = new JsonServiceClient("http://localhost:4040/");
+		private static JsonServiceClient client;
+
+		public static void SetServerUrl(string url)
+		{
+			client = new JsonServiceClient(url);
+		}
 
 		public static UnityProjectState GetUnityProjectState ()
 		{
-			return _client.Get<UnityProjectState>("/unity/projectstate");
+			return client.Get<UnityProjectState>("/unity/projectstate");
 		}
 
 		public static CompilationResult CompileScripts()
 		{
-			return _client.Post<CompilationResult>("unity/scripts", new ScriptRequest{Action = "recompile"});
+			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{Action = "recompile"});
 		}
 
 		public static void RenameAssetRequest(RenameAssetRequest r)
 		{
-			_client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
+			client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
 		}
 	}
 }
