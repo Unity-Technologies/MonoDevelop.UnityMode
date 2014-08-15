@@ -126,7 +126,7 @@ namespace MonoDevelop.UnityMode
 		{
 			UnityModeAddin.Initialize ();
 
-			new RestService (unityProjectState => {
+			var restService = new RestService (unityProjectState => {
 				UnityModeAddin.UnityProjectState = unityProjectState;
 			}, fileOpenRequest => {
 				var fileOpenInformation = new FileOpenInformation (fileOpenRequest.File, null, fileOpenRequest.Line, 0, OpenDocumentOptions.BringToFront);
@@ -135,6 +135,13 @@ namespace MonoDevelop.UnityMode
 			}
 			);
 
+			DispatchService.BackgroundDispatch(() =>
+			{
+				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Sending Unity Pair request");
+				var result = RestClient.Pair(restService.Url);
+				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Unity Pair Request: " + result.Result);
+			});
+
 			UpdateUnityProject();
 		}
 
@@ -142,7 +149,7 @@ namespace MonoDevelop.UnityMode
 		{
 			DispatchService.BackgroundDispatch(() =>
 			{
-				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "SendingInfoRequest");
+				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Sending Unity Project request");
 				UnityModeAddin.UnityProjectState = RestClient.GetUnityProjectState();
 			});
 		}

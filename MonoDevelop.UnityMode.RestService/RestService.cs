@@ -9,12 +9,15 @@ namespace MonoDevelop.UnityMode
 {
 	public class RestService
 	{
+		public string Url { get; set; }
+
 		public RestService (UnityProjectStateUpdateCallback callback, OpenFileCallback openFileCallback)
 		{
-			var listeningOn = "http://localhost:1342/";
 			var appHost = new AppHost (callback, openFileCallback);
 			appHost.Init ();
-			appHost.Start (listeningOn);
+
+			Url = "http://localhost:40000/";
+			appHost.Start (Url);
 		}
 
 		public delegate void UnityProjectStateUpdateCallback(UnityProjectState update);

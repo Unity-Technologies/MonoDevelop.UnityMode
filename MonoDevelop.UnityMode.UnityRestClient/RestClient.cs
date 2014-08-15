@@ -36,6 +36,16 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public string NewPath { get; set; }
 	}
 
+	public class PairRequest
+	{
+		public string url { get; set; }
+	}
+
+	public class PairResult
+	{
+		public string Result { get; set; } 
+	}
+
 	public class RestClient
 	{
 		private static JsonServiceClient client;
@@ -58,6 +68,11 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public static void RenameAssetRequest(RenameAssetRequest r)
 		{
 			client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
+		}
+
+		public static PairResult Pair(string url)
+		{
+			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url});
 		}
 	}
 }
