@@ -4,7 +4,6 @@ using ServiceStack.ServiceHost;
 
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
-	[Route("/unityprojectstate")]
 	public class UnityProjectState
 	{
 		public UnityProjectState()

@@ -14,6 +14,8 @@ namespace MonoDevelop.UnityMode
 {
 	public class StartupHandler : CommandHandler
 	{
+		private RestService restService;
+
 		protected override void Run ()
 		{
 			SetupStartupOptions ();
@@ -122,16 +124,23 @@ namespace MonoDevelop.UnityMode
 		}
 
 		//if (Environment.GetCommandLineArgs ().Contains ("--unityMode"))
-		static void InitializeUnitySolution()
+		void InitializeUnitySolution()
 		{
 			UnityModeAddin.Initialize ();
 
-			var restService = new RestService (unityProjectState => {
-				UnityModeAddin.UnityProjectState = unityProjectState;
-			}, fileOpenRequest => {
+			restService = new RestService ( fileOpenRequest => 
+			{
 				var fileOpenInformation = new FileOpenInformation (fileOpenRequest.File, null, fileOpenRequest.Line, 0, OpenDocumentOptions.BringToFront);
-				IdeApp.Workbench.OpenDocument (fileOpenInformation);
-				DispatchService.GuiDispatch (IdeApp.Workbench.GrabDesktopFocus);
+
+				try
+				{
+					IdeApp.Workbench.OpenDocument(fileOpenInformation);
+					DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
 			}
 			);
 

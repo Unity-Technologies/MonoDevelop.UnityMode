@@ -11,26 +11,27 @@ namespace MonoDevelop.UnityMode
 	{
 		public string Url { get; set; }
 
-		public RestService (UnityProjectStateUpdateCallback callback, OpenFileCallback openFileCallback)
+		public RestService (OpenFileCallback openFileCallback)
 		{
-			var appHost = new AppHost (callback, openFileCallback);
+			var appHost = new AppHost (openFileCallback);
 			appHost.Init ();
 
-			Url = "http://localhost:40000/";
-			appHost.Start (Url);
-		}
+			int port = 40000;
+			int timeout = 20;
 
-		public delegate void UnityProjectStateUpdateCallback(UnityProjectState update);
-
-		public class UnityProjectStateUpdateService : IService
-		{
-			public UnityProjectStateUpdateCallback Callback { get; set; }
-
-			public object Post(UnityProjectState update)
+			while (timeout-- > 0)
 			{
-				Callback (update);
-				return new HttpResult() { StatusCode = HttpStatusCode.OK };
-			}
+				try
+				{
+					Url = "http://localhost:" + port + "/";
+					appHost.Start(Url);
+					break;
+				}
+				catch (Exception exception)
+				{
+					port++;
+				}
+			}			
 		}
 
 		public delegate void OpenFileCallback(OpenFileRequest openFileRequest);
@@ -49,19 +50,17 @@ namespace MonoDevelop.UnityMode
 		//Define the Web Services AppHost
 		public class AppHost : AppHostHttpListenerBase
 		{
-			readonly UnityProjectStateUpdateCallback unityProjectStateUpdateCallback;
-			readonly OpenFileCallback _openFileCallback;
+			readonly OpenFileCallback openFileCallback;
 
-			public AppHost(UnityProjectStateUpdateCallback unityProjectStateUpdateCallback, OpenFileCallback openFileCallback)
-				: base("UnityMode Rest Service", typeof(UnityProjectStateUpdateService).Assembly) {
-				_openFileCallback = openFileCallback;
-				this.unityProjectStateUpdateCallback = unityProjectStateUpdateCallback;
+			public AppHost(OpenFileCallback openFileCallback)
+				: base("UnityMode Rest Service", typeof(RestService).Assembly)
+			{
+				this.openFileCallback = openFileCallback;
 			}
 
 			public override void Configure(Funq.Container container)
 			{
-				container.Register (_openFileCallback);
-				container.Register (unityProjectStateUpdateCallback);
+				container.Register (openFileCallback);
 			}
 		}
 	}
