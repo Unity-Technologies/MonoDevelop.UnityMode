@@ -21,7 +21,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class ScriptRequest
 	{
-		public string Action { get; set; }
+		public string action { get; set; }
 	}
 
 	public class CompilationResult
@@ -62,7 +62,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 		public static CompilationResult CompileScripts()
 		{
-			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{Action = "recompile"});
+			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{action = "recompile"});
 		}
 
 		public static void RenameAssetRequest(RenameAssetRequest r)
