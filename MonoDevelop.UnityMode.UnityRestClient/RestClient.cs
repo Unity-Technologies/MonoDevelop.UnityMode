@@ -39,6 +39,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 	public class PairRequest
 	{
 		public string url { get; set; }
+		public string name { get; set; }
 	}
 
 	public class PairResult
@@ -70,9 +71,9 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
 		}
 
-		public static PairResult Pair(string url)
+		public static PairResult Pair(string url, string name)
 		{
-			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url});
+			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name});
 		}
 	}
 }
