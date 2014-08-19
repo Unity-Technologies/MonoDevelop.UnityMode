@@ -28,7 +28,27 @@ namespace MonoDevelop.UnityMode
 			var result = new BuildResult ();
 
 			foreach (var message in restResult.Messages)
-				result.AddError(message.File, message.Line, message.Column, "", message.Message);
+			{
+				var msg = message.Message;
+				var errorNum = "";
+				var messageStrings = message.Message.Split(':');
+
+				if (messageStrings.Length == 3)
+				{
+					var errorNumStrings = messageStrings[1].Split(' ');
+
+					if (errorNumStrings.Length > 1)
+						errorNum = errorNumStrings[errorNumStrings.Length - 1];
+
+					msg = messageStrings[2];
+				}
+
+				if(message.Type == "warning")
+					result.AddWarning(message.File, message.Line, message.Column, errorNum, msg);
+				else
+					result.AddError(message.File, message.Line, message.Column, errorNum, msg);
+			}
+			
 			return result;
 		}
 	}
