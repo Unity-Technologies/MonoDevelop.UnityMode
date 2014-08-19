@@ -22,7 +22,7 @@
     
 
     <Extension path = "/MonoDevelop/Ide/Pads">
-	    <SolutionPad id = "AssetsFolderPad" _label = "Your Assets Folder" icon = "md-solution" class = "MonoDevelop.UnityMode.AssetsFolderPad" defaultLayout="*" defaultPlacement = "Left">
+	    <SolutionPad id = "AssetsFolderPad" _label = "Unity Assets Folder" icon = "md-solution" class = "MonoDevelop.UnityMode.AssetsFolderPad" defaultLayout="*" defaultPlacement = "Left">
 			<NodeBuilder id="File" class = "MonoDevelop.UnityMode.FileNodeBuilder"/>
 			<NodeBuilder id="Folder" class = "MonoDevelop.UnityMode.FolderNodeBuilder"/>
 		</SolutionPad>
