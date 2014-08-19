@@ -28,8 +28,10 @@ namespace MonoDevelop.UnityMode
 
 			foreach (var message in restResult.Messages)
 			{
+				var file = BaseDirectory + "/" + message.File;
 				var msg = message.Message;
 				var errorNum = "";
+				
 				var messageStrings = message.Message.Split(':');
 
 				if (messageStrings.Length == 3)
@@ -43,9 +45,9 @@ namespace MonoDevelop.UnityMode
 				}
 
 				if(message.Type == "warning")
-					result.AddWarning(message.File, message.Line, message.Column, errorNum, msg);
+					result.AddWarning(file, message.Line, message.Column, errorNum, msg);
 				else
-					result.AddError(message.File, message.Line, message.Column, errorNum, msg);
+					result.AddError(file, message.Line, message.Column, errorNum, msg);
 			}
 			
 			return result;
