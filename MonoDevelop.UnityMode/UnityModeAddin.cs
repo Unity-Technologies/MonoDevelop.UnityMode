@@ -13,25 +13,24 @@ namespace MonoDevelop.UnityMode
 
 		public static void Initialize()
 		{
-			UnityProjectStateChanged += (sender, e) => new SolutionUpdater ().Update (UnitySolution, e.State);
-		
-			UnitySolution = new UnitySolution ();
-			UnitySolution.Name = "UnitySolution";
-			IdeApp.Workspace.Items.Insert (0, UnitySolution);
+			UnitySolution = new UnitySolution { Name = "UnitySolution" };
+			IdeApp.Workspace.Items.Insert(0, UnitySolution);
+
+			UnityProjectStateChanged += (sender, e) => SolutionUpdater.Update(UnitySolution, e.State);
 		}
 
 		public static UnitySolution UnitySolution { get; private set; }
 
-		static UnityProjectState _unityProjectState;
+		static UnityProjectState unityProjectState;
 
 		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
 
 	
 		public static UnityProjectState UnityProjectState 
 		{
-			get { return _unityProjectState; }
+			get { return unityProjectState; }
 			set {
-				_unityProjectState = value;
+				unityProjectState = value;
 				if (UnityProjectStateChanged != null)
 					UnityProjectStateChanged (null, new UnityProjectStateChangedEventArgs() { State = value });
 			}

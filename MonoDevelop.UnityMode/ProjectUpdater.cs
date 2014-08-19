@@ -9,9 +9,8 @@ namespace MonoDevelop.UnityMode
 {
 	public class ProjectUpdater
 	{
-		public void Update (DotNetAssemblyProject project, MonoIsland update)
+		public static void Update (DotNetAssemblyProject project, MonoIsland update)
 		{
-
 			if (update.BaseDirectory != project.BaseDirectory)
 				project.BaseDirectory = update.BaseDirectory;
 			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "project.BaseDirectory are: " + project.BaseDirectory + " and "+update.BaseDirectory);
@@ -27,17 +26,17 @@ namespace MonoDevelop.UnityMode
 
 		static void ProcessReferences (DotNetAssemblyProject project, MonoIsland update)
 		{
-			var referencesToAdd = update.References.Where (r => !project.References.Any (r2 => r2.Reference == r)).ToArray ();
+			var referencesToAdd = update.References.Where (r => project.References.All(r2 => r2.Reference != r)).ToArray ();
 			foreach (var reference in referencesToAdd)
 				project.References.Add (ProjectReferenceFor (reference));
 
-			var referencesToRemove = project.References.Where (r => !update.References.Any (r2 => r.Reference == r2)).ToArray ();
+			var referencesToRemove = project.References.Where (r => update.References.All(r2 => r.Reference != r2)).ToArray ();
 			project.References.RemoveRange (referencesToRemove);
 		}
 
 		static ProjectReference ProjectReferenceFor (string reference)
 		{
-			return new ProjectReference (IsAssemblyReference(reference) ? ReferenceType.Assembly : ReferenceType.Project, reference);
+			return new ProjectReference (IsAssemblyReference(reference) ? ReferenceType.Assembly : ReferenceType.Project, reference, reference);
 		}
 
 		static bool IsAssemblyReference(string reference)

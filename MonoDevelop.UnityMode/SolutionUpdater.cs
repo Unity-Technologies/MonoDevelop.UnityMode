@@ -7,11 +7,11 @@ namespace MonoDevelop.UnityMode
 {
 	public class SolutionUpdater
 	{
-		public void Update (UnitySolution s, UnityProjectState update)
+		public static void Update (UnitySolution s, UnityProjectState update)
 		{
 			var existingProjects = s.GetAllProjects ();
 
-			var toRemoves = existingProjects.Where (p => !update.Islands.Any (p2 => p.Name == p2.Name)).ToArray ();
+			var toRemoves = existingProjects.Where (p => update.Islands.All(p2 => p.Name != p2.Name)).ToArray ();
 			foreach (var toRemove in toRemoves)
 				s.RootFolder.Items.Remove (toRemove);
 
@@ -21,13 +21,13 @@ namespace MonoDevelop.UnityMode
 				if (existing == null)
 					existing = CreateMonoDevelopProjectFromProjectUpdate (s, projectUpdate);
 
-				new ProjectUpdater ().Update (existing, projectUpdate);
+				ProjectUpdater.Update (existing, projectUpdate);
 			}
 
 			s.BaseDirectory = update.BaseDirectory;
 		}
 
-		DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate)
+		static DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate)
 		{
 			var p = new DotNetAssemblyProject (projectUpdate.Language);
 
