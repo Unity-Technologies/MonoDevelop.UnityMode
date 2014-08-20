@@ -32,8 +32,8 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class RenameAssetRequest
 	{
-		public string OldPath { get; set; }
-		public string NewPath { get; set; }
+		public string action { get; set; }
+		public string newpath { get; set; }
 	}
 
 	public class PairRequest
@@ -66,9 +66,9 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{action = "recompile"});
 		}
 
-		public static void RenameAssetRequest(RenameAssetRequest r)
+		public static void RenameAssetRequest(string oldpath, string newpath)
 		{
-			client.Post<IReturnVoid> ("/assetpipeline/renameasset", r);
+			client.Post<IReturnVoid>("unity/assets/" + oldpath, new RenameAssetRequest { action = "move", newpath = newpath });
 		}
 
 		public static PairResult Pair(string url, string name)

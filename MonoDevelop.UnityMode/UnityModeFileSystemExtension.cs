@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Linq;
 using MonoDevelop.Core.FileSystem;
 using MonoDevelop.Core;
 using System.IO;
@@ -47,26 +48,35 @@ namespace MonoDevelop.UnityMode
 
 		public override void RenameFile (FilePath file, string newName)
 		{
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UNITY RENAMING WOOHOO. " + file.FullPath + " newname: " + newName);
-			//System.IO.File.Move (file, Path.Combine (file.ParentDirectory, newName));
+			var oldPath = MakeRelative(file.FullPath);
+			var relativeParent = MakeRelative (file.ParentDirectory);
 
-			var relativePath = MakeRelative (file.FullPath);
-			var relativeParent = MakeRelative (file.ParentDirectory) + "/";
+			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
 
-			if (relativeParent == "./")
-				relativeParent = "";
+			try
+			{
+				UnityRestClient.RestClient.RenameAssetRequest(oldPath.Substring("Assets/".Length), newPath.Substring("Assets/".Length));
 
-			var newPath = relativeParent + "/" + newName;
+				var state = UnityModeAddin.UnityProjectState;
+				var island = state.Islands.Single(i => i.Files.Any(f => f == oldPath));
 
-			UnityRestClient.RestClient.RenameAssetRequest (new MonoDevelop.UnityMode.UnityRestClient.RenameAssetRequest () {
-				OldPath = relativePath,
-				NewPath = System.IO.Path.GetFileNameWithoutExtension(newPath)
-			});
+				state.AssetDatabase.Files.Remove(oldPath);
+				state.AssetDatabase.Files.Add(newPath);
+
+				island.Files.Remove(oldPath);
+				island.Files.Add(newPath);
+
+				UnityModeAddin.UnityProjectState = state;
+			}
+			catch (Exception)
+			{
+				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Unity Rename failed: " + oldPath + " -> " + newPath);
+			}
 		}
 
 		static string MakeRelative(FilePath abs)
 		{
-			return abs.ToRelative (UnityModeAddin.UnityProjectState.BaseDirectory);
+			return abs.ToRelative (UnityModeAddin.UnityProjectState.BaseDirectory).ToString().Replace('\\', '/');
 		}
 
 		public override void MoveFile (FilePath source, FilePath dest)
