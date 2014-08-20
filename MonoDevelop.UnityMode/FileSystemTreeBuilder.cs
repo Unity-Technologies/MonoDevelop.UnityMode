@@ -56,6 +56,9 @@ namespace MonoDevelop.UnityMode
 
 			foreach (var f in _assetDatabaseDTO.Files)
 				RegisterAllFoldersIn (f);
+
+			foreach (var f in _assetDatabaseDTO.EmptyDirectories)
+				RegisterFolder(f);
 		}
 
 		void RegisterAllFoldersIn (string f)

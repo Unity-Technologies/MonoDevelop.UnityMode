@@ -37,12 +37,12 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 	public class AssetDatabaseDTO
 	{
 		public List<string> Files { get; set; }
-		public List<string> EmptyFolders { get; set; }
+		public List<string> EmptyDirectories { get; set; }
 
 		public AssetDatabaseDTO()
 		{
 			Files = new List<string> ();
-			EmptyFolders = new List<string> ();
+			EmptyDirectories = new List<string>();
 		}
 	}
 }
