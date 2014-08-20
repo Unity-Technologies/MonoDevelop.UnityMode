@@ -35,6 +35,7 @@ namespace MonoDevelop.UnityMode
 			{
 				case "C#":
 					var dotNetProjectConfig = (DotNetProjectConfiguration)p.AddNewConfiguration ("Debug");
+					dotNetProjectConfig.CompilationParameters = new CSharpCompilerParameters();
 					p.DefaultConfiguration = dotNetProjectConfig;
 					break;
 			}

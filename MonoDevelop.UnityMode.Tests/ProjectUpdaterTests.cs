@@ -1,3 +1,4 @@
+using System.IO;
 using NUnit.Framework;
 using System;
 using MonoDevelop.UnityMode;
@@ -13,7 +14,6 @@ namespace MonoDevelop.UnityMode.Tests
 	public class ProjectUpdaterTests : UnitTests.TestBase
 	{
 		DotNetAssemblyProject _project;
-		ProjectUpdater _projectUpdater;
 		MonoIsland _update;
 
 		[SetUp]
@@ -24,7 +24,6 @@ namespace MonoDevelop.UnityMode.Tests
 			var config = new DotNetProjectConfiguration () { CompilationParameters = p };
 			_project.DefaultConfiguration = config;
 
-			_projectUpdater = new ProjectUpdater ();
 			_update = new MonoIsland ();
 			_update.BaseDirectory = "/mybase";
 		}
@@ -90,7 +89,7 @@ namespace MonoDevelop.UnityMode.Tests
 
 		void AssertProjectFilesEquals (string[] expected)
 		{
-			CollectionAssert.AreEqual (expected, _project.Files.Select (p => p.FilePath.ToString ()).ToArray ());
+			CollectionAssert.AreEqual (expected.Select(Path.GetFullPath).ToArray(), _project.Files.Select (p => p.FilePath.ToString ()).ToArray ());
 		}
 
 		ConfigurationParameters CompilationParameters {
@@ -102,7 +101,7 @@ namespace MonoDevelop.UnityMode.Tests
 
 		void DoUpdate ()
 		{
-			_projectUpdater.Update (_project, _update);
+			ProjectUpdater.Update (_project, _update);
 		}
 	}
 }

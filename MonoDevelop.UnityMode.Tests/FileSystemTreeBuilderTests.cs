@@ -25,7 +25,7 @@ namespace MonoDevelop.UnityMode.Tests
 		{
 			AddFile("myfile.cs"); 
 			Create ();
-			Assert.AreEqual ("myfile.cs", _result.GetFiles ().Single ().PathString ());
+			Is ("myfile.cs", _result.GetFiles ().Single ());
 		}
 
 		[Test]
@@ -50,7 +50,6 @@ namespace MonoDevelop.UnityMode.Tests
 			Create ();
 
 			var folder = _result.GetFolders ().Single();
-			Assert.AreEqual ("sub", folder.PathString ());
 			Is ("sub", folder);
 
 			var files = folder.GetFiles ().ToArray();
@@ -76,7 +75,7 @@ namespace MonoDevelop.UnityMode.Tests
 
 		static void Is (string expect, FileSystemEntry entry)
 		{
-			Assert.AreEqual (expect, entry.PathString ());
+			Assert.AreEqual (expect, entry.RelativePath);
 		}
 
 		void AddFile(string file)
