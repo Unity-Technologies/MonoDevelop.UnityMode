@@ -55,7 +55,7 @@ namespace MonoDevelop.UnityMode
 
 			try
 			{
-				UnityRestClient.RestClient.RenameAssetRequest(oldPath.Substring("Assets/".Length), newPath.Substring("Assets/".Length));
+				UnityRestClient.RestClient.RenameAssetRequest(oldPath, newPath);
 
 				var state = UnityModeAddin.UnityProjectState;
 				var island = state.Islands.Single(i => i.Files.Any(f => f == oldPath));

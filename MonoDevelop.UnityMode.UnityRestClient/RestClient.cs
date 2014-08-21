@@ -68,7 +68,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 		public static void RenameAssetRequest(string oldpath, string newpath)
 		{
-			client.Post<IReturnVoid>("unity/assets/" + oldpath, new RenameAssetRequest { action = "move", newpath = newpath });
+			client.Post<IReturnVoid>("unity/" + oldpath.ToLower(), new RenameAssetRequest { action = "move", newpath = newpath });
 		}
 
 		public static PairResult Pair(string url, string name)
