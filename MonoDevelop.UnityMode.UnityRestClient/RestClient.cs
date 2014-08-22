@@ -44,7 +44,8 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class PairResult
 	{
-		public string Result { get; set; } 
+		public string Result { get; set; }
+		public int unitypid { get; set; }
 	}
 
 	public class RestClient
