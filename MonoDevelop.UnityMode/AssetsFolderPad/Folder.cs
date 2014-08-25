@@ -70,7 +70,8 @@ namespace MonoDevelop.UnityMode
 
 			var folder = (Folder)dataObject;
 			nodeInfo.Label = folder.Name;
-			nodeInfo.Icon = Context.GetIcon(Stock.ClosedFolder);
+			nodeInfo.Icon = Context.GetIcon(Stock.OpenFolder);
+			nodeInfo.ClosedIcon = Context.GetIcon(Stock.ClosedFolder);
 		}
 
 		public override void BuildChildNodes (ITreeBuilder treeBuilder, object dataObject)
@@ -87,12 +88,16 @@ namespace MonoDevelop.UnityMode
 
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
-			return true;
+			var folder = (Folder)dataObject;
+			return folder.Children.Count > 0;
 		}
 
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)
 		{
-			attributes |= NodeAttributes.AllowRename;
+			var folder = (Folder)dataObject;
+
+			if(folder.RelativePath != "Assets")
+				attributes |= NodeAttributes.AllowRename;
 		}
 	}
 
