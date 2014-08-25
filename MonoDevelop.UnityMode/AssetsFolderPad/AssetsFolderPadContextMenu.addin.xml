@@ -1,0 +1,23 @@
+﻿<ExtensionModel>
+
+	<ExtensionPoint path = "/UnityMode/ContextMenu/AssetsFolderPad" name = "Project pad context menu">
+		<Description>Context menu for nodes in the Unity Assets folder pad.</Description>
+		<ExtensionNodeSet id="MonoDevelop.Components.Commands.ItemSet"/>
+		<ConditionType id="ItemType" type="MonoDevelop.Projects.Extensions.ItemTypeCondition">
+			<Description>Type of the item.</Description>
+		</ConditionType>
+	</ExtensionPoint>
+
+	<Extension path = "/UnityMode/ContextMenu/AssetsFolderPad">
+		<!-- Edit section -->
+		<SeparatorItem id = "EditSectionStart" />
+		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Copy" disabledVisible="False" />
+		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Cut" disabledVisible="False" />
+		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Paste" disabledVisible="False" />
+		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Delete" disabledVisible="False" />
+		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Rename" disabledVisible="False" />
+		<SeparatorItem id = "EditSectionEnd" />
+
+	</Extension>
+
+</ExtensionModel>

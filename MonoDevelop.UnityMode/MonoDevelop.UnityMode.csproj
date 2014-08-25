@@ -93,7 +93,9 @@
     <Compile Include="UnityModeFileSystemExtension.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="AssetsFolderPad\AssetsFolderPadContextMenu.addin.xml" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Mono.Options.cs" />
   </ItemGroup>

@@ -23,6 +23,11 @@ namespace MonoDevelop.UnityMode
 
 	class FileNodeBuilder: TypeNodeBuilder
 	{
+		public override string ContextMenuAddinPath
+		{
+			get { return "/UnityMode/ContextMenu/AssetsFolderPad"; }
+		}
+
 		public override Type NodeDataType {
 			get { return typeof(File); }
 		}
@@ -69,6 +74,16 @@ namespace MonoDevelop.UnityMode
 		{
 			var file = (File) CurrentNode.DataItem;
 			IdeApp.Workbench.OpenDocument (new FileOpenInformation (UnityModeAddin.UnityProjectState.BaseDirectory+"/"+file.RelativePath, null));
+		}
+
+		public override bool CanDeleteItem()
+		{
+			return true;
+		}
+
+		public override DragOperation CanDragNode()
+		{
+			return DragOperation.Copy | DragOperation.Move;
 		}
 	}
 }

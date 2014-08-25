@@ -50,6 +50,11 @@ namespace MonoDevelop.UnityMode
 
 	class FolderNodeBuilder: TypeNodeBuilder
 	{
+		public override string ContextMenuAddinPath
+		{
+			get { return "/UnityMode/ContextMenu/AssetsFolderPad"; }
+		}
+
 		public override Type NodeDataType {
 			get { return typeof(Folder); }
 		}
@@ -118,6 +123,27 @@ namespace MonoDevelop.UnityMode
 
 			//file.Path = new FilePath (file.Path.FileName + "Q");
 		}
+
+		private bool IsAssetsFolder()
+		{
+			var folder = CurrentNode.DataItem as Folder;
+
+			if (folder == null)
+				return false;
+
+			return folder.RelativePath == "Assets";
+		}
+
+		public override bool CanDeleteItem()
+		{
+			return !IsAssetsFolder();
+		}
+
+		public override DragOperation CanDragNode()
+		{
+			return IsAssetsFolder() ? DragOperation.None : DragOperation.Copy | DragOperation.Move;
+		}
+
 
 	}
 }
