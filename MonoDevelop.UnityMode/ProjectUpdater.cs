@@ -13,7 +13,6 @@ namespace MonoDevelop.UnityMode
 		{
 			if (update.BaseDirectory != project.BaseDirectory)
 				project.BaseDirectory = update.BaseDirectory;
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "project.BaseDirectory are: " + project.BaseDirectory + " and "+update.BaseDirectory);
 
 			ProcessFiles (project, update);
 			ProcessDefines (project, update);
