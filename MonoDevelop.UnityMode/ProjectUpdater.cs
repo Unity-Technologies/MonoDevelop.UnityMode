@@ -62,10 +62,6 @@ namespace MonoDevelop.UnityMode
 			var toAdd = updateFiles.Where (f => !project.Files.Any (f2 => f2.FilePath.ToString () == f)).ToArray ();
 			project.Files.RemoveRange (toRemove);
 			project.AddFiles (toAdd.Select (f => new FilePath (f)));
-
-			//			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "toAdd are: " + toAdd [0]);
-			//LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "toAdd are: " + new FilePath(toAdd.First()));
-			//LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Files are: " + project.Files.First ().FilePath.ToString ());
 		}
 
 	}

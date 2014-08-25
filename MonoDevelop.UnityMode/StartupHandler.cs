@@ -116,11 +116,11 @@ namespace MonoDevelop.UnityMode
 			} 
 			catch(Mono.Options.OptionException e)
 			{
-				LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "OptionException: " + e.ToString());
+				LoggingService.LogInfo("OptionException: " + e.ToString());
 			}
 
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Unity Process ID: " + StartupOptions.UnityProcessId);
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
+			LoggingService.LogInfo("Unity Process ID: " + StartupOptions.UnityProcessId);
+			LoggingService.LogInfo("Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
 		}
 
 		//if (Environment.GetCommandLineArgs ().Contains ("--unityMode"))
@@ -158,9 +158,9 @@ namespace MonoDevelop.UnityMode
 
 			DispatchService.BackgroundDispatch(() =>
 			{
-				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Sending Unity Pair request");
+				LoggingService.LogInfo("Sending Unity Pair request");
 				var result = RestClient.Pair(restService.Url, "MonoDevelop " + MonoDevelop.BuildInfo.VersionLabel);
-				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Unity Pair Request: " + result.Result);
+				LoggingService.LogInfo("Unity Pair Request: " + result.Result);
 				StartupOptions.UnityProcessId = result.unitypid;
 			});
 
@@ -171,7 +171,7 @@ namespace MonoDevelop.UnityMode
 		{
 			DispatchService.BackgroundDispatch(() =>
 			{
-				LoggingService.Log(MonoDevelop.Core.Logging.LogLevel.Info, "Sending Unity Project request");
+				LoggingService.LogInfo("Sending Unity Project request");
 				UnityModeAddin.UnityProjectState = RestClient.GetUnityProjectState();
 			});
 		}
