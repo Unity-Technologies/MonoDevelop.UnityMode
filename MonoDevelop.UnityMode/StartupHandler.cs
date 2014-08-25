@@ -134,8 +134,20 @@ namespace MonoDevelop.UnityMode
 
 				try
 				{
-					IdeApp.Workbench.OpenDocument(fileOpenInformation);
-					DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
+					DispatchService.GuiDispatch(() =>
+					{
+						if (IdeApp.Workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
+						{
+							var docs = IdeApp.Workbench.Documents.Where(d => d.FileName == fileOpenInformation.FileName);
+							docs.ElementAt(0).Select();
+						}
+						else
+						{
+							IdeApp.Workbench.OpenDocument(fileOpenInformation);
+							DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
+							
+						}
+					});
 				}
 				catch (Exception e)
 				{
