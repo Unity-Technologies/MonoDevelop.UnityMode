@@ -27,7 +27,7 @@ namespace MonoDevelop.UnityMode
 
 			//((DefaultWorkbench)IdeApp.Workbench.RootWindow).RecreateMenu ();
 
-			InitializeUnitySolution ();
+			InitializeRestServiceAndPair ();
 			IdeApp.Workbench.ShowCommandBar ("UnityDebugging");
 
 			Workbench wb = IdeApp.Workbench;
@@ -123,8 +123,7 @@ namespace MonoDevelop.UnityMode
 			LoggingService.LogInfo("Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
 		}
 
-		//if (Environment.GetCommandLineArgs ().Contains ("--unityMode"))
-		void InitializeUnitySolution()
+		void InitializeRestServiceAndPair()
 		{
 			UnityModeAddin.Initialize ();
 
@@ -151,7 +150,7 @@ namespace MonoDevelop.UnityMode
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e);
+					LoggingService.LogError(e.ToString());
 				}
 			}
 			);
@@ -164,21 +163,12 @@ namespace MonoDevelop.UnityMode
 				StartupOptions.UnityProcessId = result.unitypid;
 			});
 
-			UpdateUnityProject();
-		}
-
-		static void UpdateUnityProject()
-		{
-			DispatchService.BackgroundDispatch(() =>
-			{
-				LoggingService.LogInfo("Sending Unity Project request");
-				UnityModeAddin.UnityProjectState = RestClient.GetUnityProjectState();
-			});
+			UnityModeAddin.UpdateUnityProjectState();
 		}
 
 		private void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
 		{
-			UpdateUnityProject();
+			UnityModeAddin.UpdateUnityProjectState();
 		}
 	}
 }

@@ -1,11 +1,16 @@
 using System;
+using MonoDevelop.Core;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.Ide;
+using MonoDevelop.UnityMode.UnityRestClient;
 
 namespace MonoDevelop.UnityMode
 {
 	public static class UnityModeAddin
 	{
+		static UnityProjectState unityProjectState;
+		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
+
 		static UnityModeAddin()
 		{
 			UnityProjectState = new UnityProjectState ();
@@ -21,18 +26,27 @@ namespace MonoDevelop.UnityMode
 
 		public static UnitySolution UnitySolution { get; private set; }
 
-		static UnityProjectState unityProjectState;
+		public static void NotifyUnityProjectStateChanged()
+		{
+			if (UnityProjectStateChanged != null)
+				UnityProjectStateChanged(null, new UnityProjectStateChangedEventArgs() { State = unityProjectState });
+		}
 
-		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
+		public static void UpdateUnityProjectState()
+		{
+			DispatchService.BackgroundDispatch(() =>
+			{
+				LoggingService.LogInfo("Sending Unity Project request");
+				UnityModeAddin.UnityProjectState = RestClient.GetUnityProjectState();
+			});
+		}
 
-	
 		public static UnityProjectState UnityProjectState 
 		{
 			get { return unityProjectState; }
 			set {
 				unityProjectState = value;
-				if (UnityProjectStateChanged != null)
-					UnityProjectStateChanged (null, new UnityProjectStateChangedEventArgs() { State = value });
+				NotifyUnityProjectStateChanged();
 			}
 		 }
 	}

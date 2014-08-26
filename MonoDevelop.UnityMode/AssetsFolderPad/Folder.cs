@@ -108,6 +108,14 @@ namespace MonoDevelop.UnityMode
 
 	class FolderNodeCommandHandler: NodeCommandHandler
 	{
+		public override void RenameItem(string newName)
+		{
+			base.RenameItem(newName);
+			var folder = (Folder)CurrentNode.DataItem;
+
+			FileService.RenameDirectory(new FilePath(UnityModeAddin.UnityProjectState.BaseDirectory + "/" + folder.RelativePath), newName);
+		}
+
 		public override bool CanDropNode (object dataObject, DragOperation operation)
 		{
 			if (dataObject is File)
