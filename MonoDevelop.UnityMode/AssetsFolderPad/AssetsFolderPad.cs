@@ -48,11 +48,15 @@ namespace MonoDevelop.UnityMode
 
 		public void Refresh(UnityProjectState state)
 		{
-			TreeView.Clear ();
+			DispatchService.GuiDispatch(() =>
+			{
+				TreeView.Clear();
 
-			_rootFolder = new FileSystemTreeBuilder (state.AssetDatabase).Create ();
-			foreach(var child in _rootFolder.Children)
-				TreeView.AddChild (child);
+				_rootFolder = new FileSystemTreeBuilder(state.AssetDatabase).Create();
+				foreach (var child in _rootFolder.Children)
+					TreeView.AddChild(child);
+				
+			});
 		}
 
 
