@@ -19,9 +19,15 @@ namespace MonoDevelop.UnityMode
 		public static void Initialize()
 		{
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
-			IdeApp.Workspace.Items.Insert(0, UnitySolution);
 
-			UnityProjectStateChanged += (sender, e) => SolutionUpdater.Update(UnitySolution, e.State);
+
+			UnityProjectStateChanged += (sender, e) =>
+			{
+				SolutionUpdater.Update(UnitySolution, e.State);
+
+				if(!IdeApp.Workspace.Items.Contains(UnitySolution))
+					IdeApp.Workspace.Items.Insert(0, UnitySolution);
+			};
 		}
 
 		public static UnitySolution UnitySolution { get; private set; }
