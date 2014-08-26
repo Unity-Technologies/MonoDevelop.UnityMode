@@ -1,7 +1,6 @@
 using System;
 using MonoDevelop.Ide.Gui.Components;
 using MonoDevelop.Core;
-using Gdk;
 using MonoDevelop.Ide.Gui;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,9 +136,7 @@ namespace MonoDevelop.UnityMode
 
 			var folder = (Folder)CurrentNode.DataItem;
 
-//			FileService.MoveFile();
-
-			//file.Path = new FilePath (file.Path.FileName + "Q");
+			FileService.MoveFile(new FilePath(file.AbsolutePath), new FilePath(folder.AbsolutePath + "/" + file.Name));
 		}
 
 		public override bool CanDeleteItem()
