@@ -56,8 +56,6 @@ namespace MonoDevelop.UnityMode
 		{
 			attributes |= NodeAttributes.AllowRename;
 		}
-
-
 	}
 
 	class FileNodeCommandHandler: NodeCommandHandler
@@ -67,13 +65,13 @@ namespace MonoDevelop.UnityMode
 			base.RenameItem (newName);
 			var file = (File) CurrentNode.DataItem;
 
-			FileService.RenameFile (new FilePath(UnityModeAddin.UnityProjectState.BaseDirectory+"/"+file.RelativePath), newName);
+			FileService.RenameFile (new FilePath(file.AbsolutePath), newName);
 		}
 
 		public override void ActivateItem ()
 		{
 			var file = (File) CurrentNode.DataItem;
-			IdeApp.Workbench.OpenDocument (new FileOpenInformation (UnityModeAddin.UnityProjectState.BaseDirectory+"/"+file.RelativePath, null));
+			IdeApp.Workbench.OpenDocument (new FileOpenInformation (file.AbsolutePath, null));
 		}
 
 		public override bool CanDeleteItem()

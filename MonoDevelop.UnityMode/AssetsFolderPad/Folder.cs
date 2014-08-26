@@ -12,6 +12,7 @@ namespace MonoDevelop.UnityMode
 
 		public string RelativePath { get; set; }
 		public string Name { get { return System.IO.Path.GetFileName (RelativePath); } }
+		public string AbsolutePath { get { return UnityModeAddin.UnityProjectState.BaseDirectory + "/" + RelativePath; } }
 	}
 
 	public class Folder : FileSystemEntry
@@ -45,6 +46,11 @@ namespace MonoDevelop.UnityMode
 
 		public bool IsRoot {
 			get { return RelativePath.Length == 0; }
+		}
+
+		public bool IsAssetsFolder()
+		{
+			return RelativePath == "Assets";
 		}
 	}
 
@@ -101,7 +107,7 @@ namespace MonoDevelop.UnityMode
 		{
 			var folder = (Folder)dataObject;
 
-			if(folder.RelativePath != "Assets")
+			if(!folder.IsAssetsFolder())
 				attributes |= NodeAttributes.AllowRename;
 		}
 	}
@@ -113,7 +119,7 @@ namespace MonoDevelop.UnityMode
 			base.RenameItem(newName);
 			var folder = (Folder)CurrentNode.DataItem;
 
-			FileService.RenameDirectory(new FilePath(UnityModeAddin.UnityProjectState.BaseDirectory + "/" + folder.RelativePath), newName);
+			FileService.RenameDirectory(new FilePath(folder.AbsolutePath), newName);
 		}
 
 		public override bool CanDropNode (object dataObject, DragOperation operation)
@@ -129,17 +135,11 @@ namespace MonoDevelop.UnityMode
 			if (file == null)
 				return;
 
+			var folder = (Folder)CurrentNode.DataItem;
+
+//			FileService.MoveFile();
+
 			//file.Path = new FilePath (file.Path.FileName + "Q");
-		}
-
-		private bool IsAssetsFolder()
-		{
-			var folder = CurrentNode.DataItem as Folder;
-
-			if (folder == null)
-				return false;
-
-			return folder.RelativePath == "Assets";
 		}
 
 		public override bool CanDeleteItem()
@@ -150,6 +150,16 @@ namespace MonoDevelop.UnityMode
 		public override DragOperation CanDragNode()
 		{
 			return IsAssetsFolder() ? DragOperation.None : DragOperation.Copy | DragOperation.Move;
+		}
+
+		private bool IsAssetsFolder()
+		{
+			var folder = CurrentNode.DataItem as Folder;
+
+			if (folder == null)
+				return false;
+
+			return folder.IsAssetsFolder();
 		}
 
 
