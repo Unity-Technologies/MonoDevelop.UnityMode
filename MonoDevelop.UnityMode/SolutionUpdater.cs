@@ -15,7 +15,7 @@ namespace MonoDevelop.UnityMode
 			foreach (var toRemove in toRemoves)
 				s.RootFolder.Items.Remove (toRemove);
 
-			foreach (var projectUpdate in update.Islands.Where(i => i.Language == "C#"))
+			foreach (var projectUpdate in update.Islands.Where(i => i.Files.Count > 0))
 			{
 				var existing = existingProjects.OfType<DotNetAssemblyProject>().SingleOrDefault (p => p.Name == projectUpdate.Name);
 				if (existing == null)
@@ -31,9 +31,10 @@ namespace MonoDevelop.UnityMode
 		{
 			var p = new DotNetAssemblyProject (projectUpdate.Language);
 
+			// FIXME
 			switch (projectUpdate.Language)
 			{
-				case "C#":
+				default: 
 					var dotNetProjectConfig = (DotNetProjectConfiguration)p.AddNewConfiguration ("Debug");
 					dotNetProjectConfig.CompilationParameters = new CSharpCompilerParameters();
 					p.DefaultConfiguration = dotNetProjectConfig;
