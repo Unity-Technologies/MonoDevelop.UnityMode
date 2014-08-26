@@ -1,10 +1,10 @@
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
-using MonoDevelop.Projects;
-using MonoDevelop.UnityMode.RestServiceModel;
-using System.Diagnostics;
+using MonoDevelop.Ide.Codons;
 using MonoDevelop.Ide.Gui;
+using MonoDevelop.Ide.Gui.Pads;
+using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.UnityRestClient;
 using System.Linq;
 using System;
@@ -18,7 +18,23 @@ namespace MonoDevelop.UnityMode
 
 		protected override void Run ()
 		{
+			Workbench workbench = IdeApp.Workbench;
+			WorkbenchWindow workbenchWindow = workbench.RootWindow;
+
+			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
+
+			if (assetsFolderPad != null && !assetsFolderPad.Visible)
+				assetsFolderPad.Visible = true;
+
+			var solutionPad = workbench.Pads.SolutionPad;
+
+			if (solutionPad != null && solutionPad.Visible)
+				solutionPad.Visible = false;
+
+			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
+
 			SetupStartupOptions ();
+
 			RestClient.SetServerUrl(StartupOptions.UnityRestServerUrl);
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
@@ -30,10 +46,6 @@ namespace MonoDevelop.UnityMode
 			InitializeRestServiceAndPair ();
 			IdeApp.Workbench.ShowCommandBar ("UnityDebugging");
 
-			Workbench wb = IdeApp.Workbench;
-			WorkbenchWindow ww = wb.RootWindow;
-
-			ww.FocusInEvent += WorkbenchFocusInEvent;
 
 			//var dw = (DefaultWorkbench)ww;
 
