@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.Core;
@@ -56,12 +57,16 @@ namespace MonoDevelop.UnityMode
 
 		static void ProcessFiles (DotNetAssemblyProject project, MonoIsland update)
 		{
-			var updateFiles = update.Files.Select (f => project.BaseDirectory + "/" + f);
+			var updateFiles = update.Files.Select (f => Path.GetFullPath(project.BaseDirectory + "/" + f)).ToArray();
 
-			var toRemove = project.Files.Where (f => !updateFiles.Any (f2 => f.FilePath.ToString() == f2)).ToArray ();
-			var toAdd = updateFiles.Where (f => !project.Files.Any (f2 => f2.FilePath.ToString () == f)).ToArray ();
-			project.Files.RemoveRange (toRemove);
-			project.AddFiles (toAdd.Select (f => new FilePath (f)));
+			var toRemove = project.Files.Where (f => updateFiles.All(f2 => f.FilePath.FullPath != f2)).ToArray ();
+			var toAdd = updateFiles.Where(f => project.Files.All(f2 => f2.FilePath.FullPath != f)).ToArray();
+
+			if(toRemove.Length > 0)
+				project.Files.RemoveRange (toRemove);
+
+			if(toAdd.Length > 0)
+				project.AddFiles (toAdd.Select (f => new FilePath (f)));
 		}
 
 	}
