@@ -1,14 +1,18 @@
 ﻿<ExtensionModel>
 
-	<ExtensionPoint path = "/UnityMode/ContextMenu/AssetsFolderPad" name = "Project pad context menu">
+	<ExtensionPoint path = "/UnityMode/ContextMenu/AssetsFolderPad" name = "Assets folder pad context menu">
 		<Description>Context menu for nodes in the Unity Assets folder pad.</Description>
 		<ExtensionNodeSet id="MonoDevelop.Components.Commands.ItemSet"/>
-		<ConditionType id="ItemType" type="MonoDevelop.Projects.Extensions.ItemTypeCondition">
-			<Description>Type of the item.</Description>
-		</ConditionType>
 	</ExtensionPoint>
 
 	<Extension path = "/UnityMode/ContextMenu/AssetsFolderPad">
+			<!-- Add section -->
+		<SeparatorItem id = "AddSectionStart" />
+			<ItemSet id = "Add" _label = "_Add" autohide="True">
+				<CommandItem id = "MonoDevelop.UnityMode.ProjectCommands.NewFolder"/>
+			</ItemSet>
+		<SeparatorItem id = "AddSectionEnd" />
+
 		<!-- Edit section -->
 		<SeparatorItem id = "EditSectionStart" />
 		<CommandItem id = "MonoDevelop.Ide.Commands.EditCommands.Copy" disabledVisible="False" />

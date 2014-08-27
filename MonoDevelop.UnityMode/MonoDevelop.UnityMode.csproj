@@ -77,6 +77,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssetsFolderPad\ProjectCommands.cs" />
+    <Compile Include="AssetsFolderPad\FileSystemEntryCondition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitySolution.cs" />
     <Compile Include="StartupHandler.cs" />

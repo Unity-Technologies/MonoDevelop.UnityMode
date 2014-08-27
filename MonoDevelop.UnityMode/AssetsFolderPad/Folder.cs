@@ -1,9 +1,12 @@
 using System;
+using System.IO;
+using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide.Gui.Components;
 using MonoDevelop.Core;
 using MonoDevelop.Ide.Gui;
 using System.Collections.Generic;
 using System.Linq;
+using MonoDevelop.Ide.Gui.Pads;
 
 namespace MonoDevelop.UnityMode
 {
@@ -182,6 +185,28 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		[CommandHandler(ProjectCommands.NewFolder)]
+		public void AddNewFolder()
+		{
+			var folder = CurrentNode.GetParentDataItem(typeof(Folder), true) as Folder;
+			string directoryName = folder.AbsolutePath + "/" +  GettextCatalog.GetString("New Folder");
+			int index = -1;
+
+			if (Directory.Exists(directoryName))
+			{
+				while (Directory.Exists(directoryName + (++index + 1))) ;
+			}
+
+			if (index >= 0)
+			{
+				directoryName += index + 1;
+			}
+
+			Directory.CreateDirectory(directoryName);
+
+			UnityModeAddin.UpdateUnityProjectState();
+		}
+
 		private bool IsAssetsFolder()
 		{
 			var folder = CurrentNode.DataItem as Folder;
@@ -191,8 +216,6 @@ namespace MonoDevelop.UnityMode
 
 			return folder.IsAssetsFolder();
 		}
-
-
 	}
 }
 
