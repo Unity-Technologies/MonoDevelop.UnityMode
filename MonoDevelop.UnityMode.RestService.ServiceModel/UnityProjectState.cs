@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
@@ -14,17 +13,6 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		public List<MonoIsland> Islands { get; set; }
 		public string BaseDirectory { get; set; }
 		public AssetDatabaseDTO AssetDatabase { get; set; }
-
-		public void RenameFile(string oldPath, string newPath)
-		{
-			var island = Islands.Single(i => i.Files.Any(f => f == oldPath));
-
-			AssetDatabase.Files.Remove(oldPath);
-			AssetDatabase.Files.Add(newPath);
-
-			island.Files.Remove(oldPath);
-			island.Files.Add(newPath);
-		}
 	}
 
 	public class MonoIsland

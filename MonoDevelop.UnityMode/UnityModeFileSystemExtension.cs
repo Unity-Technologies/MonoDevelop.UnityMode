@@ -44,6 +44,7 @@ namespace MonoDevelop.UnityMode
 		public override void CopyFile (FilePath source, FilePath dest, bool overwrite)
 		{
 			System.IO.File.Copy (source, dest, overwrite);
+			UnityModeAddin.UpdateUnityProjectState();
 		}
 
 		public override void RenameFile (FilePath path, string newName)
@@ -53,17 +54,23 @@ namespace MonoDevelop.UnityMode
 
 			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
 
-			MoveFile(oldPath, newPath);
+			MoveFileOrDirectory(oldPath, newPath);
 		}
 
 		public override void MoveFile (FilePath source, FilePath dest)
 		{
-			MoveFile(MakeRelative(source), MakeRelative(dest));
+			MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
 		}
 
 		public override void DeleteFile (FilePath file)
 		{
 			System.IO.File.Delete (file);
+			UnityModeAddin.UpdateUnityProjectState();
+		}
+
+		public override void DeleteDirectory(FilePath path)
+		{
+			Directory.Delete(path, true);
 			UnityModeAddin.UpdateUnityProjectState();
 		}
 
@@ -102,7 +109,7 @@ namespace MonoDevelop.UnityMode
 
 			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
 
-			MoveDirectory(oldPath, newPath);
+			MoveFileOrDirectory(oldPath, newPath);
 		}
 
 		public override FilePath ResolveFullPath (FilePath path)
@@ -112,13 +119,7 @@ namespace MonoDevelop.UnityMode
 
 		public override void MoveDirectory (FilePath source, FilePath dest)
 		{
-			MoveDirectory(MakeRelative(source), MakeRelative(dest));
-		}
-
-		public override void DeleteDirectory (FilePath path)
-		{
-			Directory.Delete (path, true);
-			UnityModeAddin.UpdateUnityProjectState();
+			MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
 		}
 
 		public override void RequestFileEdit (IEnumerable<FilePath> files)
@@ -134,22 +135,7 @@ namespace MonoDevelop.UnityMode
 			return abs.ToRelative(UnityModeAddin.UnityProjectState.BaseDirectory).ToString().Replace('\\', '/');
 		}
 
-		static void MoveFile(string oldPath, string newPath)
-		{
-			try
-			{
-				UnityRestClient.RestClient.MoveAssetRequest(oldPath, newPath);
-
-				UnityModeAddin.UnityProjectState.RenameFile(oldPath, newPath);
-				UnityModeAddin.NotifyUnityProjectStateChanged();
-			}
-			catch (Exception)
-			{
-				LoggingService.LogInfo("Unity move failed: " + oldPath + " -> " + newPath);
-			}
-		}
-
-		static void MoveDirectory(string oldPath, string newPath)
+		private static void MoveFileOrDirectory(string oldPath, string newPath)
 		{
 			try
 			{
@@ -161,7 +147,6 @@ namespace MonoDevelop.UnityMode
 				LoggingService.LogInfo("Unity move failed: " + oldPath + " -> " + newPath);
 			}
 		}
-
 	}
 }
 

@@ -79,6 +79,12 @@ namespace MonoDevelop.UnityMode
 			return true;
 		}
 
+		public override void DeleteItem()
+		{
+			var file = (File)CurrentNode.DataItem;
+			FileService.DeleteFile(file.AbsolutePath);
+		}
+
 		public override DragOperation CanDragNode()
 		{
 			return DragOperation.Copy | DragOperation.Move;

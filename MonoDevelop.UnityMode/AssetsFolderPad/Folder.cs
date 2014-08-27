@@ -125,18 +125,13 @@ namespace MonoDevelop.UnityMode
 		{
 			if (dataObject is File)
 				return true;
+
+			var folder = dataObject as Folder;
+
+			if (folder != null && !folder.IsAssetsFolder())
+				return true;
+
 			return false;
-		}
-
-		public override void OnNodeDrop (object dataObjects, DragOperation operation)
-		{
-			var file = dataObjects as File;
-			if (file == null)
-				return;
-
-			var folder = (Folder)CurrentNode.DataItem;
-
-			FileService.MoveFile(new FilePath(file.AbsolutePath), new FilePath(folder.AbsolutePath + "/" + file.Name));
 		}
 
 		public override bool CanDeleteItem()
@@ -147,6 +142,44 @@ namespace MonoDevelop.UnityMode
 		public override DragOperation CanDragNode()
 		{
 			return IsAssetsFolder() ? DragOperation.None : DragOperation.Copy | DragOperation.Move;
+		}
+
+		public override void DeleteItem()
+		{
+			var folder = (Folder)CurrentNode.DataItem;
+			FileService.DeleteDirectory(folder.AbsolutePath);
+		}
+
+		public override void OnNodeDrop(object dataObjects, DragOperation operation)
+		{
+			var file = dataObjects as File;
+			var folder = (Folder)CurrentNode.DataItem;
+
+			if (file != null)
+			{
+				var src = new FilePath(file.AbsolutePath);
+				var dst = new FilePath(folder.AbsolutePath + "/" + file.Name);
+
+				if(operation == DragOperation.Move)
+					FileService.MoveFile(src, dst);
+				else if(operation == DragOperation.Copy)
+					FileService.CopyFile(src, dst);
+
+				return;
+			}
+
+			var dropFolder = dataObjects as Folder;
+
+			if (dropFolder != null)
+			{
+				var src = new FilePath(dropFolder.AbsolutePath);
+				var dst = new FilePath(folder.AbsolutePath + "/" + dropFolder.Name);
+
+				if(operation == DragOperation.Move)
+					FileService.MoveDirectory(src, dst);
+				else if(operation == DragOperation.Copy)
+					FileService.CopyDirectory(src, dst);
+			}
 		}
 
 		private bool IsAssetsFolder()
