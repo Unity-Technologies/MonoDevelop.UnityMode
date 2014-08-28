@@ -47,6 +47,19 @@ namespace MonoDevelop.UnityMode
 			});
 		}
 
+		public static void UpdateUnityProjectStateRename(string oldPath, string newPath)
+		{
+			DispatchService.BackgroundDispatch(() =>
+			{
+				LoggingService.LogInfo("Sending Unity Project request (rename)");
+				var projectState = RestClient.GetUnityProjectState();
+
+				projectState.RenameHint = new RenameHint {OldPath = oldPath, newPath = newPath};
+
+				UnityProjectState = projectState;
+			});
+		}
+
 		public static UnityProjectState UnityProjectState 
 		{
 			get { return unityProjectState; }

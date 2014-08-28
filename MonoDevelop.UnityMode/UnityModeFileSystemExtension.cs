@@ -54,7 +54,7 @@ namespace MonoDevelop.UnityMode
 
 			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
 
-			MoveFileOrDirectory(oldPath, newPath);
+			RenameFileOrDirectory(oldPath, newPath);
 		}
 
 		public override void MoveFile (FilePath source, FilePath dest)
@@ -109,7 +109,7 @@ namespace MonoDevelop.UnityMode
 
 			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
 
-			MoveFileOrDirectory(oldPath, newPath);
+			RenameFileOrDirectory(oldPath, newPath);
 		}
 
 		public override FilePath ResolveFullPath (FilePath path)
@@ -119,7 +119,11 @@ namespace MonoDevelop.UnityMode
 
 		public override void MoveDirectory (FilePath source, FilePath dest)
 		{
-			MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
+			// FileService calls this on RenameDirectory, so we check for rename.
+			if (source.ParentDirectory.FullPath == dest.ParentDirectory.FullPath)
+				RenameFileOrDirectory(MakeRelative(source), MakeRelative(dest));
+			else
+				MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
 		}
 
 		public override void RequestFileEdit (IEnumerable<FilePath> files)
@@ -145,6 +149,19 @@ namespace MonoDevelop.UnityMode
 			catch (Exception)
 			{
 				LoggingService.LogInfo("Unity move failed: " + oldPath + " -> " + newPath);
+			}
+		}
+
+		private static void RenameFileOrDirectory(string oldPath, string newPath)
+		{
+			try
+			{
+				UnityRestClient.RestClient.MoveAssetRequest(oldPath, newPath);
+				UnityModeAddin.UpdateUnityProjectStateRename(oldPath, newPath);
+			}
+			catch (Exception)
+			{
+				LoggingService.LogInfo("Unity rename failed: " + oldPath + " -> " + newPath);
 			}
 		}
 	}

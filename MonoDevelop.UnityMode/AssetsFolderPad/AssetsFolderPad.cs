@@ -18,6 +18,7 @@ namespace MonoDevelop.UnityMode
 		public static AssetsFolderPad Singleton;
 
 		Folder _rootFolder;
+		private FolderUpdater folderUpdater = new FolderUpdater();
 
 		public AssetsFolderPad ()
 		{
@@ -48,14 +49,23 @@ namespace MonoDevelop.UnityMode
 
 		public void Refresh(UnityProjectState state)
 		{
+			bool updated = folderUpdater.Update(state);
+
 			DispatchService.GuiDispatch(() =>
 			{
-				TreeView.Clear();
+				if (updated)
+				{
+					// Updated folder structure, refresh tree
+					TreeView.RefreshNode(TreeView.GetRootNode());
+				}
+				else
+				{
+					// Created a new folder structure, replace old tree
+					TreeView.Clear();
+					foreach (var child in folderUpdater.RootFolder.Children)
+						TreeView.AddChild(child);					
+				}
 
-				_rootFolder = new FileSystemTreeBuilder(state.AssetDatabase).Create();
-				foreach (var child in _rootFolder.Children)
-					TreeView.AddChild(child);
-				
 			});
 		}
 

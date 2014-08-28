@@ -36,6 +36,16 @@ namespace MonoDevelop.UnityMode
 			Children.Add (child);
 		}
 
+		public void Remove(FileSystemEntry child)
+		{
+			Children.Remove(child);
+		}
+
+		public bool Empty()
+		{
+			return Children.Count == 0;
+		}
+
 		public IEnumerable<File> GetFiles()
 		{
 			return Children.OfType<File> ();
