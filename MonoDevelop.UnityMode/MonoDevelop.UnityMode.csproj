@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{54833F06-FF38-483A-A1F5-43DF9CE0375F}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -19,6 +19,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="/Users/lukasz/code/lukaszunity/monodevelop/main/build/bin/MonoDevelop.exe" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -66,7 +71,9 @@
     <Reference Include="MonoDevelop.Debugger.Soft.Unity">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.dll</HintPath>
     </Reference>
-    <Reference Include="Xwt, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL" />
+    <Reference Include="Xwt">
+      <HintPath>..\..\monodevelop\main\build\bin\Xwt.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Manifest.addin.xml">
@@ -112,10 +119,6 @@
     <ProjectReference Include="..\MonoDevelop.UnityMode.RestService\MonoDevelop.UnityMode.RestService.csproj">
       <Project>{B3AA406F-BD2C-41F2-947C-B16271DF516D}</Project>
       <Name>MonoDevelop.UnityMode.RestService</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\monodevelop\main\src\core\MonoDevelop.Core\MonoDevelop.Core.csproj">
-      <Project>{7525BB88-6142-4A26-93B9-A30C6983390A}</Project>
-      <Name>MonoDevelop.Core</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
