@@ -17,7 +17,6 @@ namespace MonoDevelop.UnityMode
 	{
 		public static AssetsFolderPad Singleton;
 
-		Folder _rootFolder;
 		private FolderUpdater folderUpdater = new FolderUpdater();
 
 		public AssetsFolderPad ()
@@ -29,23 +28,16 @@ namespace MonoDevelop.UnityMode
 		{
 			base.Initialize (builders, options, contextMenuPath);
 
-			/*
-			IdeApp.Workspace.ItemAddedToSolution += Refresh;
-			IdeApp.Workspace.FileAddedToProject += Refresh;
-			IdeApp.Workspace.FileRemovedFromProject += Refresh;
-			IdeApp.Workspace.FileRenamedInProject += Refresh;
-			IdeApp.Workspace.WorkspaceItemOpened += Refresh;
-			//IdeApp.Workbench.ActiveDocumentChanged += OnWindowChanged;*/
 			Refresh (UnityModeAddin.UnityProjectState);
-
 			UnityModeAddin.UnityProjectStateChanged += Refresh;
+
+			TreeView.ShowSelectionPopupButton = true;
 		}
 
-		public void Refresh(object bah, UnityProjectStateChangedEventArgs args)
+		public void Refresh(object obj, UnityProjectStateChangedEventArgs args)
 		{
 			Refresh (args.State);
 		}
-
 
 		public void Refresh(UnityProjectState state)
 		{
@@ -68,37 +60,6 @@ namespace MonoDevelop.UnityMode
 
 			});
 		}
-
-
-		/*
-		void OnWindowChanged (object ob, EventArgs args)
-		{
-			Gtk.Application.Invoke (delegate {
-				SelectActiveFile ();
-			});
-		}
-
-		void SelectActiveFile ()
-		{
-			Document doc = IdeApp.Workbench.ActiveDocument;
-			if (doc == null || doc.Project == null)
-				return;
-
-			string file = doc.FileName;
-			if (file == null)
-				return;
-
-			ProjectFile pf = doc.Project.Files.GetFile (file);
-			if (pf == null)
-				return;
-
-			ITreeNavigator nav = treeView.GetNodeAtObject (pf, true);
-			if (nav == null)
-				return;
-
-			nav.ExpandToNode ();
-			nav.Selected = true;
-		}*/
 	}
 	
 }
