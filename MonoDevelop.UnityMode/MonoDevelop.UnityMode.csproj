@@ -68,9 +68,6 @@
     <Reference Include="Mono.Addins">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.Addins.dll</HintPath>
     </Reference>
-    <Reference Include="MonoDevelop.Debugger.Soft.Unity">
-      <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.dll</HintPath>
-    </Reference>
     <Reference Include="Xwt">
       <HintPath>..\..\monodevelop\main\build\bin\Xwt.dll</HintPath>
     </Reference>
@@ -108,6 +105,10 @@
     <None Include="Mono.Options.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.csproj">
+      <Project>{42407518-6F18-401E-BDA2-730BE36DFF26}</Project>
+      <Name>MonoDevelop.Debugger.Soft.Unity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
       <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
       <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>

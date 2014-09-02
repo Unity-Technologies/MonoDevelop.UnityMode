@@ -7,3 +7,6 @@ MonoDevelop.UnityMode/obj
 MonoDevelop.UnityMode.Tests/bin
 MonoDevelop.UnityMode.Tests/obj
 *.suo
+MonoDevelop.Debugger.Soft.Unity/bin
+MonoDevelop.Debugger.Soft.Unity/obj
+MonoDevelop.Debugger.Soft.Unity/UnityUtilities/obj/*

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<Template Originator="Levi Bard" Language="C#" Created="07/29/2010" LastModified="07/29/2010">
+	<TemplateConfiguration>
+		<_Name>C# Unity Script</_Name>
+		<Icon>md-unityscript-file</Icon>
+		<_Category>Unity</_Category>
+		<_Description>Creates a new C# script for Unity.</_Description>
+	</TemplateConfiguration>
+	
+	<TemplateFiles>
+		<File DefaultExtension=".cs" DefaultName="NewBehaviourScript" AddStandardHeader="True">
+		<![CDATA[using UnityEngine;
+using System.Collections;
+
+public class ${FileNameWithoutExtension} : MonoBehaviour {
+
+	// Use this for initialization
+	void Start () {
+	
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
+}
+]]>
+		</File>
+	</TemplateFiles>
+	
+	<FileOptions/>
+	
+</Template>

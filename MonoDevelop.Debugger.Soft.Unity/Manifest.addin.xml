@@ -1,0 +1,44 @@
+<Addin id = "MonoDevelop.Debugger.Soft.Unity"
+       name	     = "Mono Soft Debugger Support for Unity"
+       author	 = "Lucas Meijer"
+       url       = "http://github.com/Unity-Technologies/MonoDevelop.Debugger.Soft.Unity"
+       description = "Mono Soft Debugger Support for Unity"
+       copyright   = "MIT X11"
+       category = "Unity"
+       version   = "5.4">
+
+	<Dependencies>
+		<Addin id="MonoDevelop.Ide" version="5.4"/>
+		<Addin id="MonoDevelop.Core" version="5.4"/>
+		<Addin id="MonoDevelop.Debugger" version="5.4"/>
+		<Addin id="MonoDevelop.Debugger.Soft" version="5.4"/>
+	</Dependencies>
+	
+	<Extension path="/MonoDevelop/Debugging/DebuggerEngines">
+		<DebuggerEngine
+			id="MonoDevelop.Debugger.Soft.Unity"
+			name="Unity Debugger"
+			features="Breakpoints, Pause, Stepping, DebugFile, ConditionalBreakpoints, Tracepoints, Catchpoints, Attaching"
+			type="MonoDevelop.Debugger.Soft.Unity.UnitySoftDebuggerEngine" />
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/ProjectModel/ProjectServiceExtensions">
+		<Class class = "MonoDevelop.Debugger.Soft.Unity.UnityProjectServiceExtension" id="UnityProjectServiceExtension" insertafter="FinalStep"/>
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Ide/GlobalOptionsDialog">
+		<Section id = "Unity" _label = "Unity">
+			<Section
+				id = "UnitySoftDebuggerOptions"
+				_label = "Debugger"
+				icon = "unity-icon-24" 
+				class = "MonoDevelop.Debugger.Soft.Unity.GeneralOptionsPanelBinding"/>
+			</Section>
+	</Extension>
+	
+	<Extension path = "/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid = "unity-icon-24" resource = "MonoDevelop.Debugger.Soft.Unity.icons.unity-icon-24.png" />
+	</Extension>
+	
+</Addin>
+
