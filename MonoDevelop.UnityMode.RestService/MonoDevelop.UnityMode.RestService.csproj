@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\monodevelop\main\build\Addins\</OutputPath>
+    <OutputPath>..\..\monodevelop\main\build\Addins\MonoDevelop.UnityMode</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\monodevelop\main\build\Addins\</OutputPath>
+    <OutputPath>..\..\monodevelop\main\build\Addins\MonoDevelop.UnityMode</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -32,18 +32,23 @@
     <Reference Include="System" />
     <Reference Include="Mono.TextEditor">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.TextEditor.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory.CSharp">
       <HintPath>..\..\monodevelop\main\build\bin\ICSharpCode.NRefactory.CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>..\..\monodevelop\main\build\bin\ICSharpCode.NRefactory.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ServiceStack.Client">
       <HintPath>..\lib\ServiceStack.Client.dll</HintPath>

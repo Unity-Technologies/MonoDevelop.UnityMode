@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\MonoDevelop\main\build\Addins\MonoDevelop.Debugger.Soft.Unity\</OutputPath>
+    <OutputPath>..\..\MonoDevelop\main\build\Addins\MonoDevelop.UnityMode</OutputPath>
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\MonoDevelop\main\build\Addins\MonoDevelop.Debugger.Soft.Unity\</OutputPath>
+    <OutputPath>..\..\MonoDevelop\main\build\Addins\MonoDevelop.UnityMode</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -55,27 +55,35 @@
     <Reference Include="Mono.Posix" />
     <Reference Include="Mono.Debugger.Soft">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft\Mono.Debugger.Soft.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Debugger.Soft">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft\MonoDevelop.Debugger.Soft.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Debugger">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger\MonoDevelop.Debugger.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugging">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.Debugging.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugging.Soft">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger.Soft\Mono.Debugging.Soft.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.TextEditor">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.TextEditor.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
