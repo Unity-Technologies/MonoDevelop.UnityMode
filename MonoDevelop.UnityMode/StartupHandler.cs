@@ -116,11 +116,14 @@ namespace MonoDevelop.UnityMode
 		{
 			var args = Environment.GetCommandLineArgs ();
 
+			string openFileArg = null;
+
 			var p = new Mono.Options.OptionSet ();
 			p.Add ("unityProcessId=", "Unity Process Id", (int i) => StartupOptions.UnityProcessId = i);
-			p.Add("unityRestServerUrl=", "Unity REST Server URL", s => StartupOptions.UnityRestServerUrl = s);
+			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => StartupOptions.UnityRestServerUrl = s);
+			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
 
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "ARGS: " + String.Join("!",args));
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args" + String.Join("!",args));
 
 			try 
 			{
@@ -131,21 +134,30 @@ namespace MonoDevelop.UnityMode
 				LoggingService.LogInfo("OptionException: " + e.ToString());
 			}
 
+			if (openFileArg != null && openFileArg.Length > 0) 
+			{
+				string[] fileLine = openFileArg.Split (';');
+
+				if (fileLine.Length == 2)
+					OpenFile (fileLine[0], int.Parse(fileLine[1]));
+				else
+					OpenFile (openFileArg, 0);
+			}
+
 			LoggingService.LogInfo("Unity Process ID: " + StartupOptions.UnityProcessId);
 			LoggingService.LogInfo("Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
+			LoggingService.LogInfo("Unity Open File: " + openFileArg);
 		}
-
-		void InitializeRestServiceAndPair()
+		 
+		void OpenFile(string filename, int line)
 		{
-			UnityModeAddin.Initialize ();
+			LoggingService.LogInfo ("OpenFile: " + filename + " Line " + line);
 
-			restService = new RestService ( fileOpenRequest => 
+			var fileOpenInformation = new FileOpenInformation (filename, null, line, 0, OpenDocumentOptions.BringToFront);
+
+			try
 			{
-				var fileOpenInformation = new FileOpenInformation (fileOpenRequest.File, null, fileOpenRequest.Line, 0, OpenDocumentOptions.BringToFront);
-
-				try
-				{
-					DispatchService.GuiDispatch(() =>
+				DispatchService.GuiDispatch(() =>
 					{
 						if (IdeApp.Workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
 						{
@@ -156,16 +168,21 @@ namespace MonoDevelop.UnityMode
 						{
 							IdeApp.Workbench.OpenDocument(fileOpenInformation);
 							DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
-							
+
 						}
 					});
-				}
-				catch (Exception e)
-				{
-					LoggingService.LogError(e.ToString());
-				}
 			}
-			);
+			catch (Exception e)
+			{
+				LoggingService.LogError(e.ToString());
+			}
+		}
+
+		void InitializeRestServiceAndPair()
+		{
+			UnityModeAddin.Initialize ();
+
+			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line) );
 
 			DispatchService.BackgroundDispatch(() =>
 			{
