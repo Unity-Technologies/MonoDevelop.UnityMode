@@ -21,7 +21,7 @@
     <ConsolePause>false</ConsolePause>
     <CustomCommands>
       <CustomCommands>
-        <Command type="Execute" command="/Users/lukasz/code/lukaszunity/monodevelop/main/build/bin/MonoDevelop.exe" />
+        <Command type="Execute" command="../../monodevelop/main/build/bin/MonoDevelop.exe" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>

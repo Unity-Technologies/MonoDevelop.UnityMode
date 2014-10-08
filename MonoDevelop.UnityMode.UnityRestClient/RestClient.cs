@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using MonoDevelop.UnityMode.RestServiceModel;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
@@ -40,12 +41,13 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 	{
 		public string url { get; set; }
 		public string name { get; set; }
+		public int processid { get; set; }
 	}
 
 	public class PairResult
 	{
-		public string Result { get; set; }
-		public int unitypid { get; set; }
+		public string result { get; set; }
+		public int unityprocessid { get; set; }
 	}
 
 	public class RestClient
@@ -74,7 +76,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 		public static PairResult Pair(string url, string name)
 		{
-			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name});
+			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name, processid = Process.GetCurrentProcess().Id});
 		}
 	}
 }

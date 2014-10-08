@@ -188,8 +188,8 @@ namespace MonoDevelop.UnityMode
 			{
 				LoggingService.LogInfo("Sending Unity Pair request");
 				var result = RestClient.Pair(restService.Url, "MonoDevelop " + MonoDevelop.BuildInfo.VersionLabel);
-				LoggingService.LogInfo("Unity Pair Request: " + result.Result);
-				StartupOptions.UnityProcessId = result.unitypid;
+				LoggingService.LogInfo("Unity Pair Request: " + result.result);
+				StartupOptions.UnityProcessId = result.unityprocessid;
 			});
 
 			UnityModeAddin.UpdateUnityProjectState();
