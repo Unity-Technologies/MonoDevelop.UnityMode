@@ -24,7 +24,7 @@ namespace MonoDevelop.UnityMode
 
 		public static void Doit()
 		{
-			var processInfo = new ProcessInfo (StartupOptions.UnityProcessId, "Unity");
+			var processInfo = new ProcessInfo (UnityModeSettings.UnityProcessId, "Unity");
 			var engines = DebuggingService.GetDebuggerEngines ();
 			var engine = engines.Where (e => e.Id == "MonoDevelop.Debugger.Soft.Unity").SingleOrDefault ();
 			if (engine == null)

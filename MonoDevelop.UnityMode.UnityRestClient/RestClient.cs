@@ -56,7 +56,12 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 		public static void SetServerUrl(string url)
 		{
-			client = new JsonServiceClient(url);
+			client = url == null ? null : new JsonServiceClient(url);
+		}
+
+		public static bool Available
+		{
+			get { return client != null; }
 		}
 
 		public static UnityProjectState GetUnityProjectState ()

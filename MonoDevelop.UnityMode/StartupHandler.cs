@@ -33,9 +33,9 @@ namespace MonoDevelop.UnityMode
 
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
 
-			SetupStartupOptions ();
+			SetupSettingsFromArgs ();
 
-			RestClient.SetServerUrl(StartupOptions.UnityRestServerUrl);
+			RestClient.SetServerUrl(UnityModeSettings.UnityRestServerUrl);
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
 
@@ -112,15 +112,15 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		void SetupStartupOptions ()
+		void SetupSettingsFromArgs ()
 		{
 			var args = Environment.GetCommandLineArgs ();
 
 			string openFileArg = null;
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProcessId=", "Unity Process Id", (int i) => StartupOptions.UnityProcessId = i);
-			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => StartupOptions.UnityRestServerUrl = s);
+			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityModeSettings.UnityProcessId = i);
+			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityModeSettings.UnityRestServerUrl = s);
 			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
 
 			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args" + String.Join("!",args));
@@ -144,8 +144,8 @@ namespace MonoDevelop.UnityMode
 					OpenFile (openFileArg, 0);
 			}
 
-			LoggingService.LogInfo("Unity Process ID: " + StartupOptions.UnityProcessId);
-			LoggingService.LogInfo("Unity REST Server Url: " + StartupOptions.UnityRestServerUrl);
+			LoggingService.LogInfo("Unity Process ID: " + UnityModeSettings.UnityProcessId);
+			LoggingService.LogInfo("Unity REST Server Url: " + UnityModeSettings.UnityRestServerUrl);
 			LoggingService.LogInfo("Unity Open File: " + openFileArg);
 		}
 		 
@@ -178,18 +178,32 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		void Pair(int unityProcessId, string unityRestServerUrl)
+		{
+			UnityModeSettings.UnityProcessId = unityProcessId;
+			UnityModeSettings.UnityRestServerUrl = unityRestServerUrl;
+			RestClient.SetServerUrl (UnityModeSettings.UnityRestServerUrl);
+
+			LoggingService.LogInfo ("Pairing");
+			LoggingService.LogInfo("Unity Process ID: " + UnityModeSettings.UnityProcessId);
+			LoggingService.LogInfo("Unity REST Server Url: " + UnityModeSettings.UnityRestServerUrl);
+
+			UnityModeAddin.UpdateUnityProjectState ();
+		}
+			
 		void InitializeRestServiceAndPair()
 		{
 			UnityModeAddin.Initialize ();
 
-			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line) );
-
+			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line), 
+											pairRequest => Pair(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl) );
+					
 			DispatchService.BackgroundDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Unity Pair request");
-				var result = RestClient.Pair(restService.Url, "MonoDevelop " + MonoDevelop.BuildInfo.VersionLabel);
+				var result = RestClient.Pair(restService.Url, "Unity Script Editor " + MonoDevelop.BuildInfo.VersionLabel);
 				LoggingService.LogInfo("Unity Pair Request: " + result.result);
-				StartupOptions.UnityProcessId = result.unityprocessid;
+				UnityModeSettings.UnityProcessId = result.unityprocessid;
 			});
 
 			UnityModeAddin.UpdateUnityProjectState();

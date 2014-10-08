@@ -23,8 +23,15 @@ namespace MonoDevelop.UnityMode
 
 		protected override BuildResult OnBuild (MonoDevelop.Core.IProgressMonitor monitor, ConfigurationSelector configuration)
 		{
-			var restResult = RestClient.CompileScripts ();
 			var result = new BuildResult ();
+
+			if (!RestClient.Available) 
+			{
+				result.AddError ("Not connected to Unity instance");
+				return result;
+			}
+
+			var restResult = RestClient.CompileScripts ();
 
 			foreach (var message in restResult.Messages)
 			{

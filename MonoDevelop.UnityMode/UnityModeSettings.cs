@@ -1,10 +1,11 @@
 
 namespace MonoDevelop.UnityMode
 {
-	public static class StartupOptions
+	public static class UnityModeSettings
 	{
-		static StartupOptions()
+		static UnityModeSettings()
 		{
+			UnityProcessId = -1;
 			UnityRestServerUrl = "http://localhost:38000";
 		}
 

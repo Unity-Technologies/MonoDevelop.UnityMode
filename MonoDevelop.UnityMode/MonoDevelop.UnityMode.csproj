@@ -102,11 +102,11 @@
     <Compile Include="ProjectUpdater.cs" />
     <Compile Include="SolutionUpdater.cs" />
     <Compile Include="Debugging.cs" />
-    <Compile Include="StartupOptions.cs" />
     <Compile Include="AssetsFolderPad\File.cs" />
     <Compile Include="AssetsFolderPad\Folder.cs" />
     <Compile Include="UnityModeAddin.cs" />
     <Compile Include="UnityModeFileSystemExtension.cs" />
+    <Compile Include="UnityModeSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

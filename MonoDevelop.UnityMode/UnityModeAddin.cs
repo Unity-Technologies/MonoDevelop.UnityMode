@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using MonoDevelop.Core;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.Ide;
@@ -20,6 +21,7 @@ namespace MonoDevelop.UnityMode
 		{
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 
+			// TODO: Should we close all other open solutions?
 
 			UnityProjectStateChanged += (sender, e) =>
 			{
@@ -28,6 +30,12 @@ namespace MonoDevelop.UnityMode
 				if(!IdeApp.Workspace.Items.Contains(UnitySolution))
 					IdeApp.Workspace.Items.Insert(0, UnitySolution);
 			};
+		}
+
+		public static void ClearUnityProjectState()
+		{
+			UnityProjectState = new UnityProjectState ();
+			NotifyUnityProjectStateChanged ();
 		}
 
 		public static UnitySolution UnitySolution { get; private set; }
@@ -40,6 +48,27 @@ namespace MonoDevelop.UnityMode
 
 		public static void UpdateUnityProjectState()
 		{
+			if(UnityModeSettings.UnityProcessId > 0)
+			{
+				try
+				{
+					Process.GetProcessById(UnityModeSettings.UnityProcessId);
+				}
+				catch(Exception)
+				{
+					UnityModeSettings.UnityProcessId = -1;
+					UnityModeSettings.UnityRestServerUrl = null;
+
+					RestClient.SetServerUrl (null);
+
+					ClearUnityProjectState ();
+					return;
+				}
+			}
+
+			if (!RestClient.Available)
+				return;
+
 			DispatchService.BackgroundDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Unity Project request");
@@ -49,6 +78,9 @@ namespace MonoDevelop.UnityMode
 
 		public static void UpdateUnityProjectStateRename(string oldPath, string newPath)
 		{
+			if (!RestClient.Available)
+				return;
+
 			DispatchService.BackgroundDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Unity Project request (rename)");
