@@ -35,7 +35,7 @@ namespace MonoDevelop.UnityMode
 
 			SetupSettingsFromArgs ();
 
-			RestClient.SetServerUrl(UnityModeSettings.UnityRestServerUrl);
+			RestClient.SetServerUrl(UnityInstance.RestServerUrl);
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
 
@@ -119,8 +119,8 @@ namespace MonoDevelop.UnityMode
 			string openFileArg = null;
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityModeSettings.UnityProcessId = i);
-			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityModeSettings.UnityRestServerUrl = s);
+			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityInstance.ProcessId = i);
+			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityInstance.RestServerUrl = s);
 			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
 
 			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
@@ -144,9 +144,7 @@ namespace MonoDevelop.UnityMode
 					OpenFile (openFileArg, 0);
 			}
 
-			LoggingService.LogInfo("Unity Process ID: " + UnityModeSettings.UnityProcessId);
-			LoggingService.LogInfo("Unity REST Server Url: " + UnityModeSettings.UnityRestServerUrl);
-			LoggingService.LogInfo("Unity Open File: " + openFileArg);
+			UnityInstance.Log();
 		}
 		 
 		void OpenFile(string filename, int line)
@@ -180,23 +178,21 @@ namespace MonoDevelop.UnityMode
 
 		void UnityPairRequest(int unityProcessId, string unityRestServerUrl, string unityProject)
 		{
-			UnityModeSettings.UnityProcessId = unityProcessId;
-			UnityModeSettings.UnityRestServerUrl = unityRestServerUrl;
-			UnityModeSettings.UnityProject = unityProject;
+			UnityInstance.ProcessId = unityProcessId;
+			UnityInstance.RestServerUrl = unityRestServerUrl;
+			UnityInstance.Project = unityProject;
 
-			RestClient.SetServerUrl (UnityModeSettings.UnityRestServerUrl);
+			RestClient.SetServerUrl (UnityInstance.RestServerUrl);
 
-			LoggingService.LogInfo("Received Unity Pair request");
-			LoggingService.LogInfo("Unity Process ID: " + UnityModeSettings.UnityProcessId);
-			LoggingService.LogInfo("Unity REST Server Url: " + UnityModeSettings.UnityRestServerUrl);
-			LoggingService.LogInfo("Unity Project: " +  UnityModeSettings.UnityProject);
+			LoggingService.LogInfo("Received Pair request from Unity");
+			UnityInstance.Log();
 
 			UnityModeAddin.UpdateUnityProjectState ();
 		}
 
 		void QuitApplicationRequest(string unityProject)
 		{
-			if(unityProject == UnityModeSettings.UnityProject)
+			if(unityProject == UnityInstance.Project)
 			{
 				IdeApp.Exit();
 			}
@@ -212,18 +208,14 @@ namespace MonoDevelop.UnityMode
 
 			DispatchService.BackgroundDispatch(() =>
 			{
-				LoggingService.LogInfo("Sending Unity Pair request");
-				var result = RestClient.Pair(restService.Url, "Unity Script Editor " + MonoDevelop.BuildInfo.VersionLabel);
-				LoggingService.LogInfo("Unity Pair Request: " + result.result);
+				LoggingService.LogInfo("Sending Pair request to Unity");
+				var result = RestClient.Pair(restService.Url, MonoDevelop.Core.BrandingService.ApplicationName + " " + MonoDevelop.BuildInfo.VersionLabel);
+				LoggingService.LogInfo("Unity Pair Request Result: " + result.result);
 
-				UnityModeSettings.UnityProcessId = result.unityprocessid;
-				UnityModeSettings.UnityProject = result.unityproject;
+				UnityInstance.ProcessId = result.unityprocessid;
+				UnityInstance.Project = result.unityproject;
 
-				LoggingService.LogInfo("Unity Process ID: " + UnityModeSettings.UnityProcessId);
-				LoggingService.LogInfo("Unity REST Server Url: " + UnityModeSettings.UnityRestServerUrl);
-				LoggingService.LogInfo("Unity Project: " +  UnityModeSettings.UnityProject);
-
-				
+				UnityInstance.Log();
 			});
 
 			UnityModeAddin.UpdateUnityProjectState();

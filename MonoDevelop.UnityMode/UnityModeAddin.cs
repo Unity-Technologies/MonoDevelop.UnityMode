@@ -48,16 +48,16 @@ namespace MonoDevelop.UnityMode
 
 		public static void UpdateUnityProjectState()
 		{
-			if(UnityModeSettings.UnityProcessId > 0)
+			if(UnityInstance.ProcessId > 0)
 			{
 				try
 				{
-					Process.GetProcessById(UnityModeSettings.UnityProcessId);
+					Process unityProcess = Process.GetProcessById(UnityInstance.ProcessId);
 				}
 				catch(Exception)
 				{
-					UnityModeSettings.UnityProcessId = -1;
-					UnityModeSettings.UnityRestServerUrl = null;
+					UnityInstance.ProcessId = -1;
+					UnityInstance.RestServerUrl = null;
 
 					RestClient.SetServerUrl (null);
 

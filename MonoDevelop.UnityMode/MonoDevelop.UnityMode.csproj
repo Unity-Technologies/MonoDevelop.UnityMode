@@ -106,7 +106,7 @@
     <Compile Include="AssetsFolderPad\Folder.cs" />
     <Compile Include="UnityModeAddin.cs" />
     <Compile Include="UnityModeFileSystemExtension.cs" />
-    <Compile Include="UnityModeSettings.cs" />
+    <Compile Include="UnityInstance.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
