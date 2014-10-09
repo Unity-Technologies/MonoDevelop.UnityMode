@@ -11,6 +11,7 @@ namespace MonoDevelop.UnityMode
 
 		public static int UnityProcessId { get; set; }
 		public static string UnityRestServerUrl { get; set; }
+		public static string UnityProject { get; set; }
 	}
 }
 

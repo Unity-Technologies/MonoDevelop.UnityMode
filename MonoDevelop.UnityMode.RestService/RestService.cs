@@ -13,10 +13,11 @@ namespace MonoDevelop.UnityMode
 
 		public delegate void OpenFileCallback(OpenFileRequest openFileRequest);
 		public delegate void PairCallback(PairRequest pairRequest);
+		public delegate void QuitApplicationCallBack(QuitApplicationRequest quitRequest); 
 
-		public RestService (OpenFileCallback openFileCallback, PairCallback pairCallback)
+		public RestService (OpenFileCallback openFileCallback, PairCallback pairCallback, QuitApplicationCallBack quitCallback)
 		{
-			var appHost = new AppHost (openFileCallback, pairCallback);
+			var appHost = new AppHost (openFileCallback, pairCallback, quitCallback);
 			appHost.Init ();
 
 			int port = 40000;
@@ -59,23 +60,37 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		public class QuitApplicationService : IService
+		{
+			public QuitApplicationCallBack Callback { get; set; }
+
+			public object Post(QuitApplicationRequest quitRequest)
+			{
+				Callback (quitRequest);
+				return new HttpResult () { StatusCode = HttpStatusCode.OK };
+			}
+		}
+
 		//Define the Web Services AppHost
 		public class AppHost : AppHostHttpListenerBase
 		{
 			readonly OpenFileCallback openFileCallback;
 			readonly PairCallback pairCallback;
+			readonly QuitApplicationCallBack quitCallback;
 
-			public AppHost(OpenFileCallback openFileCallback, PairCallback pairCallback)
+			public AppHost(OpenFileCallback openFileCallback, PairCallback pairCallback, QuitApplicationCallBack quitCallback)
 				: base("UnityMode Rest Service", typeof(RestService).Assembly)
 			{
 				this.openFileCallback = openFileCallback;
 				this.pairCallback = pairCallback;
+				this.quitCallback = quitCallback;
 			}
 
 			public override void Configure(Funq.Container container)
 			{
 				container.Register (openFileCallback);
 				container.Register (pairCallback);
+				container.Register (quitCallback);
 			}
 		}
 	}

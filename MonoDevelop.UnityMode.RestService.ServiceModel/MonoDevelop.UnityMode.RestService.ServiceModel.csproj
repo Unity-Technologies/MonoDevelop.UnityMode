@@ -52,6 +52,7 @@
     <Compile Include="OpenFileRequest.cs" />
     <Compile Include="UnityProjectState.cs" />
     <Compile Include="PairRequest.cs" />
+    <Compile Include="QuitApplicationRequest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

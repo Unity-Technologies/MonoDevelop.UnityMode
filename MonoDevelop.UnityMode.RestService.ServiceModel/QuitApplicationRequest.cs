@@ -2,11 +2,9 @@
 
 namespace MonoDevelop.UnityMode.RestServiceModel
 {
-	[Route("/pair")]
-	public class PairRequest
+	[Route("/quit")]
+	public class QuitApplicationRequest
 	{
-		public int UnityProcessId { get; set; }
-		public string UnityRestServerUrl { get; set; }
 		public string UnityProject { get; set; }
 	}
 }

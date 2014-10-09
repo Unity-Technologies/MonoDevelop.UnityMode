@@ -46,8 +46,14 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 	public class PairResult
 	{
+		PairResult()
+		{
+			unityprocessid = -1;
+		}
+
 		public string result { get; set; }
 		public int unityprocessid { get; set; }
+		public string unityproject { get; set; }
 	}
 
 	public class RestClient
