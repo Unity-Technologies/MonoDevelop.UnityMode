@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Diagnostics;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.ServiceHost;
 using ServiceStack.Common.Web;
@@ -17,25 +18,20 @@ namespace MonoDevelop.UnityMode
 
 		public RestService (OpenFileCallback openFileCallback, PairCallback pairCallback, QuitApplicationCallBack quitCallback)
 		{
+			int port = 40000 + (Process.GetCurrentProcess().Id % 1000);
+			Url = "http://localhost:" + port + "/";
+
 			var appHost = new AppHost (openFileCallback, pairCallback, quitCallback);
 			appHost.Init ();
 
-			int port = 40000;
-			int timeout = 20;
-
-			while (timeout-- > 0)
+			try
 			{
-				try
-				{
-					Url = "http://localhost:" + port + "/";
-					appHost.Start(Url);
-					break;
-				}
-				catch (Exception exception)
-				{
-					port++;
-				}
-			}			
+				appHost.Start(Url);
+			}
+			catch (Exception exception)
+			{
+				Url = null;
+			}
 		}
 			
 		public class OpenFileService : IService
