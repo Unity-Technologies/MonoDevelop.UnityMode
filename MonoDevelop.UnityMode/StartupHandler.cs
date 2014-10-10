@@ -126,7 +126,7 @@ namespace MonoDevelop.UnityMode
 
 		static void WorkBenchActiveDocumentChanged (object sender, EventArgs e)
 		{
-		
+			UnityModeAddin.UpdateUnityOpenDocuments ();
 		}
 	}
 }

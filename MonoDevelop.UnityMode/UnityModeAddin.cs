@@ -198,6 +198,14 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		internal static void UpdateUnityOpenDocuments()
+		{
+			if (!UnityInstance.OpenDocuments.Any (d => d == IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/'))) 
+			{
+				UnityInstance.OpenDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString().Replace('\\', '/')).ToList ();
+			}
+		}
+
 		static void UnityPairRequest(int unityProcessId, string unityRestServerUrl, string unityProject)
 		{
 			UnityInstance.ProcessId = unityProcessId;
