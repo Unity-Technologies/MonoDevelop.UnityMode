@@ -14,8 +14,6 @@ namespace MonoDevelop.UnityMode
 {
 	public class StartupHandler : CommandHandler
 	{
-		private RestService restService;
-
 		protected override void Run ()
 		{
 			Workbench workbench = IdeApp.Workbench;
@@ -32,10 +30,10 @@ namespace MonoDevelop.UnityMode
 				solutionPad.Visible = false;
 
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
+			workbench.ActiveDocumentChanged += WorkBenchActiveDocumentChanged;
 
-			SetupSettingsFromArgs ();
+			UnityModeAddin.SetupSettingsFromArgs ();
 
-			RestClient.SetServerUrl(UnityInstance.RestServerUrl);
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
 
@@ -43,7 +41,6 @@ namespace MonoDevelop.UnityMode
 
 			//((DefaultWorkbench)IdeApp.Workbench.RootWindow).RecreateMenu ();
 
-			InitializeRestServiceAndPair ();
 			IdeApp.Workbench.ShowCommandBar ("UnityDebugging");
 
 
@@ -66,8 +63,18 @@ namespace MonoDevelop.UnityMode
 					DebugEditorHandler.Doit();
 					}
 				};*/
+
+			UnityModeAddin.InitializeRestServiceAndPair ();
 		}
 
+		~StartupHandler()
+		{
+			Workbench workbench = IdeApp.Workbench;
+			WorkbenchWindow workbenchWindow = workbench.RootWindow;
+
+			workbenchWindow.FocusInEvent -= WorkbenchFocusInEvent;
+			workbench.ActiveDocumentChanged -= WorkBenchActiveDocumentChanged;
+		}
 
 		CommandEntrySet MyPostProcessor(CommandEntrySet input)
 		{
@@ -111,119 +118,15 @@ namespace MonoDevelop.UnityMode
 				return false;
 			}
 		}
-
-		void SetupSettingsFromArgs ()
-		{
-			var args = Environment.GetCommandLineArgs ();
-
-			string openFileArg = null;
-
-			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityInstance.ProcessId = i);
-			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityInstance.RestServerUrl = s);
-			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
-
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
-
-			try 
-			{
-				p.Parse (args);
-			} 
-			catch(Mono.Options.OptionException e)
-			{
-				LoggingService.LogInfo("OptionException: " + e.ToString());
-			}
-
-			if (openFileArg != null && openFileArg.Length > 0) 
-			{
-				string[] fileLine = openFileArg.Split (';');
-
-				if (fileLine.Length == 2)
-					OpenFile (fileLine[0], int.Parse(fileLine[1]));
-				else
-					OpenFile (openFileArg, 0);
-			}
-
-			UnityInstance.Log();
-		}
-		 
-		void OpenFile(string filename, int line)
-		{
-			LoggingService.LogInfo ("OpenFile: " + filename + " Line " + line);
-
-			var fileOpenInformation = new FileOpenInformation (filename, null, line, 0, OpenDocumentOptions.BringToFront);
-
-			try
-			{
-				DispatchService.GuiDispatch(() =>
-					{
-						if (IdeApp.Workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
-						{
-							var docs = IdeApp.Workbench.Documents.Where(d => d.FileName == fileOpenInformation.FileName);
-							docs.ElementAt(0).Select();
-						}
-						else
-						{
-							IdeApp.Workbench.OpenDocument(fileOpenInformation);
-							DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
-
-						}
-					});
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError(e.ToString());
-			}
-		}
-
-		void UnityPairRequest(int unityProcessId, string unityRestServerUrl, string unityProject)
-		{
-			UnityInstance.ProcessId = unityProcessId;
-			UnityInstance.RestServerUrl = unityRestServerUrl;
-			UnityInstance.Project = unityProject;
-
-			RestClient.SetServerUrl (UnityInstance.RestServerUrl);
-
-			LoggingService.LogInfo("Received Pair request from Unity");
-			UnityInstance.Log();
-
-			UnityModeAddin.UpdateUnityProjectState ();
-		}
-
-		void QuitApplicationRequest(string unityProject)
-		{
-			if(unityProject == UnityInstance.Project)
-			{
-				IdeApp.Exit();
-			}
-		} 
 			
-		void InitializeRestServiceAndPair()
+		static void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
 		{
-			UnityModeAddin.Initialize ();
-
-			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line), 
-											pairRequest => UnityPairRequest(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl, pairRequest.UnityProject),
-											quitRequest => QuitApplicationRequest(quitRequest.UnityProject));
-
-			DispatchService.BackgroundDispatch(() =>
-			{
-				LoggingService.LogInfo("Sending Pair request to Unity");
-				var result = RestClient.Pair(restService.Url, MonoDevelop.Core.BrandingService.ApplicationName + " " + MonoDevelop.BuildInfo.VersionLabel);
-				LoggingService.LogInfo("Unity Pair Request Result: " + result.result);
-
-				UnityInstance.ProcessId = result.unityprocessid;
-				UnityInstance.Project = result.unityproject;
-
-				UnityInstance.Log();
-			});
-
 			UnityModeAddin.UpdateUnityProjectState();
 		}
 
-		private void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
+		static void WorkBenchActiveDocumentChanged (object sender, EventArgs e)
 		{
-			UnityModeAddin.UpdateUnityProjectState();
+		
 		}
 	}
 }
