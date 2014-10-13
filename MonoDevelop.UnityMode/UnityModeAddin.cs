@@ -9,6 +9,7 @@ using MonoDevelop.Ide.Codons;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Pads;
 using MonoDevelop.Projects;
+using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.UnityMode.UnityRestClient;
 
@@ -109,30 +110,7 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		internal static void InitializeRestServiceAndPair()
-		{
-			UnityModeAddin.Initialize ();
-
-			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line), 
-				pairRequest => UnityPairRequest(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl, pairRequest.UnityProject),
-				quitRequest => QuitApplicationRequest(quitRequest.UnityProject));
-
-			DispatchService.BackgroundDispatch(() =>
-				{
-					LoggingService.LogInfo("Sending Pair request to Unity");
-					var result = RestClient.Pair(restService.Url, MonoDevelop.Core.BrandingService.ApplicationName + " " + MonoDevelop.BuildInfo.VersionLabel);
-					LoggingService.LogInfo("Unity Pair Request Result: " + result.result);
-
-					UnityInstance.ProcessId = result.unityprocessid;
-					UnityInstance.Project = result.unityproject;
-
-					UnityInstance.Log();
-				});
-
-			UnityModeAddin.UpdateUnityProjectState();
-		}
-
-		internal static void SetupSettingsFromArgs ()
+		internal static void SetupUnityInstanceFromArgs ()
 		{
 			var args = Environment.GetCommandLineArgs ();
 
@@ -161,34 +139,75 @@ namespace MonoDevelop.UnityMode
 				string[] fileLine = openFileArg.Split (';');
 
 				if (fileLine.Length == 2)
-					OpenFile (fileLine[0], int.Parse(fileLine[1]));
+					OpenFile (fileLine[0], int.Parse(fileLine[1]), OpenDocumentOptions.BringToFront);
 				else
-					OpenFile (openFileArg, 0);
+					OpenFile (openFileArg, 0, OpenDocumentOptions.BringToFront);
 			}
 
 			UnityInstance.Log();
 		}
 
-		static void OpenFile(string filename, int line)
+		internal static void InitializeRestServiceAndPair()
+		{
+			UnityModeAddin.Initialize ();
+
+			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line), 
+				pairRequest => UnityPairRequest(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl, pairRequest.UnityProject),
+				quitRequest => QuitApplicationRequest(quitRequest.UnityProject));
+
+			DispatchService.BackgroundDispatch(() =>
+				{
+					LoggingService.LogInfo("Sending Pair request to Unity");
+					var result = RestClient.Pair(restService.Url, MonoDevelop.Core.BrandingService.ApplicationName + " " + MonoDevelop.BuildInfo.VersionLabel);
+					LoggingService.LogInfo("Unity Pair Request Result: " + result.result);
+
+					UnityInstance.ProcessId = result.unityprocessid;
+					UnityInstance.Project = result.unityproject;
+
+					UnityInstance.OpenDocuments = RestClient.GetOpenDocuments().documents;
+
+					foreach(var document in UnityInstance.OpenDocuments)
+					{
+						OpenFile(document, 0);
+					}
+
+					UnityInstance.Log();
+				});
+
+			UnityModeAddin.UpdateUnityProjectState();
+		}
+
+		static void OpenFile(string filename, int line, OpenDocumentOptions options = OpenDocumentOptions.None)
 		{
 			LoggingService.LogInfo ("OpenFile: " + filename + " Line " + line);
 
-			var fileOpenInformation = new FileOpenInformation (filename, null, line, 0, OpenDocumentOptions.BringToFront);
+			var workbench = IdeApp.Workbench;
+
+			if (workbench.ActiveDocument != null && workbench.ActiveDocument.FileName == filename)
+				return;
+
+			var fileOpenInformation = new FileOpenInformation (filename, null, line, 0, options);
 
 			try
 			{
-				DispatchService.GuiDispatch(() =>
+				DispatchService.GuiSyncDispatch(() =>
 					{
-						if (IdeApp.Workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
+						if (workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
 						{
-							var docs = IdeApp.Workbench.Documents.Where(d => d.FileName == fileOpenInformation.FileName);
-							docs.ElementAt(0).Select();
+							var doc = workbench.Documents.Single(d => d.FileName == fileOpenInformation.FileName);
+							doc.Select();
+
+							IEditableTextBuffer ipos = (IEditableTextBuffer) doc.Window.ViewContent.GetContent (typeof(IEditableTextBuffer));
+							if (line >= 1 && ipos != null) 
+							{
+								doc.DisableAutoScroll ();
+								doc.RunWhenLoaded (() => ipos.SetCaretTo (line, 1, false, false));
+							}
 						}
 						else
 						{
-							IdeApp.Workbench.OpenDocument(fileOpenInformation);
-							DispatchService.GuiDispatch(IdeApp.Workbench.GrabDesktopFocus);
-
+							workbench.OpenDocument(fileOpenInformation);
+							IdeApp.Workbench.GrabDesktopFocus();
 						}
 					});
 			}
@@ -200,9 +219,12 @@ namespace MonoDevelop.UnityMode
 
 		internal static void UpdateUnityOpenDocuments()
 		{
-			if (!UnityInstance.OpenDocuments.Any (d => d == IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/'))) 
+			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
+
+			if (!openDocuments.SequenceEqual(UnityInstance.OpenDocuments))
 			{
-				UnityInstance.OpenDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString().Replace('\\', '/')).ToList ();
+				UnityInstance.OpenDocuments = openDocuments;
+				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityInstance.OpenDocuments));
 			}
 		}
 
@@ -224,7 +246,7 @@ namespace MonoDevelop.UnityMode
 		{
 			if(unityProject == UnityInstance.Project)
 			{
-				IdeApp.Exit();
+				DispatchService.GuiDispatch (() => IdeApp.Exit ());
 			}
 		} 
 	}

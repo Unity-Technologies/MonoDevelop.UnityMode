@@ -56,6 +56,16 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public string unityproject { get; set; }
 	}
 
+	public class OpenDocuments
+	{
+		public List<string> documents { get; set; }
+	}
+
+	public class GenericResult
+	{
+		public string result { get; set; }
+	}
+
 	public class RestClient
 	{
 		private static JsonServiceClient client;
@@ -88,6 +98,16 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public static PairResult Pair(string url, string name)
 		{
 			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name, processid = Process.GetCurrentProcess().Id});
+		}
+
+		public static GenericResult SaveOpenDocuments(List<string> documents)
+		{
+			return client.Post<GenericResult> ("/unity/opendocuments", new OpenDocuments {documents = documents});
+		}
+
+		public static OpenDocuments GetOpenDocuments()
+		{
+			return client.Get<OpenDocuments> ("/unity/opendocuments");
 		}
 	}
 }

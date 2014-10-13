@@ -30,9 +30,10 @@ namespace MonoDevelop.UnityMode
 				solutionPad.Visible = false;
 
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
-			workbench.ActiveDocumentChanged += WorkBenchActiveDocumentChanged;
+			workbench.DocumentOpened += DocumentOpenedOrClosed;
+			workbench.DocumentClosed += DocumentOpenedOrClosed;
 
-			UnityModeAddin.SetupSettingsFromArgs ();
+			UnityModeAddin.SetupUnityInstanceFromArgs ();
 
 
 			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
@@ -73,7 +74,8 @@ namespace MonoDevelop.UnityMode
 			WorkbenchWindow workbenchWindow = workbench.RootWindow;
 
 			workbenchWindow.FocusInEvent -= WorkbenchFocusInEvent;
-			workbench.ActiveDocumentChanged -= WorkBenchActiveDocumentChanged;
+			workbench.DocumentOpened -= DocumentOpenedOrClosed;
+			workbench.DocumentClosed -= DocumentOpenedOrClosed;
 		}
 
 		CommandEntrySet MyPostProcessor(CommandEntrySet input)
@@ -124,7 +126,7 @@ namespace MonoDevelop.UnityMode
 			UnityModeAddin.UpdateUnityProjectState();
 		}
 
-		static void WorkBenchActiveDocumentChanged (object sender, EventArgs e)
+		static void DocumentOpenedOrClosed (object sender, EventArgs e)
 		{
 			UnityModeAddin.UpdateUnityOpenDocuments ();
 		}
