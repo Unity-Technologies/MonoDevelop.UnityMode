@@ -151,7 +151,7 @@ namespace MonoDevelop.UnityMode
 		{
 			UnityModeAddin.Initialize ();
 
-			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line), 
+			restService = new RestService ( fileOpenRequest => OpenFile(fileOpenRequest.File, fileOpenRequest.Line, OpenDocumentOptions.BringToFront), 
 				pairRequest => UnityPairRequest(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl, pairRequest.UnityProject),
 				quitRequest => QuitApplicationRequest(quitRequest.UnityProject));
 
