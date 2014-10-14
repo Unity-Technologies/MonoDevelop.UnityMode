@@ -244,10 +244,11 @@ namespace MonoDevelop.UnityMode
 
 		static void QuitApplicationRequest(string unityProject)
 		{
-			if(unityProject == UnityInstance.Project)
-			{
+			if (unityProject == UnityInstance.Project)
 				DispatchService.GuiDispatch (() => IdeApp.Exit ());
-			}
+			else
+				LoggingService.LogInfo ("UnityMode: Could not Exit application because requested unityProject '"
+										+ unityProject + "' does not match '" + UnityInstance.Project + "'");
 		} 
 	}
 
