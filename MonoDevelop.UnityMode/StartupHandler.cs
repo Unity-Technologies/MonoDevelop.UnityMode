@@ -32,6 +32,7 @@ namespace MonoDevelop.UnityMode
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
 			workbench.DocumentOpened += DocumentOpenedOrClosed;
 			workbench.DocumentClosed += DocumentOpenedOrClosed;
+			IdeApp.Exiting += ExitingApp;
 
 			UnityModeAddin.SetupUnityInstanceFromArgs ();
 
@@ -129,6 +130,13 @@ namespace MonoDevelop.UnityMode
 		static void DocumentOpenedOrClosed (object sender, EventArgs e)
 		{
 			UnityModeAddin.UpdateUnityOpenDocuments ();
+		}
+
+		static void ExitingApp (object sender, EventArgs e)
+		{
+			var workbench = IdeApp.Workbench;
+			workbench.DocumentOpened -= DocumentOpenedOrClosed;
+			workbench.DocumentClosed -= DocumentOpenedOrClosed;
 		}
 	}
 }
