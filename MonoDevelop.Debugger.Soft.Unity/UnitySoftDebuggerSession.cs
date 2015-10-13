@@ -47,43 +47,19 @@ namespace MonoDevelop.Debugger.Soft.Unity
 	/// <summary>
 	/// Debugger session for Unity scripting code
 	/// </summary>
-	public class UnitySoftDebuggerSession : Mono.Debugging.Soft.SoftDebuggerSession
+	public class UnitySoftDebuggerSession : SoftDebuggerSession
 	{
 		ConnectorRegistry connectorRegistry;
-		string unityPath;
-		public const uint clientPort = 57432;
 		// Connector that was used to make connection for current session.
 		IUnityDbgConnector currentConnector;
 		
 		public UnitySoftDebuggerSession (ConnectorRegistry connectorRegistry)
 		{
 			this.connectorRegistry = connectorRegistry;
-			unityPath = Util.UnityLocation;
-			
-			Adaptor.BusyStateChanged += delegate(object sender, BusyStateEventArgs e) {
-				SetBusyState (e);
-			};
-			MonoDevelop.Ide.IdeApp.Exiting += (sender,args) => EndSession();
+
+			Adaptor.BusyStateChanged += (object sender, BusyStateEventArgs e) => SetBusyState (e);
 		}
 
-		protected override void OnExit()
-		{
-			Detach();
-			base.OnExit();
-		}
-		
-		protected override void EndSession ()
-		{
-			try {
-				Ide.DispatchService.GuiDispatch (() =>
-					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout
-				);
-				base.EndSession ();
-			} catch (Mono.Debugger.Soft.VMDisconnectedException) {
-			} catch (ObjectDisposedException) {
-			}
-		}
-		
 		protected override string GetConnectingMessage (DebuggerStartInfo dsi)
 		{
 			Ide.DispatchService.GuiDispatch (() =>
@@ -115,25 +91,30 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			StartConnecting(new SoftDebuggerStartInfo(new SoftDebuggerConnectArgs(null, IPAddress.Loopback, (int)defaultPort)), 3, 1000);
 		}
 
+		protected override void EndSession ()
+		{
+			Detach ();
+			base.EndSession ();
+		}
+
+		protected override void OnExit ()
+		{
+			Detach ();
+			base.OnExit ();
+		}
+
 		protected override void OnDetach()
 		{
-			try
-			{
+			try {
 				Ide.DispatchService.GuiDispatch(() =>
 					Ide.IdeApp.Workbench.CurrentLayout = UnityProjectServiceExtension.EditLayout
 				);
 
 				VirtualMachine.Detach();
 				base.EndSession();
-			}
-			catch (ObjectDisposedException)
-			{
-			}
-			catch (VMDisconnectedException)
-			{
-			}
-			catch (NullReferenceException)
-			{
+			} catch (ObjectDisposedException) {
+			} catch (VMDisconnectedException) {
+			} catch (NullReferenceException) {
 			}
 
 			if (currentConnector != null) {

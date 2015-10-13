@@ -65,7 +65,6 @@ namespace MonoDevelop.Debugger.Soft.Unity
 				unityChooser.SetFilename (Util.UnityLocation);
 			}
 			
-			launchCB.Active = Util.UnityLaunch;
 			buildCB.Active = Util.UnityBuild;
 		}
 
@@ -81,16 +80,11 @@ namespace MonoDevelop.Debugger.Soft.Unity
 					Util.UnityLocation = fullPath;
 				}
 			}
-			Util.UnityLaunch = launchCB.Active;
+
 			Util.UnityBuild = buildCB.Active;
 			PropertyService.SaveProperties ();
 			return true;
-		}
-		
-		protected virtual void OnLaunchCBToggled (object sender, System.EventArgs e)
-		{
-			unityChooser.Sensitive = launchCB.Active;
-		}
+		}		
 	}
 	
 	/// <summary>

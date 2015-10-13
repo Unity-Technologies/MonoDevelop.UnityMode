@@ -43,11 +43,18 @@ using MonoDevelop.Debugger.Soft;
 
 namespace MonoDevelop.Debugger.Soft.Unity
 {
-	public class UnitySoftDebuggerEngine: IDebuggerEngine
+	public class UnitySoftDebuggerEngine: DebuggerEngineBackend
 	{
 		UnitySoftDebuggerSession session;
 		static PlayerConnection unityPlayerConnection;
-		
+
+		List<ProcessInfo> usbProcesses = new List<ProcessInfo>();
+		bool usbProcessesFinished = true;
+		object usbLock = new object();
+
+		List<ProcessInfo> unityProcesses = new List<ProcessInfo> ();
+		bool unityProcessesFinished = true;
+
 		internal static Dictionary<uint, PlayerConnection.PlayerInfo> UnityPlayers {
 			get;
 			private set;
@@ -61,11 +68,15 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			UnityPlayers = new Dictionary<uint, PlayerConnection.PlayerInfo> ();
 			ConnectorRegistry = new ConnectorRegistry();
 			
+			bool run = true;
+		
+			MonoDevelop.Ide.IdeApp.Exiting += (sender, args) => run = false;
+
 			try {
 			// HACK: Poll Unity players
 			unityPlayerConnection = new PlayerConnection ();
 			ThreadPool.QueueUserWorkItem (delegate {
-				while (true) {
+				while (run) {
 					lock (unityPlayerConnection) {
 						unityPlayerConnection.Poll ();
 					}
@@ -77,90 +88,120 @@ namespace MonoDevelop.Debugger.Soft.Unity
 				MonoDevelop.Core.LoggingService.LogError ("Error launching player connection discovery service: Unity player discovery will be unavailable", e);
 			}
 		}
-		
-		public string Id {
-			get {
-				return "Mono.Debugger.Soft.Unity";
-			}
-		}
-		
-		static readonly List<string> UserAssemblies = new List<string>{
-		};
 
-		public bool CanDebugCommand (ExecutionCommand command)
+		public override bool CanDebugCommand (ExecutionCommand cmd)
 		{
-			return (command is UnityExecutionCommand && null == session);
-		}
-		
-		public DebuggerStartInfo CreateDebuggerStartInfo (ExecutionCommand command)
-		{
-			var cmd = command as UnityExecutionCommand;
-			if (null == cmd){ return null; }
-			var msi = new UnityDebuggerStartInfo ("Unity");
-			// msi.SetUserAssemblies (null);
-			msi.Arguments = string.Format ("-projectPath \"{0}\"", cmd.ProjectPath);
-			return msi;
+			return cmd is UnityExecutionCommand;
 		}
 
-		public DebuggerFeatures SupportedFeatures {
-			get {
-				return DebuggerFeatures.Breakpoints | 
-					   DebuggerFeatures.Pause | 
-					   DebuggerFeatures.Stepping | 
-					   DebuggerFeatures.DebugFile |
-					   DebuggerFeatures.ConditionalBreakpoints |
-					   DebuggerFeatures.Tracepoints |
-					   DebuggerFeatures.Catchpoints |
-					   DebuggerFeatures.Attaching;
-			}
+		public override bool IsDefaultDebugger (ExecutionCommand cmd)
+		{
+			return cmd is UnityExecutionCommand;
 		}
-		
-		public DebuggerSession CreateSession ()
+
+		public override DebuggerStartInfo CreateDebuggerStartInfo (ExecutionCommand command)
+		{
+			return null;
+		}
+			
+		public override DebuggerSession CreateSession ()
 		{
 			session = new UnitySoftDebuggerSession (ConnectorRegistry);
 			session.TargetExited += delegate{ session = null; };
 			return session;
 		}
 		
-		public ProcessInfo[] GetAttachableProcesses ()
+		public override ProcessInfo[] GetAttachableProcesses ()
 		{
 			int index = 1;
 			List<ProcessInfo> processes = new List<ProcessInfo> ();
-			Process[] systemProcesses = Process.GetProcesses ();
+
 			StringComparison comparison = StringComparison.OrdinalIgnoreCase;
 			
 			if (null != unityPlayerConnection) {
-				lock (unityPlayerConnection) {
-					foreach (string player in unityPlayerConnection.AvailablePlayers) {
-						try {
-							PlayerConnection.PlayerInfo info = PlayerConnection.PlayerInfo.Parse (player);
-							if (info.m_AllowDebugging) {
-								UnityPlayers[info.m_Guid] = info;
-								processes.Add (new ProcessInfo (info.m_Guid, info.m_Id));
-								++index;
+				if(Monitor.TryEnter (unityPlayerConnection)) {
+					try {
+						foreach (string player in unityPlayerConnection.AvailablePlayers) {
+							try {
+								PlayerConnection.PlayerInfo info = PlayerConnection.PlayerInfo.Parse (player);
+								if (info.m_AllowDebugging) {
+									UnityPlayers[info.m_Guid] = info;
+									processes.Add (new ProcessInfo (info.m_Guid, info.m_Id));
+									++index;
+								}
+							} catch {
+								// Don't care; continue
 							}
-						} catch {
-							// Don't care; continue
 						}
 					}
-				}
-			}
-			if (null != systemProcesses) {
-				foreach (Process p in systemProcesses) {
-					try {
-						if ((p.ProcessName.StartsWith ("unity", comparison) ||
-							p.ProcessName.Contains ("Unity.app")) &&
-							!p.ProcessName.Contains ("UnityShader")) {
-							processes.Add (new ProcessInfo (p.Id, string.Format ("{0} ({1})", "Unity Editor", p.ProcessName)));
-						}
-					} catch {
-						// Don't care; continue
+					finally {
+						Monitor.Exit (unityPlayerConnection);
 					}
 				}
 			}
 
-			// Direct USB devices
-			iOSDevices.GetUSBDevices(ConnectorRegistry, processes);
+			if (unityProcessesFinished) 
+			{
+				unityProcessesFinished = false;
+
+				ThreadPool.QueueUserWorkItem (delegate {
+
+					Process[] systemProcesses = Process.GetProcesses();
+					var unityThreadProcesses = new List<ProcessInfo>();
+
+					if(systemProcesses != null)
+					{
+						foreach (Process p in systemProcesses) {
+							try {
+								if ((p.ProcessName.StartsWith ("unity", comparison) ||
+									p.ProcessName.Contains ("Unity.app")) &&
+									!p.ProcessName.Contains ("UnityShader") &&
+									!p.ProcessName.Contains ("UnityHelper") &&
+									!p.ProcessName.Contains ("Unity Helper")) {
+									unityThreadProcesses.Add (new ProcessInfo (p.Id, string.Format ("{0} ({1})", "Unity Editor", p.ProcessName)));
+								}
+							} catch {
+								// Don't care; continue
+							}
+						}
+
+						unityProcesses = unityThreadProcesses;
+						unityProcessesFinished = true;
+					}
+				});
+			}
+
+			processes.AddRange (unityProcesses);
+
+			if (usbProcessesFinished)
+			{
+				usbProcessesFinished = false;
+
+				ThreadPool.QueueUserWorkItem (delegate {
+					// Direct USB devices
+					lock(usbLock)
+					{
+						var usbThreadProcesses = new List<ProcessInfo>();
+
+						try
+						{
+							iOSDevices.GetUSBDevices (ConnectorRegistry, usbThreadProcesses);
+						}
+						catch(NotSupportedException)
+						{
+							LoggingService.LogInfo("iOS over USB not supported on this platform");
+						}
+						catch(Exception e)
+						{
+							LoggingService.LogError("iOS USB Error: " + e);
+						}
+						usbProcesses = usbThreadProcesses;
+						usbProcessesFinished = true;
+					}
+				});
+			}
+
+			processes.AddRange (usbProcesses);
 
 			return processes.ToArray ();
 		}
@@ -171,15 +212,11 @@ namespace MonoDevelop.Debugger.Soft.Unity
 			}
 		}
 	}
-	
-	class UnityDebuggerStartInfo : SoftDebuggerStartInfo
-	{
-		public UnityDebuggerStartInfo (string appName)
-			: base (new SoftDebuggerConnectArgs (appName, IPAddress.Loopback, 57432))
-		{
-		}
-	}
 
+	class UnityExecutionCommand : ExecutionCommand
+	{
+
+	};
 
 	// Allows to define how to setup and tear down connection for debugger to connect to the
 	// debugee. For example to setup TCP tunneling over USB.
