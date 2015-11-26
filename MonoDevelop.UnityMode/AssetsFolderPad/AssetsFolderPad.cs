@@ -1,7 +1,6 @@
 using System;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
-using Mono.TextEditor;
 using MonoDevelop.Core;
 using MonoDevelop.Ide.Gui.Pads;
 using MonoDevelop.Ide.Gui.Components;

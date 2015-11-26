@@ -34,20 +34,12 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.TextEditor">
-      <HintPath>..\..\monodevelop\main\build\bin\Mono.TextEditor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Ide.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ICSharpCode.NRefactory.CSharp">
-      <HintPath>..\..\monodevelop\main\build\bin\ICSharpCode.NRefactory.CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
@@ -60,18 +52,6 @@
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="MonoDevelop.CSharpBinding">
       <HintPath>..\..\monodevelop\main\build\AddIns\BackendBindings\MonoDevelop.CSharpBinding.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\..\monodevelop\main\build\bin\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MonoDevelop.Debugger">
-      <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger\MonoDevelop.Debugger.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Debugging">
-      <HintPath>..\..\monodevelop\main\external\debugger-libs\Mono.Debugging\bin\Debug\Mono.Debugging.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Addins">
@@ -116,10 +96,6 @@
     <None Include="Mono.Options.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoDevelop.Debugger.Soft.Unity\MonoDevelop.Debugger.Soft.Unity.csproj">
-      <Project>{42407518-6F18-401E-BDA2-730BE36DFF26}</Project>
-      <Name>MonoDevelop.Debugger.Soft.Unity</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
       <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
       <Name>MonoDevelop.UnityMode.RestService.ServiceModel</Name>
