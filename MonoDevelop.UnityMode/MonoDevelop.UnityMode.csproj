@@ -89,7 +89,6 @@
     <Compile Include="OpenUnityProjectCommand.cs" />
     <Compile Include="UnityRestHelpers.cs" />
     <Compile Include="UnityProjectStateChangedHandler.cs" />
-    <Compile Include="UnityProjectStateExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
