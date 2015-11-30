@@ -49,7 +49,7 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 	public class RenameHint
 	{
 		public String OldPath { get; set; }
-		public String newPath { get; set; }
+		public String NewPath { get; set; }
 	}
 }
 

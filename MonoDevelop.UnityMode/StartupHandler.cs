@@ -32,40 +32,8 @@ namespace MonoDevelop.UnityMode
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
 			workbench.DocumentOpened += DocumentOpenedOrClosed;
 			workbench.DocumentClosed += DocumentOpenedOrClosed;
-			IdeApp.Exiting += ExitingApp;
 
-			UnityModeAddin.SetupUnityInstanceFromArgs ();
-
-
-			//Mono.Addins.AddinManager.AddinEngine.Registry.DisableAddin ("MonoDevelop.VersionControl");
-
-			//IdeApp.CommandService.CommandEntrySetPostProcessor += MyPostProcessor;
-
-			//((DefaultWorkbench)IdeApp.Workbench.RootWindow).RecreateMenu ();
-
-			IdeApp.Workbench.ShowCommandBar ("UnityDebugging");
-
-
-			//var dw = (DefaultWorkbench)ww;
-
-			/*
-			Gtk.HBox contentBox = dw.Toolbar.ContentBox;
-			//contentBox.PackStart(new Gtk.Label ("LUCASLUCAS"), false, false, 0);
-			//contentBox.PackStart(new Gtk.Button ("LUCASLUCAS"), false, false, 0);
-
-			var statusAreaAlign = new Gtk.Alignment (100, 0, 1, 1);
-			var button = new Gtk.Button ("AISHDASDADAS");
-			button.Visible = true;
-			statusAreaAlign.Add (button);
-			contentBox.PackStart (statusAreaAlign, true, true, 0);
-			contentBox.PackStart (button, false, false, 10);
-			//MonoDevelop.Debugger.DebuggerService;
-
-			dw.Toolbar.unityDebugButton.Toggled += (sender, e) => {if (true) {
-					DebugEditorHandler.Doit();
-					}
-				};*/
-
+			SetupUnityInstanceFromArgs ();
 			UnityModeAddin.InitializeRestServiceAndPair ();
 		}
 
@@ -79,64 +47,50 @@ namespace MonoDevelop.UnityMode
 			workbench.DocumentClosed -= DocumentOpenedOrClosed;
 		}
 
-		CommandEntrySet MyPostProcessor(CommandEntrySet input)
-		{
-			var toRemove = new List<CommandEntry> ();
-			foreach(CommandEntry ce in input)
-			{
-				var theSet = ce as CommandEntrySet;
-				if (theSet != null)
-					MyPostProcessor (theSet);
-
-				var id = ce.CommandId as string;
-				if (isBlackListed (id))
-					toRemove.Add (ce);
-			}
-//			foreach (var r in toRemove)
-//				input.Remove (r);
-
-			return input;
-		}
-
-		bool isBlackListed(string command)
-		{
-			switch (command)
-			{
-			/*			case "MonoDevelop.Ide.Commands.ProjectCommands.CleanSolution":
-			case "MonoDevelop.Ide.Commands.ProjectCommands.RebuildSolution":
-			case "MonoDevelop.Ide.Commands.ProjectCommands.Rebuild":
-			case "MonoDevelop.Ide.Commands.ProjectCommands.Clean":*/
-			case "Project":
-			case "Build":
-			case "Tools":
-			case "RecentProjects":
-			case "MonoDevelop.Ide.Commands.FileCommands.NewProject":
-			case "MonoDevelop.Ide.Commands.FileCommands.NewWorkspace":
-			case "MonoDevelop.Ide.Commands.FileCommands.CloseWorkspace":
-			case "MonoDevelop.Ide.Commands.ViewCommands.ShowWelcomePage":
-			case "MonoDevelop.Ide.Commands.HelpCommands.About":
-			case "MonoDevelop.Ide.Updater.UpdateCommands.CheckForUpdates":
-				return true;
-			default:
-				return false;
-			}
-		}
-			
 		static void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
 		{
-			UnityModeAddin.UpdateUnityProjectState();
+			UnityModeAddin.UnityProjectStateRefresh ();
 		}
 
 		static void DocumentOpenedOrClosed (object sender, EventArgs e)
 		{
-			UnityModeAddin.UpdateUnityOpenDocuments ();
+			UnityRestHelpers.SendOpenDocumentsToUnity ();
 		}
 
-		static void ExitingApp (object sender, EventArgs e)
+		static void SetupUnityInstanceFromArgs ()
 		{
-			var workbench = IdeApp.Workbench;
-			workbench.DocumentOpened -= DocumentOpenedOrClosed;
-			workbench.DocumentClosed -= DocumentOpenedOrClosed;
+			var args = Environment.GetCommandLineArgs ();
+
+			string openFileArg = null;
+
+			var p = new Mono.Options.OptionSet ();
+			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityInstance.ProcessId = i);
+			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityInstance.RestServerUrl = s);
+			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
+
+			RestClient.SetServerUrl(UnityInstance.RestServerUrl);
+
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
+
+			try 
+			{
+				p.Parse (args);
+			} 
+			catch(Mono.Options.OptionException e)
+			{
+				LoggingService.LogInfo("OptionException: " + e.ToString());
+			}
+
+			if (!string.IsNullOrEmpty (openFileArg)) {
+				string[] fileLine = openFileArg.Split (';');
+
+				if (fileLine.Length == 2)
+					UnityRestHelpers.OpenFile (fileLine [0], int.Parse (fileLine [1]), OpenDocumentOptions.BringToFront);
+				else
+					UnityRestHelpers.OpenFile (openFileArg, 0, OpenDocumentOptions.BringToFront);
+			}
+
+			UnityInstance.Log();
 		}
 	}
 }

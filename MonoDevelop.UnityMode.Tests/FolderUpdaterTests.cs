@@ -248,7 +248,7 @@ namespace MonoDevelop.UnityMode.Tests
 			Files.Add("sub1/sub4/myfile.cs");
 			Files.Add("sub1/sub4/myfile2.cs");
 
-			projectState.RenameHint = new RenameHint { OldPath = "sub1/sub2", newPath = "sub1/sub4" };
+			projectState.RenameHint = new RenameHint { OldPath = "sub1/sub2", NewPath = "sub1/sub4" };
 
 			Update();
 
@@ -274,7 +274,7 @@ namespace MonoDevelop.UnityMode.Tests
 			NewProjectState();
 			Files.Add("sub1/myfile2.cs");
 
-			projectState.RenameHint = new RenameHint { OldPath = "sub1/myfile.cs", newPath = "sub1/myfile2.cs" };
+			projectState.RenameHint = new RenameHint { OldPath = "sub1/myfile.cs", NewPath = "sub1/myfile2.cs" };
 
 			Update();
 			

@@ -214,7 +214,7 @@ namespace MonoDevelop.UnityMode
 
 			Directory.CreateDirectory(directoryName);
 
-			UnityModeAddin.UpdateUnityProjectState();
+			UnityModeAddin.UnityProjectStateRefresh ();
 		}
 
 		private bool IsAssetsFolder()

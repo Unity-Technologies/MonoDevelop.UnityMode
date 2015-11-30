@@ -31,7 +31,7 @@ namespace MonoDevelop.UnityMode
 
 			if (state.RenameHint != null)
 			{
-				RenameFileOrDirectory(state.RenameHint.OldPath, state.RenameHint.newPath);
+				RenameFileOrDirectory(state.RenameHint.OldPath, state.RenameHint.NewPath);
 				return true;
 			}
 
