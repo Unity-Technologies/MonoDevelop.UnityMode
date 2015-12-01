@@ -15,7 +15,7 @@ namespace MonoDevelop.UnityMode
 
 		static RestService restService;
 		static UnityProjectState unityProjectState;
-		static UnitySolution UnitySolution { get; set; }
+		static UnitySolution unitySolution;
 
 		static UnityModeAddin ()
 		{
@@ -25,14 +25,18 @@ namespace MonoDevelop.UnityMode
 				quitRequest => UnityRestHelpers.QuitApplication(quitRequest.UnityProject)
 			);
 
-			// TODO: Should we close all other open solutions?
-			UnityProjectStateChanged += (sender, e) =>
-			{
-				SolutionUpdater.Update(UnitySolution, e.State);
+			UnityProjectStateChanged += (sender, e) => SolutionUpdater.Update (UnitySolution, e.State);
+		}
 
-				if(!IdeApp.Workspace.Items.Contains(UnitySolution))
-					IdeApp.Workspace.Items.Insert(0, UnitySolution);
-			};
+		static UnitySolution UnitySolution 
+		{
+			get { return unitySolution; }
+			set 
+			{
+				unitySolution = value;
+				IdeApp.Workspace.Items.Clear ();
+				IdeApp.Workspace.Items.Add (unitySolution);
+			}
 		}
 
 		public static UnityInstance UnityInstance { get; private set; }
@@ -62,7 +66,9 @@ namespace MonoDevelop.UnityMode
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 			UnityProjectState = new UnityProjectState ();
 
-			Pair (unityRestServiceUrl, restService.Url);
+			// FIXME: Unable to connect to own IP, might be blocked by Mongoose in Unity.
+			var editorRestServiecUri = new Uri(unityRestServiceUrl);
+			Pair ("http://localhost:"+editorRestServiecUri.Port, restService.Url);
 		}
 
 		static void Pair(string unityRestServiceUrl, string monoDevelopRestServiceUrl)
@@ -73,8 +79,19 @@ namespace MonoDevelop.UnityMode
 			DispatchService.BackgroundDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Pair request to Unity");
-				var pairResult = RestClient.Pair(monoDevelopRestServiceUrl, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
-				LoggingService.LogInfo("Unity Pair Request Result: " + pairResult.result);
+				
+				PairResult pairResult = null;
+
+				try
+				{
+					pairResult = RestClient.Pair(monoDevelopRestServiceUrl, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
+					LoggingService.LogInfo("Unity Pair Request Result: " + pairResult.result);
+				}
+				catch(Exception e)
+				{
+					LoggingService.LogInfo("Unity Pair Request Exception: " + e);
+					return;
+				}
 
 				UnityInstance.ProcessID = pairResult.unityprocessid;
 				UnityInstance.ProjectPath = pairResult.unityproject;

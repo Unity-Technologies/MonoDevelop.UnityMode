@@ -6,8 +6,8 @@ namespace MonoDevelop.UnityMode.ServiceModel
 {
 	public class UnityRestServiceSettings
 	{
-		public string EditorRestServiceUrl { get; set; }
-		public int EditorProcessID { get; set; }
+		public string EditorRestServiceUrl { get; private set; }
+		public int EditorProcessID { get; private set; }
 
 		public static UnityRestServiceSettings Load(string projectPath)
 		{

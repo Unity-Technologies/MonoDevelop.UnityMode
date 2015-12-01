@@ -16,6 +16,8 @@ namespace MonoDevelop.UnityMode
 				return;
 
 			var folder = dlg.SelectedFile;
+
+			UnityModeAddin.OpenUnityProject (folder);
 		}
 	}
 }
