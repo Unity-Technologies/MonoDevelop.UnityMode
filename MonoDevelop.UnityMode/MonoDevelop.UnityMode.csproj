@@ -85,7 +85,6 @@
     <Compile Include="AssetsFolderPad\Folder.cs" />
     <Compile Include="UnityModeAddin.cs" />
     <Compile Include="UnityModeFileSystemExtension.cs" />
-    <Compile Include="UnityInstance.cs" />
     <Compile Include="OpenUnityProjectCommand.cs" />
     <Compile Include="UnityRestHelpers.cs" />
     <Compile Include="UnityProjectStateChangedHandler.cs" />

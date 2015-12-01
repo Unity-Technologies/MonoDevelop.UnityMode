@@ -1,14 +1,9 @@
-using MonoDevelop.Components.Commands;
-using MonoDevelop.Core;
-using MonoDevelop.Ide;
-using MonoDevelop.Ide.Codons;
-using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Pads;
-using MonoDevelop.Projects;
-using MonoDevelop.UnityMode.UnityRestClient;
-using System.Linq;
 using System;
-using System.Collections.Generic;
+using MonoDevelop.Core;
+using MonoDevelop.Components.Commands;
+using MonoDevelop.Ide;
+using MonoDevelop.Ide.Gui;
+using MonoDevelop.UnityMode.ServiceModel;
 
 namespace MonoDevelop.UnityMode
 {

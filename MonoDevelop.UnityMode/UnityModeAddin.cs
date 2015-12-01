@@ -1,11 +1,11 @@
 using System;
+using System.Diagnostics;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.UnityMode.UnityRestClient;
 using MonoDevelop.UnityMode.ServiceModel;
-using System.IO;
 
 namespace MonoDevelop.UnityMode
 {
@@ -25,8 +25,13 @@ namespace MonoDevelop.UnityMode
 				quitRequest => UnityRestHelpers.QuitApplication(quitRequest.UnityProject)
 			);
 
-			UnityProjectStateChanged += (sender, e) => SolutionUpdater.Update (UnitySolution, e.State);
+			UnityProjectStateChanged += (sender, e) => {
+				if (UnitySolution != null && e.State != null)
+					SolutionUpdater.Update (UnitySolution, e.State);
+			};
 		}
+
+		static UnityRestServiceSettings UnityRestServiceSettings { get; set; }
 
 		static UnitySolution UnitySolution 
 		{
@@ -35,11 +40,12 @@ namespace MonoDevelop.UnityMode
 			{
 				unitySolution = value;
 				IdeApp.Workspace.Items.Clear ();
-				IdeApp.Workspace.Items.Add (unitySolution);
+				if(unitySolution != null)
+					IdeApp.Workspace.Items.Add (unitySolution);
 			}
 		}
 
-		public static UnityInstance UnityInstance { get; private set; }
+		public static UnityProjectSettings UnityProjectSettings { get; private set; }
 
 		public static UnityProjectState UnityProjectState 
 		{
@@ -56,13 +62,12 @@ namespace MonoDevelop.UnityMode
 
 		internal static void OpenUnityProject(string projectPath)
 		{
-			var editorSettings = UnityRestServiceSettings.Load (projectPath);
-			InitializeAndPair (editorSettings.EditorRestServiceUrl);
+			InitializeAndPair (UnityRestServiceSettings.Load (projectPath).EditorRestServiceUrl);
 		}
 
 		internal static void InitializeAndPair(string unityRestServiceUrl)
 		{
-			UnityInstance = new UnityInstance ();
+			UnityProjectSettings = new UnityProjectSettings ();
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 			UnityProjectState = new UnityProjectState ();
 
@@ -73,7 +78,6 @@ namespace MonoDevelop.UnityMode
 
 		static void Pair(string unityRestServiceUrl, string monoDevelopRestServiceUrl)
 		{
-			UnityInstance.RestServiceUrl = unityRestServiceUrl;
 			RestClient.SetServerUrl(unityRestServiceUrl);
 
 			DispatchService.BackgroundDispatch(() =>
@@ -92,12 +96,12 @@ namespace MonoDevelop.UnityMode
 					LoggingService.LogInfo("Unity Pair Request Exception: " + e);
 					return;
 				}
+				
+				UnityRestServiceSettings = new UnityRestServiceSettings(unityRestServiceUrl, pairResult.unityprocessid);
+				UnityProjectSettings.ProjectPath = pairResult.unityproject;
+				UnityProjectSettings.OpenDocuments = RestClient.GetOpenDocuments().documents;
 
-				UnityInstance.ProcessID = pairResult.unityprocessid;
-				UnityInstance.ProjectPath = pairResult.unityproject;
-				UnityInstance.OpenDocuments = RestClient.GetOpenDocuments().documents;
-
-				foreach(var document in UnityInstance.OpenDocuments)
+				foreach(var document in UnityProjectSettings.OpenDocuments)
 					UnityRestHelpers.OpenFile(document, 0);
 				
 				UnityProjectStateRefresh ();
@@ -106,25 +110,22 @@ namespace MonoDevelop.UnityMode
 
 		static void ShutdownAndUnpair()
 		{
-			UnityInstance = new UnityInstance ();
-			UnitySolution = new UnitySolution { Name = "UnitySolution" };
-			UnityProjectState = new UnityProjectState ();
+			UnityProjectSettings = null;
+			UnitySolution = null;
+			UnityProjectState = null;
 			RestClient.SetServerUrl (null);
 		}
 
 		public static void UnityProjectStateRefresh ()
 		{
-			if (!UnityInstance.Paired)
+			if (!Paired)
 				return;
 
-			if (!UnityInstance.Running) 
+			if (!IsUnityRunning()) 
 			{
 				ShutdownAndUnpair ();
 				return;
 			}
-
-			if (!RestClient.Available)
-				return;
 
 			DispatchService.BackgroundDispatch(() =>
 			{
@@ -135,17 +136,14 @@ namespace MonoDevelop.UnityMode
 
 		public static void UnityProjectStateRefreshRename (string oldPath, string newPath)
 		{
-			if (!UnityInstance.Paired)
+			if (!Paired)
 				return;
 
-			if (!UnityInstance.Running) 
+			if (!IsUnityRunning()) 
 			{
 				ShutdownAndUnpair ();
 				return;
 			}
-
-			if (!RestClient.Available)
-				return;
 
 			DispatchService.BackgroundDispatch(() =>
 			{
@@ -156,6 +154,28 @@ namespace MonoDevelop.UnityMode
 
 				UnityProjectState = projectState;
 			});
+		}
+
+		static bool Paired
+		{
+			get { return UnityRestServiceSettings != null && UnityRestServiceSettings.EditorProcessID > 0 && RestClient.Available; }
+		}
+
+		static bool IsUnityRunning()
+		{
+			if (UnityRestServiceSettings == null)
+				return false;
+
+			try
+			{
+				Process.GetProcessById(UnityRestServiceSettings.EditorProcessID);
+			}
+			catch(Exception)
+			{
+				return false;
+			}
+
+			return true;
 		}
 	}
 }

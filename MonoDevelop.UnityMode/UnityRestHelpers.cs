@@ -52,21 +52,21 @@ namespace MonoDevelop.UnityMode
 
 		internal static void QuitApplication(string unityProject)
 		{
-			if (unityProject == UnityModeAddin.UnityInstance.ProjectPath)
+			if (unityProject == UnityModeAddin.UnityProjectSettings.ProjectPath)
 				DispatchService.GuiDispatch (() => IdeApp.Exit ());
 			else
 				LoggingService.LogInfo ("UnityMode: Could not Exit application because requested unityProject '"
-					+ unityProject + "' does not match '" + UnityModeAddin.UnityInstance.ProjectPath + "'");
+					+ unityProject + "' does not match '" + UnityModeAddin.UnityProjectSettings.ProjectPath + "'");
 		}
 
 		internal static void SendOpenDocumentsToUnity()
 		{
 			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
 
-			if (!openDocuments.SequenceEqual(UnityModeAddin.UnityInstance.OpenDocuments))
+			if (!openDocuments.SequenceEqual(UnityModeAddin.UnityProjectSettings.OpenDocuments))
 			{
-				UnityModeAddin.UnityInstance.OpenDocuments = openDocuments;
-				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityModeAddin.UnityInstance.OpenDocuments));
+				UnityModeAddin.UnityProjectSettings.OpenDocuments = openDocuments;
+				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityModeAddin.UnityProjectSettings.OpenDocuments));
 			}
 		}
 	}
