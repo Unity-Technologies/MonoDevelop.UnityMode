@@ -13,15 +13,14 @@ namespace MonoDevelop.UnityMode
 		public string Url { get; set; }
 
 		public delegate void OpenFileCallback(OpenFileRequest openFileRequest);
-		public delegate void PairCallback(PairRequest pairRequest);
 		public delegate void QuitApplicationCallBack(QuitApplicationRequest quitRequest); 
 
-		public RestService (OpenFileCallback openFileCallback, PairCallback pairCallback, QuitApplicationCallBack quitCallback)
+		public RestService (OpenFileCallback openFileCallback, QuitApplicationCallBack quitCallback)
 		{
 			int port = 40000 + (Process.GetCurrentProcess().Id % 1000);
 			Url = "http://localhost:" + port + "/";
 
-			var appHost = new AppHost (openFileCallback, pairCallback, quitCallback);
+			var appHost = new AppHost (openFileCallback, quitCallback);
 			appHost.Init ();
 
 			try
@@ -45,17 +44,6 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		public class PairService : IService
-		{
-			public PairCallback Callback { get; set; }
-
-			public object Post(PairRequest pairRequest)
-			{
-				Callback (pairRequest);
-				return new HttpResult () { StatusCode = HttpStatusCode.OK };
-			}
-		}
-
 		public class QuitApplicationService : IService
 		{
 			public QuitApplicationCallBack Callback { get; set; }
@@ -71,21 +59,18 @@ namespace MonoDevelop.UnityMode
 		public class AppHost : AppHostHttpListenerBase
 		{
 			readonly OpenFileCallback openFileCallback;
-			readonly PairCallback pairCallback;
 			readonly QuitApplicationCallBack quitCallback;
 
-			public AppHost(OpenFileCallback openFileCallback, PairCallback pairCallback, QuitApplicationCallBack quitCallback)
+			public AppHost(OpenFileCallback openFileCallback, QuitApplicationCallBack quitCallback)
 				: base("UnityMode Rest Service", typeof(RestService).Assembly)
 			{
 				this.openFileCallback = openFileCallback;
-				this.pairCallback = pairCallback;
 				this.quitCallback = quitCallback;
 			}
 
 			public override void Configure(Funq.Container container)
 			{
 				container.Register (openFileCallback);
-				container.Register (pairCallback);
 				container.Register (quitCallback);
 			}
 		}

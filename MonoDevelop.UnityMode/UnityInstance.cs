@@ -1,27 +1,41 @@
-using MonoDevelop.Core;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MonoDevelop.UnityMode
 {
-	public static class UnityInstance
+	public class UnityInstance
 	{
-		static UnityInstance()
+		public int ProcessID { get; set; }
+		public string RestServiceUrl { get; set; }
+		public string ProjectPath { get; set; }
+		public List<string> OpenDocuments { get; set; }
+
+		internal UnityInstance()
 		{
-			ProcessId = -1;
-			RestServerUrl = "http://localhost:38000";
 			OpenDocuments = new List<string> ();
 		}
 
-		public static int ProcessId { get; set; }
-		public static string RestServerUrl { get; set; }
-		public static string Project { get; set; }
-		public static List<string> OpenDocuments { get; set; }
-
-		public static void Log()
+		public bool Paired
 		{
-			LoggingService.LogInfo("Unity Process ID: " + ProcessId);
-			LoggingService.LogInfo("Unity Server Url: " + RestServerUrl);
-			LoggingService.LogInfo("Unity Project: " +  Project);
+			get { return ProcessID > 0; }
+		}
+
+		public bool Running
+		{
+			get 
+			{
+				try
+				{
+					Process.GetProcessById(ProcessID);
+				}
+				catch(Exception)
+				{
+					return false;
+				}
+					
+				return true;
+			}
 		}
 	}
 }

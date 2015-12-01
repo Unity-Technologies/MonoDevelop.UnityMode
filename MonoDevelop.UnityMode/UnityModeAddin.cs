@@ -1,58 +1,29 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Collections.Generic;
-using MonoDevelop.Components.Commands;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
-using MonoDevelop.Ide.Codons;
 using MonoDevelop.Ide.Gui;
-using MonoDevelop.Ide.Gui.Pads;
-using MonoDevelop.Projects;
-using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.UnityMode.UnityRestClient;
+using MonoDevelop.UnityMode.ServiceModel;
+using System.IO;
 
 namespace MonoDevelop.UnityMode
 {
 	public static class UnityModeAddin
 	{
-		public static UnitySolution UnitySolution { get; private set; }
 		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
 
 		static RestService restService;
-		static UnityProjectState unityProjectState = new UnityProjectState ();
+		static UnityProjectState unityProjectState;
+		static UnitySolution UnitySolution { get; set; }
 
-		public static UnityProjectState UnityProjectState 
+		static UnityModeAddin ()
 		{
-			get { return unityProjectState; }
-			set 
-			{
-				unityProjectState = value;
-
-				if (UnityProjectStateChanged != null)
-					UnityProjectStateChanged(null, new UnityProjectStateChangedEventArgs() { State = unityProjectState });
-			}
-		}
-
-		internal static void InitializeRestServiceAndPair()
-		{
-			InitializeSolution ();
-
-			restService = new RestService ( 
+			restService = new RestService 
+			(
 				fileOpenRequest => UnityRestHelpers.OpenFile(fileOpenRequest.File, fileOpenRequest.Line, OpenDocumentOptions.BringToFront),
-				pairRequest => UnityRestHelpers.Paired(pairRequest.UnityProcessId, pairRequest.UnityRestServerUrl, pairRequest.UnityProject),
 				quitRequest => UnityRestHelpers.QuitApplication(quitRequest.UnityProject)
 			);
-
-			Pair ();
-
-			UnityProjectStateRefresh ();
-		}
-
-		static void InitializeSolution()
-		{
-			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 
 			// TODO: Should we close all other open solutions?
 			UnityProjectStateChanged += (sender, e) =>
@@ -64,44 +35,75 @@ namespace MonoDevelop.UnityMode
 			};
 		}
 
-		static void Pair()
+		public static UnityInstance UnityInstance { get; private set; }
+
+		public static UnityProjectState UnityProjectState 
 		{
+			get { return unityProjectState; }
+
+			private set 
+			{
+				unityProjectState = value;
+
+				if (UnityProjectStateChanged != null)
+					UnityProjectStateChanged(null, new UnityProjectStateChangedEventArgs() { State = unityProjectState });
+			}
+		}
+
+		internal static void OpenUnityProject(string projectPath)
+		{
+			var editorSettings = UnityRestServiceSettings.Load (projectPath);
+			InitializeAndPair (editorSettings.EditorRestServiceUrl);
+		}
+
+		internal static void InitializeAndPair(string unityRestServiceUrl)
+		{
+			UnityInstance = new UnityInstance ();
+			UnitySolution = new UnitySolution { Name = "UnitySolution" };
+			UnityProjectState = new UnityProjectState ();
+
+			Pair (unityRestServiceUrl, restService.Url);
+		}
+
+		static void Pair(string unityRestServiceUrl, string monoDevelopRestServiceUrl)
+		{
+			UnityInstance.RestServiceUrl = unityRestServiceUrl;
+			RestClient.SetServerUrl(unityRestServiceUrl);
+
 			DispatchService.BackgroundDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Pair request to Unity");
-				var result = RestClient.Pair(restService.Url, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
-				LoggingService.LogInfo("Unity Pair Request Result: " + result.result);
+				var pairResult = RestClient.Pair(monoDevelopRestServiceUrl, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
+				LoggingService.LogInfo("Unity Pair Request Result: " + pairResult.result);
 
-				UnityInstance.ProcessId = result.unityprocessid;
-				UnityInstance.Project = result.unityproject;
-
+				UnityInstance.ProcessID = pairResult.unityprocessid;
+				UnityInstance.ProjectPath = pairResult.unityproject;
 				UnityInstance.OpenDocuments = RestClient.GetOpenDocuments().documents;
 
 				foreach(var document in UnityInstance.OpenDocuments)
 					UnityRestHelpers.OpenFile(document, 0);
-
-				UnityInstance.Log();
+				
+				UnityProjectStateRefresh ();
 			});
+		}
+
+		static void ShutdownAndUnpair()
+		{
+			UnityInstance = new UnityInstance ();
+			UnitySolution = new UnitySolution { Name = "UnitySolution" };
+			UnityProjectState = new UnityProjectState ();
+			RestClient.SetServerUrl (null);
 		}
 
 		public static void UnityProjectStateRefresh ()
 		{
-			if(UnityInstance.ProcessId > 0)
+			if (!UnityInstance.Paired)
+				return;
+
+			if (!UnityInstance.Running) 
 			{
-				try
-				{
-					Process.GetProcessById(UnityInstance.ProcessId);
-				}
-				catch(Exception)
-				{
-					UnityInstance.ProcessId = -1;
-					UnityInstance.RestServerUrl = null;
-
-					RestClient.SetServerUrl (null);
-
-					UnityProjectState = new UnityProjectState ();
-					return;
-				}
+				ShutdownAndUnpair ();
+				return;
 			}
 
 			if (!RestClient.Available)
@@ -116,6 +118,15 @@ namespace MonoDevelop.UnityMode
 
 		public static void UnityProjectStateRefreshRename (string oldPath, string newPath)
 		{
+			if (!UnityInstance.Paired)
+				return;
+
+			if (!UnityInstance.Running) 
+			{
+				ShutdownAndUnpair ();
+				return;
+			}
+
 			if (!RestClient.Available)
 				return;
 

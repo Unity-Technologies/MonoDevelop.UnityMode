@@ -50,37 +50,23 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		internal static void Paired(int unityProcessId, string unityRestServerUrl, string unityProject)
-		{
-			UnityInstance.ProcessId = unityProcessId;
-			UnityInstance.RestServerUrl = unityRestServerUrl;
-			UnityInstance.Project = unityProject;
-
-			RestClient.SetServerUrl (UnityInstance.RestServerUrl);
-
-			LoggingService.LogInfo("Received Pair request from Unity");
-			UnityInstance.Log();
-
-			UnityModeAddin.UnityProjectStateRefresh  ();
-		}
-
 		internal static void QuitApplication(string unityProject)
 		{
-			if (unityProject == UnityInstance.Project)
+			if (unityProject == UnityModeAddin.UnityInstance.ProjectPath)
 				DispatchService.GuiDispatch (() => IdeApp.Exit ());
 			else
 				LoggingService.LogInfo ("UnityMode: Could not Exit application because requested unityProject '"
-					+ unityProject + "' does not match '" + UnityInstance.Project + "'");
+					+ unityProject + "' does not match '" + UnityModeAddin.UnityInstance.ProjectPath + "'");
 		}
 
 		internal static void SendOpenDocumentsToUnity()
 		{
 			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
 
-			if (!openDocuments.SequenceEqual(UnityInstance.OpenDocuments))
+			if (!openDocuments.SequenceEqual(UnityModeAddin.UnityInstance.OpenDocuments))
 			{
-				UnityInstance.OpenDocuments = openDocuments;
-				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityInstance.OpenDocuments));
+				UnityModeAddin.UnityInstance.OpenDocuments = openDocuments;
+				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityModeAddin.UnityInstance.OpenDocuments));
 			}
 		}
 	}

@@ -12,6 +12,12 @@ using System.Collections.Generic;
 
 namespace MonoDevelop.UnityMode
 {
+	public class UnityModeArgs
+	{
+		public string UnityProjectPath { get; set; }
+		public string OpenFile { get; set; }
+	}
+
 	public class StartupHandler : CommandHandler
 	{
 		protected override void Run ()
@@ -33,8 +39,20 @@ namespace MonoDevelop.UnityMode
 			workbench.DocumentOpened += DocumentOpenedOrClosed;
 			workbench.DocumentClosed += DocumentOpenedOrClosed;
 
-			SetupUnityInstanceFromArgs ();
-			UnityModeAddin.InitializeRestServiceAndPair ();
+			var args = ParseArgs (Environment.GetCommandLineArgs ());
+
+			if (args.OpenFile != null)
+				OpenFileFromArgument (args.OpenFile);
+
+			if (args.UnityProjectPath != null)
+				UnityModeAddin.OpenUnityProject (args.UnityProjectPath);
+			else 
+			{
+				// For development
+				#if DEBUG
+				UnityModeAddin.InitializeAndPair("http://localhost:38000");
+				#endif
+			}
 		}
 
 		~StartupHandler()
@@ -57,20 +75,15 @@ namespace MonoDevelop.UnityMode
 			UnityRestHelpers.SendOpenDocumentsToUnity ();
 		}
 
-		static void SetupUnityInstanceFromArgs ()
+		static UnityModeArgs ParseArgs(string[] args)
 		{
-			var args = Environment.GetCommandLineArgs ();
+			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
 
-			string openFileArg = null;
+			UnityModeArgs unityModeArgs = new UnityModeArgs ();
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProcessId=", "Unity Process Id", (int i) => UnityInstance.ProcessId = i);
-			p.Add ("unityRestServerUrl=", "Unity REST Server URL", s => UnityInstance.RestServerUrl = s);
-			p.Add ("unityOpenFile=", "Unity Open File", f => openFileArg = f);
-
-			RestClient.SetServerUrl(UnityInstance.RestServerUrl);
-
-			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
+			p.Add ("unityOpenFile=", "Unity Open File", f => unityModeArgs.OpenFile = f);
+			p.Add ("unityProjectPath=", "Unity Project Path", path => unityModeArgs.UnityProjectPath = path);
 
 			try 
 			{
@@ -78,19 +91,21 @@ namespace MonoDevelop.UnityMode
 			} 
 			catch(Mono.Options.OptionException e)
 			{
-				LoggingService.LogInfo("OptionException: " + e.ToString());
+				LoggingService.LogInfo("OptionException: " + e);
+				return null;
 			}
 
-			if (!string.IsNullOrEmpty (openFileArg)) {
-				string[] fileLine = openFileArg.Split (';');
+			return unityModeArgs;
+		}
 
-				if (fileLine.Length == 2)
-					UnityRestHelpers.OpenFile (fileLine [0], int.Parse (fileLine [1]), OpenDocumentOptions.BringToFront);
-				else
-					UnityRestHelpers.OpenFile (openFileArg, 0, OpenDocumentOptions.BringToFront);
-			}
+		static void OpenFileFromArgument(string openFileArg)
+		{
+			string[] fileLine = openFileArg.Split (';');
 
-			UnityInstance.Log();
+			if (fileLine.Length == 2)
+				UnityRestHelpers.OpenFile (fileLine [0], int.Parse (fileLine [1]), OpenDocumentOptions.BringToFront);
+			else
+				UnityRestHelpers.OpenFile (openFileArg, 0, OpenDocumentOptions.BringToFront);
 		}
 	}
 }
