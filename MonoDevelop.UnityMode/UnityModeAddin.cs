@@ -98,15 +98,10 @@ namespace MonoDevelop.UnityMode
 				}
 				
 				UnityRestServiceSettings = new UnityRestServiceSettings(unityRestServiceUrl, pairResult.unityprocessid);
+				
+				UnityProjectSettings = UnityRestHelpers.LoadAndApplyProjectSettings();
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
-				var projectSettings =  RestClient.GetProjectSettings();
-				UnityProjectSettings.OpenDocuments = projectSettings.documents;
-				UnityProjectSettings.Breakpoints = projectSettings.breakpoints;
-
-				foreach(var document in UnityProjectSettings.OpenDocuments)
-					UnityRestHelpers.OpenFile(document, 0);
-				
 				UnityProjectStateRefresh ();
 			});
 		}

@@ -5,6 +5,9 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Content;
 using MonoDevelop.Ide;
 using MonoDevelop.UnityMode.UnityRestClient;
+using MonoDevelop.UnityMode.RestServiceModel;
+using MonoDevelop.Debugger;
+using Mono.Debugging.Client;
 
 namespace MonoDevelop.UnityMode
 {
@@ -59,15 +62,47 @@ namespace MonoDevelop.UnityMode
 					+ unityProject + "' does not match '" + UnityModeAddin.UnityProjectSettings.ProjectPath + "'");
 		}
 
-		internal static void SaveProjectSettings()
+		internal static void UpdateAndSaveProjectSettings(UnityProjectSettings projectSettings)
 		{
 			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
+			var breakpoints = DebuggingService.Breakpoints.GetBreakevents ().OfType<Breakpoint>().Select (bp => string.Format("{0};{1};{2}", bp.FileName, bp.Line, bp.Column)).ToList ();
 
-			if (!openDocuments.SequenceEqual(UnityModeAddin.UnityProjectSettings.OpenDocuments))
+			if (!openDocuments.SequenceEqual(projectSettings.OpenDocuments) || ! breakpoints.SequenceEqual(projectSettings.Breakpoints))
 			{
-				UnityModeAddin.UnityProjectSettings.OpenDocuments = openDocuments;
-				DispatchService.BackgroundDispatch (() => RestClient.SaveProjectSettings(UnityModeAddin.UnityProjectSettings.OpenDocuments, UnityModeAddin.UnityProjectSettings.Breakpoints));
+				projectSettings.OpenDocuments = openDocuments;
+				projectSettings.Breakpoints = breakpoints;
+				DispatchService.BackgroundDispatch (() => RestClient.SaveProjectSettings(projectSettings.OpenDocuments, projectSettings.Breakpoints));
 			}
+		}
+
+		internal static UnityProjectSettings LoadAndApplyProjectSettings()
+		{
+			var projectSettings =  RestClient.GetProjectSettings();
+
+			var breakpointStore = DebuggingService.Breakpoints;
+
+			breakpointStore.Clear ();
+
+			foreach (var breakpoint in projectSettings.breakpoints) {
+				var pathLineColumn = breakpoint.Split (';');
+
+				if (pathLineColumn.Length == 2)
+					breakpointStore.Add (pathLineColumn [0], int.Parse (pathLineColumn [1]));
+				else if (pathLineColumn.Length == 3)
+					breakpointStore.Add (pathLineColumn [0], int.Parse (pathLineColumn [1]), int.Parse (pathLineColumn [2]));
+				else
+					LoggingService.LogWarning (string.Format ("UnityMode: Unable to add breakpoint: {0}", breakpoint));
+			}
+
+			foreach(var document in projectSettings.documents)
+				OpenFile(document, 0);
+
+			var result = new UnityProjectSettings ();
+
+			result.OpenDocuments = projectSettings.documents;
+			result.Breakpoints = projectSettings.breakpoints;
+
+			return result;
 		}
 	}
 }

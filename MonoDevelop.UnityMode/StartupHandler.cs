@@ -1,9 +1,10 @@
 using System;
 using MonoDevelop.Core;
-using MonoDevelop.Components.Commands;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
-using MonoDevelop.UnityMode.ServiceModel;
+using MonoDevelop.Components.Commands;
+using MonoDevelop.Debugger;
+using Mono.Debugging.Client;
 
 namespace MonoDevelop.UnityMode
 {
@@ -15,6 +16,11 @@ namespace MonoDevelop.UnityMode
 
 	public class StartupHandler : CommandHandler
 	{
+		EventHandler<BreakpointEventArgs> breakpointUpdatedHandler;
+		EventHandler<BreakpointEventArgs> breakpointRemovedHandler;
+		EventHandler<BreakpointEventArgs> breakpointAddedHandler;
+		EventHandler breakpointChangedHandler;
+
 		protected override void Run ()
 		{
 			Workbench workbench = IdeApp.Workbench;
@@ -31,8 +37,20 @@ namespace MonoDevelop.UnityMode
 				solutionPad.Visible = false;
 
 			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
-			workbench.DocumentOpened += DocumentOpenedOrClosed;
-			workbench.DocumentClosed += DocumentOpenedOrClosed;
+			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
+			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
+
+
+			breakpointUpdatedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointRemovedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointAddedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointChangedHandler = DispatchService.GuiDispatch<EventHandler> (UpdateAndSaveProjectSettings);
+
+			var breakpoints = DebuggingService.Breakpoints;
+			breakpoints.BreakpointAdded += breakpointAddedHandler;
+			breakpoints.BreakpointRemoved += breakpointRemovedHandler;
+			breakpoints.Changed += breakpointChangedHandler;
+			breakpoints.BreakpointUpdated += breakpointUpdatedHandler;
 
 			var args = ParseArgs (Environment.GetCommandLineArgs ());
 
@@ -56,8 +74,8 @@ namespace MonoDevelop.UnityMode
 			WorkbenchWindow workbenchWindow = workbench.RootWindow;
 
 			workbenchWindow.FocusInEvent -= WorkbenchFocusInEvent;
-			workbench.DocumentOpened -= DocumentOpenedOrClosed;
-			workbench.DocumentClosed -= DocumentOpenedOrClosed;
+			workbench.DocumentOpened -= UpdateAndSaveProjectSettings;
+			workbench.DocumentClosed -= UpdateAndSaveProjectSettings;
 		}
 
 		static void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
@@ -65,9 +83,9 @@ namespace MonoDevelop.UnityMode
 			UnityModeAddin.UnityProjectStateRefresh ();
 		}
 
-		static void DocumentOpenedOrClosed (object sender, EventArgs e)
+		static void UpdateAndSaveProjectSettings (object sender, EventArgs e)
 		{
-			UnityRestHelpers.SaveProjectSettings ();
+			UnityRestHelpers.UpdateAndSaveProjectSettings (UnityModeAddin.UnityProjectSettings);
 		}
 
 		static UnityModeArgs ParseArgs(string[] args)
