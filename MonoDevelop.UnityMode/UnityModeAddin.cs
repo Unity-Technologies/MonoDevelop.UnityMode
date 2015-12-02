@@ -60,7 +60,7 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		internal static void OpenUnityProject(string projectPath)
+		public static void OpenUnityProject(string projectPath)
 		{
 			InitializeAndPair (UnityRestServiceSettings.Load (projectPath).EditorRestServiceUrl);
 		}
@@ -99,7 +99,10 @@ namespace MonoDevelop.UnityMode
 				
 				UnityRestServiceSettings = new UnityRestServiceSettings(unityRestServiceUrl, pairResult.unityprocessid);
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
-				UnityProjectSettings.OpenDocuments = RestClient.GetOpenDocuments().documents;
+
+				var projectSettings =  RestClient.GetProjectSettings();
+				UnityProjectSettings.OpenDocuments = projectSettings.documents;
+				UnityProjectSettings.Breakpoints = projectSettings.breakpoints;
 
 				foreach(var document in UnityProjectSettings.OpenDocuments)
 					UnityRestHelpers.OpenFile(document, 0);

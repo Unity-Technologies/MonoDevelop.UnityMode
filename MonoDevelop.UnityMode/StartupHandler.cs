@@ -67,7 +67,7 @@ namespace MonoDevelop.UnityMode
 
 		static void DocumentOpenedOrClosed (object sender, EventArgs e)
 		{
-			UnityRestHelpers.SendOpenDocumentsToUnity ();
+			UnityRestHelpers.SaveProjectSettings ();
 		}
 
 		static UnityModeArgs ParseArgs(string[] args)

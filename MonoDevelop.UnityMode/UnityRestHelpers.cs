@@ -59,14 +59,14 @@ namespace MonoDevelop.UnityMode
 					+ unityProject + "' does not match '" + UnityModeAddin.UnityProjectSettings.ProjectPath + "'");
 		}
 
-		internal static void SendOpenDocumentsToUnity()
+		internal static void SaveProjectSettings()
 		{
 			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
 
 			if (!openDocuments.SequenceEqual(UnityModeAddin.UnityProjectSettings.OpenDocuments))
 			{
 				UnityModeAddin.UnityProjectSettings.OpenDocuments = openDocuments;
-				DispatchService.BackgroundDispatch (() => RestClient.SaveOpenDocuments (UnityModeAddin.UnityProjectSettings.OpenDocuments));
+				DispatchService.BackgroundDispatch (() => RestClient.SaveProjectSettings(UnityModeAddin.UnityProjectSettings.OpenDocuments, UnityModeAddin.UnityProjectSettings.Breakpoints));
 			}
 		}
 	}

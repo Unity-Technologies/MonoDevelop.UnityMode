@@ -56,9 +56,10 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public string unityproject { get; set; }
 	}
 
-	public class OpenDocuments
+	public class ProjectSettings
 	{
 		public List<string> documents { get; set; }
+		public List<string> breakpoints { get; set; }
 	}
 
 	public class GenericResult
@@ -100,15 +101,17 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name, processid = Process.GetCurrentProcess().Id});
 		}
 
-		public static GenericResult SaveOpenDocuments(List<string> documents)
+		public static GenericResult SaveProjectSettings(List<string> documents, List<string> breakpoints)
 		{
-			return client.Post<GenericResult> ("/unity/opendocuments", new OpenDocuments {documents = documents});
+			return client.Post<GenericResult> ("/unity/projectsettings", new ProjectSettings {documents = documents, breakpoints = breakpoints});
 		}
 
-		public static OpenDocuments GetOpenDocuments()
+		public static ProjectSettings GetProjectSettings()
 		{
-			return client.Get<OpenDocuments> ("/unity/opendocuments");
+			return client.Get<ProjectSettings> ("/unity/projectsettings");
 		}
+
+	
 	}
 }
 
