@@ -67,47 +67,60 @@ namespace MonoDevelop.UnityMode
 
 		internal static void UpdateAndSaveProjectSettings(UnityProjectSettings projectSettings)
 		{
-			var openDocuments = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
-			var breakpoints = DebuggingService.Breakpoints.GetBreakevents ().OfType<Breakpoint>().Select (bp => string.Format("{0};{1};{2}", bp.FileName, bp.Line, bp.Column)).ToList ();
+			DispatchService.GuiDispatch (() => {
+				var documents = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
 
-			if (!openDocuments.SequenceEqual(projectSettings.OpenDocuments) || ! breakpoints.SequenceEqual(projectSettings.Breakpoints))
-			{
-				projectSettings.OpenDocuments = openDocuments;
-				projectSettings.Breakpoints = breakpoints;
-				DispatchService.BackgroundDispatch (() => RestClient.SaveProjectSettings(projectSettings.OpenDocuments, projectSettings.Breakpoints));
-			}
+				var breakEvents = DebuggingService.Breakpoints.GetBreakevents ();
+				var breakpoints = breakEvents.OfType<Breakpoint> ().Select (bp => new UnityProjectSettings.Breakpoint (bp.FileName, bp.Line, bp.Column, bp.Enabled)).ToList ();
+				var functionBreakpoints = breakEvents.OfType<FunctionBreakpoint> ().Select (bp => new UnityProjectSettings.FunctionBreakpoint (bp.FunctionName, bp.Language, bp.Enabled)).ToList ();
+				var exceptionBreaks = breakEvents.OfType<Catchpoint> ().Select (cp => new UnityProjectSettings.ExceptionBreak (cp.ExceptionName, cp.IncludeSubclasses, cp.Enabled)).ToList ();
+
+				if (!documents.SequenceEqual (projectSettings.Documents) ||
+				   !breakpoints.SequenceEqual (projectSettings.Breakpoints) ||
+				   !functionBreakpoints.SequenceEqual (projectSettings.FunctionBreakpoints) ||
+				   !exceptionBreaks.SequenceEqual (projectSettings.ExceptionBreaks)) {
+					projectSettings.Documents = documents;
+					projectSettings.Breakpoints = breakpoints;
+					projectSettings.FunctionBreakpoints = functionBreakpoints;
+					projectSettings.ExceptionBreaks = exceptionBreaks;
+					DispatchService.BackgroundDispatch (() => RestClient.SaveUnityProjectSettings (projectSettings));
+				}
+			});
 		}
 
 		internal static UnityProjectSettings LoadAndApplyProjectSettings()
 		{
 			var projectSettings =  RestClient.GetProjectSettings();
-
 			var breakpointStore = DebuggingService.Breakpoints;
 
-			breakpointStore.Clear ();
+			DispatchService.GuiDispatch (() => {
+				breakpointStore.Clear ();
 
-			foreach (var breakpoint in projectSettings.breakpoints) {
-				var pathLineColumn = breakpoint.Split (';');
+				foreach (var breakpoint in projectSettings.Breakpoints) {
+					var bp = new Breakpoint (breakpoint.Filename, breakpoint.Line, breakpoint.Column);
+					bp.Enabled = breakpoint.Enabled;
+					breakpointStore.Add (bp);
+				}
 
-				if (pathLineColumn.Length == 2)
-					breakpointStore.Add (pathLineColumn [0], int.Parse (pathLineColumn [1]));
-				else if (pathLineColumn.Length == 3)
-					breakpointStore.Add (pathLineColumn [0], int.Parse (pathLineColumn [1]), int.Parse (pathLineColumn [2]));
-				else
-					LoggingService.LogWarning (string.Format ("UnityMode: Unable to add breakpoint: {0}", breakpoint));
-			}
+				foreach (var functionbreakpoint in projectSettings.FunctionBreakpoints) {
+					var bp = new FunctionBreakpoint (functionbreakpoint.Function, functionbreakpoint.Language);
+					bp.Enabled = functionbreakpoint.Enabled;
+					breakpointStore.Add (bp);
+				}
 
-			foreach(var document in projectSettings.documents)
+				foreach (var exceptionBreak in projectSettings.ExceptionBreaks) {
+					var bp = new Catchpoint (exceptionBreak.Exception, exceptionBreak.IncludeSubclasses);
+					bp.Enabled = exceptionBreak.Enabled;
+					breakpointStore.Add (bp);
+				}
+			});
+
+			foreach(var document in projectSettings.Documents)
 				OpenFile(document, 0);
 
-			OpenFile (projectSettings.documents.FirstOrDefault(), 0, OpenDocumentOptions.BringToFront);
+			OpenFile (projectSettings.Documents.FirstOrDefault(), 0, OpenDocumentOptions.BringToFront);
 
-			var result = new UnityProjectSettings ();
-
-			result.OpenDocuments = projectSettings.documents;
-			result.Breakpoints = projectSettings.breakpoints;
-
-			return result;
+			return projectSettings;
 		}
 	}
 }

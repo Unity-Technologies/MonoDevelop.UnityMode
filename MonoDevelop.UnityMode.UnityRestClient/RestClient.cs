@@ -56,12 +56,6 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public string unityproject { get; set; }
 	}
 
-	public class ProjectSettings
-	{
-		public List<string> documents { get; set; }
-		public List<string> breakpoints { get; set; }
-	}
-
 	public class AssetDatabaseFolder
 	{
 		List<AssetDatabaseFolder> folders { get; set; }
@@ -121,14 +115,14 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name, processid = Process.GetCurrentProcess().Id});
 		}
 
-		public static void SaveProjectSettings(List<string> documents, List<string> breakpoints)
+		public static void SaveUnityProjectSettings(UnityProjectSettings projectSettings)
 		{
-			client.Post<IReturnVoid> ("/unity/projectsettings", new ProjectSettings {documents = documents, breakpoints = breakpoints});
+			client.Post<IReturnVoid> ("/unity/projectsettings", projectSettings);
 		}
 
-		public static ProjectSettings GetProjectSettings()
+		public static UnityProjectSettings GetProjectSettings()
 		{
-			return client.Get<ProjectSettings> ("/unity/projectsettings");
+			return client.Get<UnityProjectSettings> ("/unity/projectsettings");
 		}
 
 	
