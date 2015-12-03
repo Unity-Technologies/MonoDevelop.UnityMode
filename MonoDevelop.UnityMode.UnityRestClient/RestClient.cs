@@ -62,6 +62,21 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public List<string> breakpoints { get; set; }
 	}
 
+	public class AssetDatabaseFolder
+	{
+		List<AssetDatabaseFolder> folders { get; set; }
+
+		public AssetDatabaseFolder()
+		{
+			folders = new List<AssetDatabaseFolder> ();
+		}
+	}
+
+	public class AssetDatabaseRequest
+	{
+		public AssetDatabaseFolder root { get; set; }
+	}
+
 	public class GenericResult
 	{
 		public string result { get; set; }
@@ -86,6 +101,11 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Get<UnityProjectState>("/unity/projectstate");
 		}
 
+		public static UnityAssetDatabase GetUnityAssetDatabase ()
+		{
+			return client.Get<UnityAssetDatabase>("/unity/assets");
+		}
+
 		public static CompilationResult CompileScripts()
 		{
 			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{action = "recompile"});
@@ -101,9 +121,9 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Post<PairResult>("/unity/pair", new PairRequest {url = url, name = name, processid = Process.GetCurrentProcess().Id});
 		}
 
-		public static GenericResult SaveProjectSettings(List<string> documents, List<string> breakpoints)
+		public static void SaveProjectSettings(List<string> documents, List<string> breakpoints)
 		{
-			return client.Post<GenericResult> ("/unity/projectsettings", new ProjectSettings {documents = documents, breakpoints = breakpoints});
+			client.Post<IReturnVoid> ("/unity/projectsettings", new ProjectSettings {documents = documents, breakpoints = breakpoints});
 		}
 
 		public static ProjectSettings GetProjectSettings()

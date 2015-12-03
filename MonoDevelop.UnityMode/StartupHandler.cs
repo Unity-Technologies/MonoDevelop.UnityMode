@@ -81,6 +81,7 @@ namespace MonoDevelop.UnityMode
 		static void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
 		{
 			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityAssetDatabaseRefresh ();
 		}
 
 		static void UpdateAndSaveProjectSettings (object sender, EventArgs e)

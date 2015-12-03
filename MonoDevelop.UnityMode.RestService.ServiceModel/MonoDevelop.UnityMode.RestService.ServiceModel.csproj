@@ -54,6 +54,7 @@
     <Compile Include="QuitApplicationRequest.cs" />
     <Compile Include="UnityRestServiceSettings.cs" />
     <Compile Include="UnityProjectSettings.cs" />
+    <Compile Include="UnityAssetDatabase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

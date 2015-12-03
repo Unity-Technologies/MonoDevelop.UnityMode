@@ -10,47 +10,40 @@ namespace MonoDevelop.UnityMode
 {
 	public class FolderUpdater
 	{
-		private AssetDatabase assetDatabase;
-		private Dictionary<string, Folder> folders;
+		UnityAssetDatabase assetDatabase;
+		Dictionary<string, Folder> folders;
 
-		public string BaseDirectory { get; set; }
 		public Folder RootFolder { get; private set; }
 
-		public bool Update(UnityProjectState state)
+		public bool Update(UnityAssetDatabase database)
 		{
-			if (assetDatabase == null || assetDatabase == state.AssetDatabase || BaseDirectory != state.BaseDirectory)
+			if (assetDatabase == null || assetDatabase == database)
 			{
-				Create(state);
+				Create(database);
 				return false;
 			}
 
 			var oldAssetDatabase = assetDatabase;
-			var newAssetDatabase = state.AssetDatabase;
+			var newAssetDatabase = database;
 
-			assetDatabase = state.AssetDatabase;
+			assetDatabase = database;
 
-			if (state.RenameHint != null)
+			if (database.RenameHint != null)
 			{
-				RenameFileOrDirectory(state.RenameHint.OldPath, state.RenameHint.NewPath);
+				RenameFileOrDirectory(database.RenameHint.OldPath, database.RenameHint.NewPath);
 				return true;
 			}
 
 			var addFiles = newAssetDatabase.Files.Where(f => !oldAssetDatabase.Files.Contains(f)).ToArray();
-			var addEmptyDirectories = newAssetDatabase.EmptyDirectories.Where(f => !oldAssetDatabase.EmptyDirectories.Contains(f)).ToArray();
+			var addEmptyDirectories = newAssetDatabase.Directories.Where(f => !oldAssetDatabase.Directories.Contains(f)).ToArray();
 
 			var removeFiles = oldAssetDatabase.Files.Where(f => !newAssetDatabase.Files.Contains(f)).ToArray();
-			var removeEmptyDirectories = oldAssetDatabase.EmptyDirectories.Where(f => !newAssetDatabase.EmptyDirectories.Contains(f)).ToArray();
+			var removeEmptyDirectories = oldAssetDatabase.Directories.Where(f => !newAssetDatabase.Directories.Contains(f)).ToArray();
 
 			var numChanges = addFiles.Length + addEmptyDirectories.Length + removeFiles.Length + removeEmptyDirectories.Length;
 
 			if (numChanges == 0)
 				return true;
-
-			foreach (var file in addFiles)
-				AddFile(file);
-
-			foreach (var file in removeFiles)
-				RemoveFile(file, addEmptyDirectories);
 
 			foreach (var directory in addEmptyDirectories)
 				AddEmptyDirectory(directory);
@@ -58,13 +51,18 @@ namespace MonoDevelop.UnityMode
 			foreach (var directory in removeEmptyDirectories)
 				RemoveEmptyDirectory(directory, addEmptyDirectories);
 
+			foreach (var file in addFiles)
+				AddFile(file);
+
+			foreach (var file in removeFiles)
+				RemoveFile(file, addEmptyDirectories);
+
 			return true;
 		}
 
-		private void Create(UnityProjectState state)
+		public void Create(UnityAssetDatabase database)
 		{
-			assetDatabase = state.AssetDatabase;
-			BaseDirectory = state.BaseDirectory;
+			assetDatabase = database;
 
 			RootFolder = new Folder("");
 			folders = new Dictionary<string, Folder> {{RootFolder.RelativePath, RootFolder}};
@@ -74,11 +72,12 @@ namespace MonoDevelop.UnityMode
 				AddFile(file);
 
 			// Build folder structure from empty folders
-			foreach (var emptyDirectory in assetDatabase.EmptyDirectories)
+			foreach (var emptyDirectory in assetDatabase.Directories)
 				AddEmptyDirectory(emptyDirectory);
+
 		}
 
-		private void AddFile(string file)
+		void AddFile(string file)
 		{
 			var parentPath = GetParentDirectoryPath(file);
 			Folder childFolder = null;
@@ -103,7 +102,7 @@ namespace MonoDevelop.UnityMode
 			fileFolder.Add(new File(file));
 		}
 
-		private void RemoveFile(string file, string[] addEmptyDirectories)
+		void RemoveFile(string file, string[] addEmptyDirectories)
 		{
 			var parentPath = GetParentDirectoryPath(file);
 			var parentFolder = folders[parentPath];
@@ -126,7 +125,7 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		private void AddEmptyDirectory(string directory)
+		void AddEmptyDirectory(string directory)
 		{
 			Folder childFolder = null;
 
@@ -150,7 +149,7 @@ namespace MonoDevelop.UnityMode
 				folders[directory].Add(childFolder);
 		}
 
-		private void RemoveEmptyDirectory(string directory, string[] addEmptyDirectories)
+		void RemoveEmptyDirectory(string directory, string[] addEmptyDirectories)
 		{
 			var folder = folders[directory];
 
@@ -165,7 +164,7 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		private void RenameFileOrDirectory(string oldPath, string newPath)
+		void RenameFileOrDirectory(string oldPath, string newPath)
 		{
 			if (folders.ContainsKey(oldPath)) // Folder
 			{

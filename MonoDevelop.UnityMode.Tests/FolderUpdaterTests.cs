@@ -11,17 +11,17 @@ namespace MonoDevelop.UnityMode.Tests
 	public class FolderUpdaterTests
 	{
 		private FolderUpdater folderUpdater;
-		private UnityProjectState projectState;
+		private UnityAssetDatabase assetDatabase;
 
 		private Folder RootFolder { get { return folderUpdater.RootFolder; } }
-		private List<String> Files { get { return projectState.AssetDatabase.Files; } }
-		private List<String> EmptyDirectories { get { return projectState.AssetDatabase.EmptyDirectories; } }
+		private List<String> Files { get { return assetDatabase.Files; } }
+		private List<String> EmptyDirectories { get { return assetDatabase.Directories; } }
 
 		[SetUp]
 		public void Setup()
 		{
 			folderUpdater = new FolderUpdater();
-			projectState = new UnityProjectState();
+			assetDatabase = new UnityAssetDatabase();
 		}
 
 		[Test]
@@ -113,7 +113,7 @@ namespace MonoDevelop.UnityMode.Tests
 			
 			Is("myfile.cs", RootFolder.GetFiles().Single());
 
-			NewProjectState();
+			NewAssetDatabase();
 			Files.Add("myfile.cs");
 			Files.Add("myfile2.cs");
 
@@ -133,7 +133,7 @@ namespace MonoDevelop.UnityMode.Tests
 			
 			Is("myfile.cs", RootFolder.GetFiles().Single());
 
-			NewProjectState();
+			NewAssetDatabase();
 			Files.Add("myfile.cs");
 			Files.Add("sub1/myfile2.cs");
 
@@ -155,7 +155,7 @@ namespace MonoDevelop.UnityMode.Tests
 			Is("sub1", RootFolder.GetFolders().Single());
 			Is("sub1/myfile.cs", RootFolder.GetFolders().Single().GetFiles().Single());
 
-			NewProjectState();
+			NewAssetDatabase();
 			EmptyDirectories.Add("sub1");
 
 			Update();
@@ -177,7 +177,7 @@ namespace MonoDevelop.UnityMode.Tests
 			Assert.IsTrue(Contains(RootFolder.GetFolders().Single(), "sub1/myfile2.cs"));
 			Assert.IsTrue(Contains(RootFolder.GetFolders().Single(), "sub1/sub2"));
 
-			NewProjectState();
+			NewAssetDatabase();
 			Files.Add("myfile.cs");
 
 			Update();
@@ -205,7 +205,7 @@ namespace MonoDevelop.UnityMode.Tests
 			Assert.IsTrue(Contains(sub2, "sub1/sub2/myfile.cs"));
 			Assert.IsTrue(Contains(sub2, "sub1/sub2/myfile2.cs"));
 
-			NewProjectState();
+			NewAssetDatabase();
 
 			Files.Add("sub1/sub4/myfile.cs");
 			Files.Add("sub1/sub4/myfile2.cs");
@@ -243,12 +243,12 @@ namespace MonoDevelop.UnityMode.Tests
 			Assert.IsTrue(Contains(sub2, "sub1/sub2/myfile.cs"));
 			Assert.IsTrue(Contains(sub2, "sub1/sub2/myfile2.cs"));
 
-			NewProjectState();
+			NewAssetDatabase();
 
 			Files.Add("sub1/sub4/myfile.cs");
 			Files.Add("sub1/sub4/myfile2.cs");
 
-			projectState.RenameHint = new RenameHint { OldPath = "sub1/sub2", NewPath = "sub1/sub4" };
+			assetDatabase.RenameHint = new RenameHint { OldPath = "sub1/sub2", NewPath = "sub1/sub4" };
 
 			Update();
 
@@ -271,10 +271,10 @@ namespace MonoDevelop.UnityMode.Tests
 			Is("sub1", sub1);
 			Is("sub1/myfile.cs", sub1.GetFiles().Single());
 
-			NewProjectState();
+			NewAssetDatabase();
 			Files.Add("sub1/myfile2.cs");
 
-			projectState.RenameHint = new RenameHint { OldPath = "sub1/myfile.cs", NewPath = "sub1/myfile2.cs" };
+			assetDatabase.RenameHint = new RenameHint { OldPath = "sub1/myfile.cs", NewPath = "sub1/myfile2.cs" };
 
 			Update();
 			
@@ -282,19 +282,19 @@ namespace MonoDevelop.UnityMode.Tests
 			Is("sub1/myfile2.cs", sub1.GetFiles().Single());
 		}
 
-		void NewProjectState()
+		void NewAssetDatabase()
 		{
-			projectState = new UnityProjectState();
+			assetDatabase = new UnityAssetDatabase();
 		}
 
 		void Create()
 		{
-			Assert.IsFalse(folderUpdater.Update(projectState));
+			Assert.IsFalse(folderUpdater.Update(assetDatabase));
 		}
 
 		void Update()
 		{
-			Assert.IsTrue(folderUpdater.Update(projectState));
+			Assert.IsTrue(folderUpdater.Update(assetDatabase));
 		}
 
 		static void Is(string expect, FileSystemEntry entry)

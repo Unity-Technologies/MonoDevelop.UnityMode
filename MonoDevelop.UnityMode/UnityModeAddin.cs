@@ -12,9 +12,11 @@ namespace MonoDevelop.UnityMode
 	public static class UnityModeAddin
 	{
 		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
+		public static event UnityAssetDatabaseChangedHandler UnityAssetDatabaseChanged;
 
 		static RestService restService;
 		static UnityProjectState unityProjectState;
+		static UnityAssetDatabase unityAssetDatabase;
 		static UnitySolution unitySolution;
 
 		static UnityModeAddin ()
@@ -60,6 +62,19 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		public static UnityAssetDatabase UnityAssetDatabase
+		{
+			get { return unityAssetDatabase; }
+
+			private set 
+			{
+				unityAssetDatabase = value;
+
+				if (UnityAssetDatabaseChanged != null)
+					UnityAssetDatabaseChanged(null, new UnityAssetDatabaseChangedEventArgs() { Database = unityAssetDatabase });
+			}
+		}
+
 		public static void OpenUnityProject(string projectPath)
 		{
 			InitializeAndPair (UnityRestServiceSettings.Load (projectPath).EditorRestServiceUrl);
@@ -70,6 +85,7 @@ namespace MonoDevelop.UnityMode
 			UnityProjectSettings = new UnityProjectSettings ();
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 			UnityProjectState = new UnityProjectState ();
+			UnityAssetDatabase = new UnityAssetDatabase ();
 
 			// FIXME: Unable to connect to own IP, might be blocked by Mongoose in Unity.
 			var editorRestServiecUri = new Uri(unityRestServiceUrl);
@@ -103,6 +119,7 @@ namespace MonoDevelop.UnityMode
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
 				UnityProjectStateRefresh ();
+				UnityAssetDatabaseRefresh ();
 			});
 		}
 
@@ -132,7 +149,7 @@ namespace MonoDevelop.UnityMode
 			});
 		}
 
-		public static void UnityProjectStateRefreshRename (string oldPath, string newPath)
+		public static void UnityAssetDatabaseRefreshRename (string oldPath, string newPath)
 		{
 			if (!Paired)
 				return;
@@ -145,12 +162,30 @@ namespace MonoDevelop.UnityMode
 
 			DispatchService.BackgroundDispatch(() =>
 			{
-				LoggingService.LogInfo("Sending Unity Project request (rename)");
-				var projectState = RestClient.GetUnityProjectState();
+				LoggingService.LogInfo("Sending Unity AssetDatabase request (rename)");
+				var assetDatabase = RestClient.GetUnityAssetDatabase();
 
-				projectState.RenameHint = new RenameHint {OldPath = oldPath, NewPath = newPath};
+				assetDatabase.RenameHint = new RenameHint {OldPath = oldPath, NewPath = newPath};
 
-				UnityProjectState = projectState;
+				UnityAssetDatabase = assetDatabase;
+			});
+		}
+
+		public static void UnityAssetDatabaseRefresh ()
+		{
+			if (!Paired)
+				return;
+
+			if (!IsUnityRunning()) 
+			{
+				ShutdownAndUnpair ();
+				return;
+			}
+
+			DispatchService.BackgroundDispatch(() =>
+			{
+				LoggingService.LogInfo("Sending Unity AssetDatabase request");
+				UnityAssetDatabase = RestClient.GetUnityAssetDatabase();
 			});
 		}
 

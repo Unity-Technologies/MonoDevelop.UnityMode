@@ -27,24 +27,27 @@ namespace MonoDevelop.UnityMode
 		{
 			base.Initialize (builders, options, contextMenuPath);
 
-			Refresh (UnityModeAddin.UnityProjectState);
-			UnityModeAddin.UnityProjectStateChanged += Refresh;
+			UnityModeAddin.UnityAssetDatabaseChanged += Refresh;
+			Refresh (UnityModeAddin.UnityAssetDatabase);
 
 			TreeView.ShowSelectionPopupButton = true;
 		}
 
-		public void Refresh(object obj, UnityProjectStateChangedEventArgs args)
+		public void Refresh(object obj, UnityAssetDatabaseChangedEventArgs args)
 		{
-			Refresh (args.State);
+			Refresh (args.Database);
 		}
 
-		public void Refresh(UnityProjectState state)
+		public void Refresh(UnityAssetDatabase database)
 		{
-			bool updated = folderUpdater.Update(state);
+			if (database == null)
+				return;
+
+			bool updated = folderUpdater.Update(database);
 
 			DispatchService.GuiDispatch(() =>
 			{
-				if (updated)
+				if (updated && TreeView.GetRootNode() != null)
 				{
 					// Updated folder structure, refresh tree
 					TreeView.RefreshNode(TreeView.GetRootNode());
