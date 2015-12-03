@@ -15,6 +15,9 @@ namespace MonoDevelop.UnityMode
 	{
 		internal static void OpenFile(string filename, int line, OpenDocumentOptions options = OpenDocumentOptions.None)
 		{
+			if (filename == null)
+				return;
+
 			LoggingService.LogInfo ("OpenFile: " + filename + " Line " + line);
 
 			var workbench = IdeApp.Workbench;
@@ -96,6 +99,8 @@ namespace MonoDevelop.UnityMode
 
 			foreach(var document in projectSettings.documents)
 				OpenFile(document, 0);
+
+			OpenFile (projectSettings.documents.FirstOrDefault(), 0, OpenDocumentOptions.BringToFront);
 
 			var result = new UnityProjectSettings ();
 

@@ -21,6 +21,7 @@ namespace MonoDevelop.UnityMode
 		public AssetsFolderPad ()
 		{
 			Singleton = this;
+			IdeApp.Workbench.ActiveDocumentChanged += new EventHandler (DocumentChanged);
 		}
 
 		public override void Initialize (NodeBuilder[] builders, TreePadOption[] options, string contextMenuPath)
@@ -57,10 +58,34 @@ namespace MonoDevelop.UnityMode
 					// Created a new folder structure, replace old tree
 					TreeView.Clear();
 					foreach (var child in folderUpdater.RootFolder.Children)
-						TreeView.AddChild(child);					
-				}
+						TreeView.AddChild(child);
 
+					SelectActiveDocument();
+				}
 			});
+		}
+
+		void DocumentChanged (object ob, EventArgs args)
+		{
+			DispatchService.GuiDispatch (SelectActiveDocument);
+		}
+
+		void SelectActiveDocument()
+		{
+			if (IdeApp.Workbench.ActiveDocument == null)
+				return;
+
+			var file = folderUpdater.RootFolder.GetFile(IdeApp.Workbench.ActiveDocument.FileName);
+
+			if(file != null)
+			{
+				var nav = TreeView.GetNodeAtObject(file, true);
+				if(nav != null)
+				{
+					nav.ExpandToNode ();
+					nav.Selected = true;
+				}
+			}
 		}
 	}
 	

@@ -10,13 +10,6 @@ using MonoDevelop.Ide.Gui.Pads;
 
 namespace MonoDevelop.UnityMode
 {
-	public abstract class FileSystemEntry {
-
-		public string RelativePath { get; set; }
-		public string Name { get { return System.IO.Path.GetFileName (RelativePath); } }
-		public string AbsolutePath { get { return UnityModeAddin.UnityProjectState.BaseDirectory + "/" + RelativePath; } }
-	}
-
 	public class Folder : FileSystemEntry
 	{
 		public List<FileSystemEntry> Children { get; set; }
@@ -31,14 +24,48 @@ namespace MonoDevelop.UnityMode
 			RelativePath = path;
 		}
 
+		public File GetFile(string path)
+		{
+			if (path.StartsWith (UnityModeAddin.UnityProjectState.BaseDirectory))
+				path = path.Substring (UnityModeAddin.UnityProjectState.BaseDirectory.Length+1);
+
+			Folder currentFolder = this;
+			string currentPath = path;
+
+			while (currentFolder != null) 
+			{
+				var index = currentPath.IndexOf ('/');
+
+				if (index == -1)
+					return currentFolder.GetChild (currentPath) as File;
+
+				var folderName = currentPath.Substring (0, index);
+				currentFolder = currentFolder.GetChild (folderName) as Folder;
+
+				currentPath = currentPath.Substring (index+1);
+			}
+
+			return null;
+		}
+
+		public FileSystemEntry GetChild(string name)
+		{
+			foreach (var child in Children)
+				if (child.Name == name)
+					return child;
+			return null;
+		}
+
 		public void Add(FileSystemEntry child)
 		{
 			Children.Add (child);
+			child.Parent = this;
 		}
 
 		public void Remove(FileSystemEntry child)
 		{
 			Children.Remove(child);
+			child.Parent = null;
 		}
 
 		public bool Empty()
@@ -121,6 +148,12 @@ namespace MonoDevelop.UnityMode
 
 			if(!folder.IsAssetsFolder())
 				attributes |= NodeAttributes.AllowRename;
+		}
+
+		public override object GetParentObject (object dataObject)
+		{
+			var fileSystemEntry = (FileSystemEntry)dataObject;
+			return fileSystemEntry.Parent;
 		}
 	}
 

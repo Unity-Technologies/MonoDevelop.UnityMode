@@ -18,7 +18,6 @@ namespace MonoDevelop.UnityMode
 		{
 			RelativePath = path;
 		}
-
 	}
 
 	class FileNodeBuilder: TypeNodeBuilder
@@ -55,6 +54,12 @@ namespace MonoDevelop.UnityMode
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)
 		{
 			attributes |= NodeAttributes.AllowRename;
+		}
+
+		public override object GetParentObject (object dataObject)
+		{
+			var fileSystemEntry = (FileSystemEntry)dataObject;
+			return fileSystemEntry.Parent;
 		}
 	}
 
