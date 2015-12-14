@@ -10,6 +10,7 @@
 		<SeparatorItem id = "AddSectionStart" />
 			<ItemSet id = "Add" _label = "_Add" autohide="True">
 				<CommandItem id = "MonoDevelop.UnityMode.ProjectCommands.NewFolder"/>
+				<CommandItem id = "MonoDevelop.UnityMode.ProjectCommands.NewCSharpScript"/>
 			</ItemSet>
 		<SeparatorItem id = "AddSectionEnd" />
 

@@ -235,19 +235,34 @@ namespace MonoDevelop.UnityMode
 			string directoryName = folder.AbsolutePath + "/" +  GettextCatalog.GetString("New Folder");
 			int index = -1;
 
-			if (Directory.Exists(directoryName))
-			{
-				while (Directory.Exists(directoryName + (++index + 1))) ;
-			}
+			if (Directory.Exists (directoryName))
+				while (Directory.Exists (directoryName + (++index + 1))) {}
 
 			if (index >= 0)
-			{
 				directoryName += index + 1;
-			}
 
 			Directory.CreateDirectory(directoryName);
 
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
+		}
+
+		[CommandHandler(ProjectCommands.NewCSharpScript)]
+		public void AddNewCSharpScript ()
+		{
+			var folder = CurrentNode.GetParentDataItem(typeof(Folder), true) as Folder;
+			string fileName = folder.AbsolutePath + "/" + "NewBehaviourScript";
+
+			int index = -1;
+
+			if (System.IO.File.Exists(fileName + ".cs"))
+				while (System.IO.File.Exists (fileName + (++index + 1) + ".cs")) {}
+
+			if (index >= 0)
+				fileName += index + 1;
+
+			System.IO.File.WriteAllText (fileName + ".cs", "class " + Path.GetFileName(fileName) + " {} ");
+
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		private bool IsAssetsFolder()

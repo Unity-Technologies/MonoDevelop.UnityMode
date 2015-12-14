@@ -32,6 +32,10 @@
 			_label = "New Folder"
 			_description = "New Folder"/>
 
+		<Command id = "MonoDevelop.UnityMode.ProjectCommands.NewCSharpScript"
+			_label = "New C# Script"
+			_description = "Create C# Scrip"/>
+
 		<Command id = "MonoDevelop.UnityMode.FileCommands.OpenUnityProject"
 			defaultHandler = "MonoDevelop.UnityMode.OpenUnityProjectCommand"
 			_label = "Open Unity Project..."

@@ -5,5 +5,6 @@ namespace MonoDevelop.UnityMode
 	public enum ProjectCommands
 	{
 		NewFolder,
+		NewCSharpScript
 	}
 }
