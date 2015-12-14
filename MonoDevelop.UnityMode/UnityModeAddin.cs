@@ -118,7 +118,7 @@ namespace MonoDevelop.UnityMode
 				UnityProjectSettings = UnityRestHelpers.LoadAndApplyProjectSettings();
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
-				UnityProjectRefresh ();
+				UnityProjectRefreshImmediate ();
 			});
 		}
 
@@ -130,32 +130,12 @@ namespace MonoDevelop.UnityMode
 			RestClient.SetServerUrl (null);
 		}
 
-		public static void UnityProjectRefreshRename (string oldPath, string newPath)
+		public static void UnityProjectRefresh (RenameHint renameHint = null)
 		{
-			if (!Paired)
-				return;
-
-			if (!IsUnityRunning()) 
-			{
-				ShutdownAndUnpair ();
-				return;
-			}
-
-			DispatchService.BackgroundDispatch(() =>
-			{
-				LoggingService.LogInfo("Sending Unity AssetDatabase request (rename)");
-				var assetDatabase = RestClient.GetUnityAssetDatabase();
-
-				assetDatabase.RenameHint = new RenameHint {OldPath = oldPath, NewPath = newPath};
-
-				UnityAssetDatabase = assetDatabase;
-
-				LoggingService.LogInfo("Sending Unity Project request");
-				UnityProjectState = RestClient.GetUnityProjectState();
-			});
+			DispatchService.BackgroundDispatch(() => UnityProjectRefreshImmediate (renameHint));
 		}
 
-		public static void UnityProjectRefresh ()
+		static void UnityProjectRefreshImmediate (RenameHint renameHint = null)
 		{
 			if (!Paired)
 				return;
@@ -166,14 +146,15 @@ namespace MonoDevelop.UnityMode
 				return;
 			}
 
-			DispatchService.BackgroundDispatch(() =>
-			{
-				LoggingService.LogInfo("Sending Unity AssetDatabase request");
-				UnityAssetDatabase = RestClient.GetUnityAssetDatabase();
+			LoggingService.LogInfo("Sending Unity AssetDatabase request");
 
-				LoggingService.LogInfo("Sending Unity Project request");
-				UnityProjectState = RestClient.GetUnityProjectState();
-			});
+			var assetDatabase = RestClient.GetUnityAssetDatabase();
+			assetDatabase.RenameHint = renameHint;
+			UnityAssetDatabase = assetDatabase;
+
+			LoggingService.LogInfo("Sending Unity Project request");
+			UnityProjectState = RestClient.GetUnityProjectState();
+			LoggingService.LogInfo("Unity Project refresh done");
 		}
 
 		static bool Paired

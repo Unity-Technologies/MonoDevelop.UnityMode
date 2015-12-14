@@ -5,6 +5,7 @@ using System.IO;
 using File = System.IO.File;
 using Directory = System.IO.Directory;
 using System.Collections.Generic;
+using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode
 {
@@ -131,7 +132,7 @@ namespace MonoDevelop.UnityMode
 			try
 			{
 				UnityRestClient.RestClient.MoveAssetRequest(oldPath, newPath);
-				UnityModeAddin.UnityProjectRefreshRename (oldPath, newPath);
+				UnityModeAddin.UnityProjectRefresh (new RenameHint{ OldPath = oldPath, NewPath = newPath});
 			}
 			catch (Exception)
 			{
