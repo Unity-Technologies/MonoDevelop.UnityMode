@@ -118,8 +118,7 @@ namespace MonoDevelop.UnityMode
 				UnityProjectSettings = UnityRestHelpers.LoadAndApplyProjectSettings();
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
-				UnityProjectStateRefresh ();
-				UnityAssetDatabaseRefresh ();
+				UnityProjectRefresh ();
 			});
 		}
 
@@ -131,25 +130,7 @@ namespace MonoDevelop.UnityMode
 			RestClient.SetServerUrl (null);
 		}
 
-		public static void UnityProjectStateRefresh ()
-		{
-			if (!Paired)
-				return;
-
-			if (!IsUnityRunning()) 
-			{
-				ShutdownAndUnpair ();
-				return;
-			}
-
-			DispatchService.BackgroundDispatch(() =>
-			{
-				LoggingService.LogInfo("Sending Unity Project request");
-				UnityProjectState = RestClient.GetUnityProjectState();
-			});
-		}
-
-		public static void UnityAssetDatabaseRefreshRename (string oldPath, string newPath)
+		public static void UnityProjectRefreshRename (string oldPath, string newPath)
 		{
 			if (!Paired)
 				return;
@@ -168,10 +149,13 @@ namespace MonoDevelop.UnityMode
 				assetDatabase.RenameHint = new RenameHint {OldPath = oldPath, NewPath = newPath};
 
 				UnityAssetDatabase = assetDatabase;
+
+				LoggingService.LogInfo("Sending Unity Project request");
+				UnityProjectState = RestClient.GetUnityProjectState();
 			});
 		}
 
-		public static void UnityAssetDatabaseRefresh ()
+		public static void UnityProjectRefresh ()
 		{
 			if (!Paired)
 				return;
@@ -186,6 +170,9 @@ namespace MonoDevelop.UnityMode
 			{
 				LoggingService.LogInfo("Sending Unity AssetDatabase request");
 				UnityAssetDatabase = RestClient.GetUnityAssetDatabase();
+
+				LoggingService.LogInfo("Sending Unity Project request");
+				UnityProjectState = RestClient.GetUnityProjectState();
 			});
 		}
 

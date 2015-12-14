@@ -18,7 +18,7 @@ namespace MonoDevelop.UnityMode
 		public override void CopyFile (FilePath source, FilePath dest, bool overwrite)
 		{
 			System.IO.File.Copy (source, dest, overwrite);
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public override void RenameFile (FilePath path, string newName)
@@ -39,25 +39,25 @@ namespace MonoDevelop.UnityMode
 		public override void DeleteFile (FilePath file)
 		{
 			System.IO.File.Delete (file);
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public override void DeleteDirectory(FilePath path)
 		{
 			Directory.Delete(path, true);
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public override void CreateDirectory (FilePath path)
 		{
 			Directory.CreateDirectory (path);
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public override void CopyDirectory (FilePath sourcePath, FilePath destPath)
 		{
 			CopyDirectory (sourcePath, destPath, "");
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		void CopyDirectory (FilePath src, FilePath dest, FilePath subdir)
@@ -73,7 +73,7 @@ namespace MonoDevelop.UnityMode
 			foreach (string dir in Directory.GetDirectories (src))
 				CopyDirectory (dir, dest, Path.Combine (subdir, Path.GetFileName (dir)));
 
-			UnityModeAddin.UnityProjectStateRefresh ();
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public override void RenameDirectory (FilePath path, string newName)
@@ -118,7 +118,7 @@ namespace MonoDevelop.UnityMode
 			try
 			{
 				UnityRestClient.RestClient.MoveAssetRequest(oldPath, newPath);
-				UnityModeAddin.UnityProjectStateRefresh ();
+				UnityModeAddin.UnityProjectRefresh ();
 			}
 			catch (Exception)
 			{
@@ -131,7 +131,7 @@ namespace MonoDevelop.UnityMode
 			try
 			{
 				UnityRestClient.RestClient.MoveAssetRequest(oldPath, newPath);
-				UnityModeAddin.UnityAssetDatabaseRefreshRename (oldPath, newPath);
+				UnityModeAddin.UnityProjectRefreshRename (oldPath, newPath);
 			}
 			catch (Exception)
 			{
