@@ -16,6 +16,16 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 			Files = new List<string> ();
 			Directories = new List<string>();
 		}
+
+		public bool FileExists(string path)
+		{
+			return Files.Contains (path);
+		}
+
+		public bool DirectoryExists(string path)
+		{
+			return Directories.Contains (path);
+		}
 	}
 
 	public class RenameHint

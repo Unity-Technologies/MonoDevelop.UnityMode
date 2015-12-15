@@ -50,15 +50,24 @@ namespace MonoDevelop.UnityMode
 			{
 				if (updated && TreeView.GetRootNode() != null)
 				{
-					// Updated folder structure, refresh tree
-					TreeView.RefreshNode(TreeView.GetRootNode());
+					// Updated folder structure, refresh all root items
+					var node = TreeView.GetRootNode();
+
+					if(node != null)
+					{
+						do
+						{
+							TreeView.RefreshNode(node);
+						}
+						while(node.MoveNext());
+					}
 				}
 				else
 				{
 					// Created a new folder structure, replace old tree
 					TreeView.Clear();
 					foreach (var child in folderUpdater.RootFolder.Children)
-						TreeView.AddChild(child);
+						TreeView.AddChild(child).Expanded = false;
 
 					SelectActiveDocument();
 				}

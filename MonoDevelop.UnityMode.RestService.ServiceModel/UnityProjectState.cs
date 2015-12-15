@@ -12,6 +12,7 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 
 		public List<MonoIsland> Islands { get; set; }
 		public string BaseDirectory { get; set; }
+		public string AssetsDirectory { get { return BaseDirectory + "/Assets"; } }
 	}
 
 	public class MonoIsland

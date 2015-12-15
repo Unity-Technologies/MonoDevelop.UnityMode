@@ -100,6 +100,10 @@
     <Compile Include="UnityProjectStateChangedHandler.cs" />
     <Compile Include="UnityAssetDatabaseChangedHandler.cs" />
     <Compile Include="AssetsFolderPad\FileSystemEntry.cs" />
+    <Compile Include="AssetsFolderPad\FolderNodeCommandHandler.cs" />
+    <Compile Include="AssetsFolderPad\FolderNodeBuilder.cs" />
+    <Compile Include="AssetsFolderPad\FileNodeBuilder.cs" />
+    <Compile Include="AssetsFolderPad\FileNodeCommandHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

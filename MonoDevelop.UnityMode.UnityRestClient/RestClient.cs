@@ -31,10 +31,19 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		public List<CompilationMessage> Messages { get; set; }
 	}
 
-	public class MoveAssetRequest
+	public class AssetRequest
 	{
 		public string action { get; set; }
+	}
+
+	public class MoveAssetRequest : AssetRequest
+	{
 		public string newpath { get; set; }
+	}
+
+	public class CreateAssetRequest : AssetRequest
+	{
+		public string type { get; set; }
 	}
 
 	public class PairRequest
@@ -105,9 +114,24 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			return client.Post<CompilationResult>("unity/scripts", new ScriptRequest{action = "recompile"});
 		}
 
-		public static void MoveAssetRequest(string oldpath, string newpath)
+		public static void CreateAsset(string path, string type)
 		{
-			client.Post<IReturnVoid>("unity/" + oldpath.ToLower(), new MoveAssetRequest { action = "move", newpath = newpath });
+			client.Post<IReturnVoid>("unity/assets/" + path, new CreateAssetRequest { action = "create", type = type });
+		}
+
+		public static void MoveAsset(string oldpath, string newpath)
+		{
+			client.Post<IReturnVoid>("unity/assets/" + oldpath, new MoveAssetRequest { action = "move", newpath = newpath });
+		}
+
+		public static void DeleteAsset(string path)
+		{
+			client.Delete<IReturnVoid>("unity/assets/" + path);
+		}
+
+		public static void CreateDirectory(string path)
+		{
+			CreateAsset (path, "directory");
 		}
 
 		public static PairResult Pair(string url, string name)
