@@ -5,10 +5,10 @@ using MonoDevelop.Core;
 using MonoDevelop.UnityMode;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
+using System.Linq;
 
 namespace MonoDevelop.UnityMode
 {
-
 	class FileNodeCommandHandler: NodeCommandHandler
 	{
 		public override void RenameItem (string newName)
@@ -25,15 +25,21 @@ namespace MonoDevelop.UnityMode
 			IdeApp.Workbench.OpenDocument (new FileOpenInformation (file.AbsolutePath, null));
 		}
 
-		public override bool CanDeleteItem()
+		public override bool CanDeleteMultipleItems ()
 		{
 			return true;
 		}
 
-		public override void DeleteItem()
+		public override void DeleteMultipleItems ()
 		{
-			var file = CurrentNode.DataItem as File;
-			FileService.DeleteFile(file.RelativePath);
+			var folders = CurrentNodes.Select (nn => nn.DataItem as File).ToArray ();
+
+			var message = folders.Length == 1 ? "Delete selected asset?" : "Delete selected assets?";
+			var result = MessageService.AskQuestion (message, string.Join("\n", folders.Select(f => f.RelativePath )) + "\n\nYou cannot undo this action", AlertButton.Delete, AlertButton.Cancel);
+
+			if(result == AlertButton.Delete)
+				foreach(var folder in folders)
+					FileService.DeleteDirectory(folder.RelativePath);
 		}
 
 		public override DragOperation CanDragNode()

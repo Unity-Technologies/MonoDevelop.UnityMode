@@ -7,6 +7,7 @@ using MonoDevelop.Ide.Gui;
 using System.Collections.Generic;
 using System.Linq;
 using MonoDevelop.Ide.Gui.Pads;
+using MonoDevelop.Ide;
 
 namespace MonoDevelop.UnityMode
 {
@@ -26,20 +27,26 @@ namespace MonoDevelop.UnityMode
 			return dataObject is File || dataObject is Folder;
 		}
 
-		public override bool CanDeleteItem()
-		{
-			return true;
-		}
-
 		public override DragOperation CanDragNode()
 		{
 			return DragOperation.Copy | DragOperation.Move;
 		}
 
-		public override void DeleteItem()
+		public override bool CanDeleteMultipleItems ()
 		{
-			var folder = CurrentNode.DataItem as Folder;
-			FileService.DeleteDirectory(folder.RelativePath);
+			return true;
+		}
+
+		public override void DeleteMultipleItems ()
+		{
+			var folders = CurrentNodes.Select (nn => nn.DataItem as Folder).ToArray ();
+
+			var message = folders.Length == 1 ? "Delete selected directory?" : "Delete selected directories?";
+			var result = MessageService.AskQuestion (message, string.Join("\n", folders.Select(f => f.RelativePath )) + "\n\nYou cannot undo this action", AlertButton.Delete, AlertButton.Cancel);
+
+			if(result == AlertButton.Delete)
+				foreach(var folder in folders)
+					FileService.DeleteDirectory(folder.RelativePath);
 		}
 
 		public override void OnNodeDrop(object dataObjects, DragOperation operation)
