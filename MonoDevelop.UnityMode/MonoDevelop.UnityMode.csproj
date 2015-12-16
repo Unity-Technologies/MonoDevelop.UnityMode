@@ -77,6 +77,12 @@
     <EmbeddedResource Include="Manifest.addin.xml">
       <Gettext-ScanForTranslations>False</Gettext-ScanForTranslations>
     </EmbeddedResource>
+    <EmbeddedResource Include="Icons\UnityScriptProject.png">
+      <LogicalName>unityicon</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icons\UnityScriptProject32.png">
+      <LogicalName>unityicon-32</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

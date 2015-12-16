@@ -21,7 +21,7 @@
 	</Extension>
 
 	<Extension path = "/MonoDevelop/Ide/Pads">
-		<SolutionPad id = "AssetsFolderPad" _label = "Unity Assets Folder" icon = "md-solution" class = "MonoDevelop.UnityMode.AssetsFolderPad" defaultLayout="*" defaultPlacement = "Left">
+		<SolutionPad id = "AssetsFolderPad" _label = "Assets" icon = "unity-icon" class = "MonoDevelop.UnityMode.AssetsFolderPad" defaultLayout="*" defaultPlacement = "Left">
 			<NodeBuilder id="File" class = "MonoDevelop.UnityMode.FileNodeBuilder"/>
 			<NodeBuilder id="Folder" class = "MonoDevelop.UnityMode.FolderNodeBuilder"/>
 		</SolutionPad>
@@ -34,7 +34,7 @@
 
 		<Command id = "MonoDevelop.UnityMode.ProjectCommands.NewCSharpScript"
 			_label = "New C# Script"
-			_description = "Create C# Scrip"/>
+			_description = "Create C# Script"/>
 
 		<Command id = "MonoDevelop.UnityMode.FileCommands.OpenUnityProject"
 			defaultHandler = "MonoDevelop.UnityMode.OpenUnityProjectCommand"
@@ -50,5 +50,9 @@
 
 	<Extension path = "/MonoDevelop/Core/FileSystemExtensions">
 		<Class class = "MonoDevelop.UnityMode.UnityModeFileSystemExtension" insertbefore = "MidStep" />
+	</Extension>
+
+	<Extension path = "/MonoDevelop/Core/StockIcons">
+		<StockIcon stockid = "unity-icon" resource = "unityicon-32" />
 	</Extension>
 </Addin>
