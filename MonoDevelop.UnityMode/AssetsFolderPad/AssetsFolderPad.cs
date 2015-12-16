@@ -9,6 +9,7 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Pads.ProjectPad;
 using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.RestServiceModel;
+using System.Collections.Generic;
 
 namespace MonoDevelop.UnityMode
 {
@@ -50,17 +51,33 @@ namespace MonoDevelop.UnityMode
 			{
 				if (updated && TreeView.GetRootNode() != null)
 				{
-					// Updated folder structure, refresh all root items
+					// Refresh root folders and remove any that no longer exist.
 					var node = TreeView.GetRootNode();
-
+					var refreshedFolders = new List<FileSystemEntry>();
 					if(node != null)
 					{
+						var removeObjects = new List<object>();
+
 						do
 						{
-							TreeView.RefreshNode(node);
+							var folder = folderUpdater.RootFolder.GetChild(node.NodeName);
+							if(folder != null)
+							{
+								TreeView.RefreshNode(node);
+								refreshedFolders.Add(folder);
+							}
+							else
+								removeObjects.Add(node.DataItem);
 						}
 						while(node.MoveNext());
+
+						foreach(var @object in removeObjects)
+							TreeView.RemoveChild(@object);
 					}
+
+					// Add new root folders
+					foreach (var child in folderUpdater.RootFolder.Children.Where(f => !refreshedFolders.Contains(f)))
+						TreeView.AddChild(child).Expanded = false;
 				}
 				else
 				{
