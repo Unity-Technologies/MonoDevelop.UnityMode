@@ -14,14 +14,14 @@ namespace MonoDevelop.UnityMode
 		public override void RenameItem (string newName)
 		{
 			base.RenameItem (newName);
-			var file = (File) CurrentNode.DataItem;
+			var file = CurrentNode.DataItem as File;
 
-			FileService.RenameFile (new FilePath(file.AbsolutePath), newName);
+			FileService.RenameFile (new FilePath(file.RelativePath), newName);
 		}
 
 		public override void ActivateItem ()
 		{
-			var file = (File) CurrentNode.DataItem;
+			var file = CurrentNode.DataItem as File;
 			IdeApp.Workbench.OpenDocument (new FileOpenInformation (file.AbsolutePath, null));
 		}
 
@@ -32,8 +32,8 @@ namespace MonoDevelop.UnityMode
 
 		public override void DeleteItem()
 		{
-			var file = (File)CurrentNode.DataItem;
-			FileService.DeleteFile(file.AbsolutePath);
+			var file = CurrentNode.DataItem as File;
+			FileService.DeleteFile(file.RelativePath);
 		}
 
 		public override DragOperation CanDragNode()

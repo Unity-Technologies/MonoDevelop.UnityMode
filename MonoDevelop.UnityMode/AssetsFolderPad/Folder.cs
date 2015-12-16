@@ -87,10 +87,6 @@ namespace MonoDevelop.UnityMode
 			get { return RelativePath.Length == 0; }
 		}
 
-		public bool IsAssetsFolder()
-		{
-			return RelativePath == "Assets";
-		}
 	}
 
 

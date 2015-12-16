@@ -124,6 +124,11 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			client.Post<IReturnVoid>("unity/assets/" + oldpath, new MoveAssetRequest { action = "move", newpath = newpath });
 		}
 
+		public static void CopyAsset(string oldpath, string newpath)
+		{
+			client.Post<IReturnVoid>("unity/assets/" + oldpath, new MoveAssetRequest { action = "move", newpath = newpath });
+		}
+
 		public static void DeleteAsset(string path)
 		{
 			client.Delete<IReturnVoid>("unity/assets/" + path);
@@ -148,8 +153,6 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 		{
 			return client.Get<UnityProjectSettings> ("/unity/projectsettings");
 		}
-
-	
 	}
 }
 

@@ -7,130 +7,12 @@ using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode
 {
-	internal class UnityModeFileSystemExtension : FileSystemExtension
+	class UnityModeFileSystemExtension : FileSystemExtension
 	{
-		public override bool CanHandlePath (FilePath path, bool isDirectory)
-		{
-			return true;
-		}
-
-		public override void CopyFile (FilePath source, FilePath dest, bool overwrite)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void RenameFile (FilePath path, string newName)
-		{
-			var oldPath = MakeRelative(path.FullPath);
-			var relativeParent = MakeRelative(path.ParentDirectory);
-
-			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
-
-			RenameFileOrDirectory(oldPath, newPath);
-		}
-
-		public override void MoveFile (FilePath source, FilePath dest)
-		{
-			MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
-		}
-
-		public override void DeleteFile (FilePath file)
-		{
-			try
-			{
-				UnityRestClient.RestClient.DeleteAsset(MakeRelative(file.FullPath));
-				UnityModeAddin.UnityProjectRefresh ();
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError("Unity delete asset failed: " + file, e);
-			}			
-		}
-
-		public override void DeleteDirectory(FilePath path)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void CreateDirectory (FilePath path)
-		{
-			try
-			{
-				UnityRestClient.RestClient.CreateDirectory(path);
-				UnityModeAddin.UnityProjectRefresh ();
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError("Unity create directory failed: " + path, e);
-			}
-		}
-
-		public override void CopyDirectory (FilePath sourcePath, FilePath destPath)
-		{
-			CopyDirectory (sourcePath, destPath, "");
-			UnityModeAddin.UnityProjectRefresh ();
-		}
-
-		void CopyDirectory (FilePath src, FilePath dest, FilePath subdir)
-		{
-			string destDir = Path.Combine (dest, subdir);
-
-			if (!Directory.Exists (destDir))
-				FileService.CreateDirectory (destDir);
-
-			foreach (string file in Directory.GetFiles (src))
-				FileService.CopyFile (file, Path.Combine (destDir, Path.GetFileName (file)));
-
-			foreach (string dir in Directory.GetDirectories (src))
-				CopyDirectory (dir, dest, Path.Combine (subdir, Path.GetFileName (dir)));
-
-			UnityModeAddin.UnityProjectRefresh ();
-		}
-
-		public override void RenameDirectory (FilePath path, string newName)
-		{
-			var oldPath = MakeRelative(path.FullPath);
-			var relativeParent = MakeRelative(path.ParentDirectory);
-
-			var newPath = relativeParent == "." ? newName : relativeParent + "/" + newName;
-
-			RenameFileOrDirectory(oldPath, newPath);
-		}
-
-		public override FilePath ResolveFullPath (FilePath path)
-		{
-			return Path.GetFullPath (path);
-		}
-
-		public override void MoveDirectory (FilePath source, FilePath dest)
-		{
-			// FileService calls this on RenameDirectory, so we check for rename.
-			if (source.ParentDirectory.FullPath == dest.ParentDirectory.FullPath)
-				RenameFileOrDirectory(MakeRelative(source), MakeRelative(dest));
-			else
-				MoveFileOrDirectory(MakeRelative(source), MakeRelative(dest));
-		}
-
-		public override void RequestFileEdit (IEnumerable<FilePath> files)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void NotifyFilesChanged (IEnumerable<FilePath> file)
-		{
-		}
-
 		public static void CreateAsset(string path, string type)
 		{
-			try
-			{
-				UnityRestClient.RestClient.CreateAsset(path, type); 
-				UnityModeAddin.UnityProjectRefresh ();
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError("Unity create asset from template failed: " + path + " type " + type, e);
-			}
+			UnityRestClient.RestClient.CreateAsset(path, type); 
+			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		public static bool FileExists(string path)
@@ -143,36 +25,123 @@ namespace MonoDevelop.UnityMode
 			return UnityModeAddin.UnityAssetDatabase.DirectoryExists (path);
 		}
 
-		static string MakeRelative(FilePath abs)
+		public static string FindAvailableFilename(string filename)
 		{
-			return abs.ToRelative(UnityModeAddin.UnityProjectState.AssetsDirectory).ToString().Replace('\\', '/');
+			if (!FileExists(filename))
+				return filename;
+
+			string basename = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileNameWithoutExtension (filename));
+			string extension = Path.GetExtension (filename);
+
+			int suffix = 1;
+
+			while (FileExists (basename + suffix + extension))
+				suffix++;
+
+			return basename + suffix + extension;
 		}
 
-		private static void MoveFileOrDirectory(string oldPath, string newPath)
+		public static string FindAvailableDirectoryName(string directoryName)
 		{
-			try
-			{
-				UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
-				UnityModeAddin.UnityProjectRefresh ();
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError("Unity move failed: " + oldPath + " -> " + newPath, e);
-			}
+			if (!DirectoryExists (directoryName))
+				return directoryName;
+
+			int suffix = 1;
+
+			while (UnityModeFileSystemExtension.DirectoryExists (directoryName + suffix))
+				suffix++;
+
+			return directoryName + suffix;
 		}
 
-		private static void RenameFileOrDirectory(string oldPath, string newPath)
+		public override bool CanHandlePath (FilePath path, bool isDirectory)
 		{
-			try
-			{
-				UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
-				UnityModeAddin.UnityProjectRefresh (new RenameHint{ OldPath = oldPath, NewPath = newPath});
-			}
-			catch (Exception e)
-			{
-				LoggingService.LogError("Unity rename failed: " + oldPath + " -> " + newPath, e);
-			}
+			return !path.IsAbsolute;
 		}
+
+		public override void CopyFile (FilePath source, FilePath dest, bool overwrite)
+		{
+			UnityRestClient.RestClient.CopyAsset(source, dest);
+			UnityModeAddin.UnityProjectRefresh ();
+		}
+
+		public override void RenameFile (FilePath path, string newName)
+		{
+			RenameAsset (path, path.ParentDirectory + "/" + newName);
+		}
+
+		public override void MoveFile (FilePath source, FilePath dest)
+		{
+			MoveAsset (source, dest);
+		}
+
+		public override void DeleteFile (FilePath file)
+		{
+			UnityRestClient.RestClient.DeleteAsset(file);
+			UnityModeAddin.UnityProjectRefresh ();
+		}
+
+		public override void DeleteDirectory(FilePath path)
+		{
+			DeleteFile (path);
+		}
+
+		public override void CreateDirectory (FilePath path)
+		{
+			UnityRestClient.RestClient.CreateDirectory(path);
+			UnityModeAddin.UnityProjectRefresh ();
+		}
+
+		public override void CopyDirectory (FilePath sourcePath, FilePath destPath)
+		{
+			CopyDirectory (sourcePath, destPath, "");
+		}
+
+		void CopyDirectory (FilePath src, FilePath dest, FilePath subdir)
+		{
+			CopyFile (src, dest, true);
+		}
+
+		public override void RenameDirectory (FilePath path, string newName)
+		{
+			RenameFile (path, newName);
+		}
+
+		public override void MoveDirectory (FilePath source, FilePath dest)
+		{
+			// FileService calls this on RenameDirectory, so we check for rename.
+			if (source.ParentDirectory.FullPath == dest.ParentDirectory.FullPath)
+				RenameAsset(source, dest);
+			else
+				MoveAsset(source, dest);
+		}
+
+		public override FilePath ResolveFullPath (FilePath path)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override void RequestFileEdit (IEnumerable<FilePath> files)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public override void NotifyFilesChanged (IEnumerable<FilePath> file)
+		{
+		}
+
+		static void MoveAsset(string oldPath, string newPath)
+		{
+			UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
+			UnityModeAddin.UnityProjectRefresh ();
+		}
+
+		static void RenameAsset(string oldPath, string newPath)
+		{
+			UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
+			UnityModeAddin.UnityProjectRefresh (new RenameHint{ OldPath = oldPath, NewPath = newPath});
+		}
+
 	}
 }
 

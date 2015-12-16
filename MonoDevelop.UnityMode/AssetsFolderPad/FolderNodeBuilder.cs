@@ -62,10 +62,7 @@ namespace MonoDevelop.UnityMode
 
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)
 		{
-			var folder = (Folder)dataObject;
-
-			if(!folder.IsAssetsFolder())
-				attributes |= NodeAttributes.AllowRename;
+			attributes |= NodeAttributes.AllowRename;
 		}
 
 		public override object GetParentObject (object dataObject)
