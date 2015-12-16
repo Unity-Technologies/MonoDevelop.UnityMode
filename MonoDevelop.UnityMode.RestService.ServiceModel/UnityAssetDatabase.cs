@@ -9,7 +9,7 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 	{
 		public List<string> Files { get; set; }
 		public List<string> Directories { get; set; }
-		public RenameHint RenameHint { get; set; }
+		public Hint Hint { get; set; }
 
 		public UnityAssetDatabase()
 		{
@@ -28,7 +28,11 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		}
 	}
 
-	public class RenameHint
+	public abstract class Hint
+	{
+	}
+
+	public class RenameHint : Hint
 	{
 		public String OldPath { get; set; }
 		public String NewPath { get; set; }

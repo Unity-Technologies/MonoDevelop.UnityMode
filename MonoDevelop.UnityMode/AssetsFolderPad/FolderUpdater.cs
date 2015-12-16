@@ -26,11 +26,15 @@ namespace MonoDevelop.UnityMode
 			var oldAssetDatabase = assetDatabase;
 			var newAssetDatabase = database;
 
+			var hint = database.Hint;
+			database.Hint = null;
+
 			assetDatabase = database;
 
-			if (database.RenameHint != null)
+			if (hint is RenameHint)
 			{
-				RenameFileOrDirectory(database.RenameHint.OldPath, database.RenameHint.NewPath);
+				RenameHint renameHint = hint as RenameHint;
+				RenameFileOrDirectory(renameHint.OldPath, renameHint.NewPath);
 				return true;
 			}
 

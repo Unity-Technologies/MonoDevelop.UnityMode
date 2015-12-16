@@ -130,12 +130,12 @@ namespace MonoDevelop.UnityMode
 			RestClient.SetServerUrl (null);
 		}
 
-		public static void UnityProjectRefresh (RenameHint renameHint = null)
+		public static void UnityProjectRefresh (Hint hint = null)
 		{
-			DispatchService.BackgroundDispatch(() => UnityProjectRefreshImmediate (renameHint));
+			DispatchService.BackgroundDispatch(() => UnityProjectRefreshImmediate (hint));
 		}
 
-		static void UnityProjectRefreshImmediate (RenameHint renameHint = null)
+		static void UnityProjectRefreshImmediate (Hint hint = null)
 		{
 			if (!Paired)
 				return;
@@ -149,7 +149,7 @@ namespace MonoDevelop.UnityMode
 			LoggingService.LogInfo("Sending Unity AssetDatabase request");
 
 			var assetDatabase = RestClient.GetUnityAssetDatabase();
-			assetDatabase.RenameHint = renameHint;
+			assetDatabase.Hint = hint;
 			UnityAssetDatabase = assetDatabase;
 
 			LoggingService.LogInfo("Sending Unity Project request");

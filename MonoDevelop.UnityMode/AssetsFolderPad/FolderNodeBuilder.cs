@@ -28,15 +28,15 @@ namespace MonoDevelop.UnityMode
 
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
-			var file = (Folder) dataObject;
-			return file.Name;
+			var folder = dataObject as Folder;
+			return folder.Name;
 		}
 
 		public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
 		{
 			base.BuildNode(treeBuilder, dataObject, nodeInfo);
 
-			var folder = (Folder)dataObject;
+			var folder = dataObject as Folder;
 			nodeInfo.Label = folder.Name;
 			nodeInfo.Icon = Context.GetIcon(Stock.OpenFolder);
 			nodeInfo.ClosedIcon = Context.GetIcon(Stock.ClosedFolder);
@@ -46,7 +46,7 @@ namespace MonoDevelop.UnityMode
 		{
 			base.BuildChildNodes (treeBuilder, dataObject);
 
-			var folder = (Folder)dataObject;
+			var folder = dataObject as Folder;
 
 			foreach (var file in folder.GetFiles())
 				treeBuilder.AddChild (file);
@@ -56,7 +56,7 @@ namespace MonoDevelop.UnityMode
 
 		public override bool HasChildNodes (ITreeBuilder builder, object dataObject)
 		{
-			var folder = (Folder)dataObject;
+			var folder = dataObject as Folder;
 			return folder.Children.Count > 0;
 		}
 
