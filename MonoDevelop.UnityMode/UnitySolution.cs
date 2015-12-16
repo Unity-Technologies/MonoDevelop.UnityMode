@@ -11,7 +11,7 @@ namespace MonoDevelop.UnityMode
 		public UnitySolution()
 		{
 			Singleton = this;
-			var config = new UnitySolutionConfiguration {Id = "Unity Configuration"};
+			var config = new UnitySolutionConfiguration {Id = "Unity"};
 			Configurations.Add (config);
 			DefaultConfiguration = config;
 		}
