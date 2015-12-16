@@ -10,6 +10,7 @@ using MonoDevelop.Ide.Gui.Pads.ProjectPad;
 using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.RestServiceModel;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MonoDevelop.UnityMode
 {
@@ -45,6 +46,7 @@ namespace MonoDevelop.UnityMode
 			if (database == null)
 				return;
 
+			Hint hint = database.Hint;
 			bool updated = folderUpdater.Update(database);
 
 			DispatchService.GuiDispatch(() =>
@@ -54,30 +56,45 @@ namespace MonoDevelop.UnityMode
 					// Refresh root folders and remove any that no longer exist.
 					var node = TreeView.GetRootNode();
 					var refreshedFolders = new List<FileSystemEntry>();
-					if(node != null)
+					var removeObjects = new List<object>();
+
+					do
 					{
-						var removeObjects = new List<object>();
-
-						do
+						var folder = folderUpdater.RootFolder.GetChild(node.NodeName);
+						if(folder != null)
 						{
-							var folder = folderUpdater.RootFolder.GetChild(node.NodeName);
-							if(folder != null)
-							{
-								TreeView.RefreshNode(node);
-								refreshedFolders.Add(folder);
-							}
-							else
-								removeObjects.Add(node.DataItem);
+							TreeView.RefreshNode(node);
+							refreshedFolders.Add(folder);
 						}
-						while(node.MoveNext());
-
-						foreach(var @object in removeObjects)
-							TreeView.RemoveChild(@object);
+						else
+							removeObjects.Add(node.DataItem);
 					}
+					while(node.MoveNext());
+
+					foreach(var @object in removeObjects)
+						TreeView.RemoveChild(@object);
 
 					// Add new root folders
 					foreach (var child in folderUpdater.RootFolder.Children.Where(f => !refreshedFolders.Contains(f)))
 						TreeView.AddChild(child).Expanded = false;
+
+					if(hint is NewFileHint)
+					{
+						var newFileHint = hint as NewFileHint;
+						UnityRestHelpers.OpenFile(Path.Combine(UnityModeAddin.UnityProjectState.AssetsDirectory, newFileHint.Path), 1, OpenDocumentOptions.BringToFront);
+					}
+					else if(hint is NewFolderHint)
+					{
+						var newFolderHint = hint as NewFolderHint;
+						var newFolder = folderUpdater.RootFolder.FindEntry(newFolderHint.Path) as Folder;
+						var nav = TreeView.GetNodeAtObject(newFolder);
+
+						if(nav != null)
+						{
+							nav.Selected = true;
+							TreeView.StartLabelEdit();
+						}
+					}
 				}
 				else
 				{
@@ -101,7 +118,7 @@ namespace MonoDevelop.UnityMode
 			if (IdeApp.Workbench.ActiveDocument == null)
 				return;
 
-			var file = folderUpdater.RootFolder.GetFile(IdeApp.Workbench.ActiveDocument.FileName);
+			var file = folderUpdater.RootFolder.FindEntry(IdeApp.Workbench.ActiveDocument.FileName) as File;
 
 			if(file != null)
 			{

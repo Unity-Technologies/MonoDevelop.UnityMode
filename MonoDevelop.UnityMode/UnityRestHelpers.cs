@@ -15,7 +15,7 @@ namespace MonoDevelop.UnityMode
 	{
 		internal static void OpenFile(string filename, int line, OpenDocumentOptions options = OpenDocumentOptions.None)
 		{
-			if (filename == null)
+			if (filename == null || !System.IO.File.Exists(filename))
 				return;
 
 			LoggingService.LogInfo ("OpenFile: " + filename + " Line " + line);

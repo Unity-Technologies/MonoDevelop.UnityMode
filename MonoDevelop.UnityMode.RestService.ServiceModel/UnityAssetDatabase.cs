@@ -37,5 +37,15 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		public String OldPath { get; set; }
 		public String NewPath { get; set; }
 	}
+
+	public class NewFileHint : Hint
+	{
+		public String Path { get; set; }
+	}
+
+	public class NewFolderHint : Hint
+	{
+		public String Path { get; set; }
+	}
 }
 

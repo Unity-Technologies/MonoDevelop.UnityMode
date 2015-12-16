@@ -24,7 +24,7 @@ namespace MonoDevelop.UnityMode
 			RelativePath = path;
 		}
 
-		public File GetFile(string path)
+		public FileSystemEntry FindEntry(string path)
 		{
 			if (path.StartsWith (UnityModeAddin.UnityProjectState.AssetsDirectory))
 				path = path.Substring (UnityModeAddin.UnityProjectState.AssetsDirectory.Length+1);
@@ -37,7 +37,7 @@ namespace MonoDevelop.UnityMode
 				var index = currentPath.IndexOf ('/');
 
 				if (index == -1)
-					return currentFolder.GetChild (currentPath) as File;
+					return currentFolder.GetChild (currentPath);
 
 				var folderName = currentPath.Substring (0, index);
 				currentFolder = currentFolder.GetChild (folderName) as Folder;

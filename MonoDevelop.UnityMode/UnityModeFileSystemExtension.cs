@@ -11,8 +11,8 @@ namespace MonoDevelop.UnityMode
 	{
 		public static void CreateAsset(string path, string type)
 		{
-			UnityRestClient.RestClient.CreateAsset(path, type); 
-			UnityModeAddin.UnityProjectRefresh ();
+			UnityRestClient.RestClient.CreateAsset(path, type);
+			UnityModeAddin.UnityProjectRefresh (new NewFileHint{ Path = path });
 		}
 
 		public static bool FileExists(string path)
@@ -89,7 +89,7 @@ namespace MonoDevelop.UnityMode
 		public override void CreateDirectory (FilePath path)
 		{
 			UnityRestClient.RestClient.CreateDirectory(path);
-			UnityModeAddin.UnityProjectRefresh ();
+			UnityModeAddin.UnityProjectRefresh (new NewFolderHint{ Path = path });
 		}
 
 		public override void CopyDirectory (FilePath sourcePath, FilePath destPath)
