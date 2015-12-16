@@ -34,28 +34,33 @@ namespace MonoDevelop.UnityMode
 				return true;
 			}
 
+			// Perform delta update of folders by comparing existing asset database with new one.
 			var addFiles = newAssetDatabase.Files.Where(f => !oldAssetDatabase.Files.Contains(f)).ToArray();
-			var addEmptyDirectories = newAssetDatabase.Directories.Where(f => !oldAssetDatabase.Directories.Contains(f)).ToArray();
+			var addDirectories = newAssetDatabase.Directories.Where(f => !oldAssetDatabase.Directories.Contains(f)).ToArray();
 
 			var removeFiles = oldAssetDatabase.Files.Where(f => !newAssetDatabase.Files.Contains(f)).ToArray();
-			var removeEmptyDirectories = oldAssetDatabase.Directories.Where(f => !newAssetDatabase.Directories.Contains(f)).ToArray();
+			var removeDirectories = oldAssetDatabase.Directories.Where(f => !newAssetDatabase.Directories.Contains(f)).ToArray();
 
-			var numChanges = addFiles.Length + addEmptyDirectories.Length + removeFiles.Length + removeEmptyDirectories.Length;
+			var numChanges = addFiles.Length + addDirectories.Length + removeFiles.Length + removeDirectories.Length;
 
 			if (numChanges == 0)
 				return true;
 
-			foreach (var directory in addEmptyDirectories)
-				AddEmptyDirectory(directory);
+			// Add all new folders
+			foreach (var directory in addDirectories)
+				AddDirectory(directory);
 
-			foreach (var directory in removeEmptyDirectories)
-				RemoveEmptyDirectory(directory, addEmptyDirectories);
-
+			// Add all new files
 			foreach (var file in addFiles)
 				AddFile(file);
 
+			// Remove all removed files
 			foreach (var file in removeFiles)
-				RemoveFile(file, addEmptyDirectories);
+				RemoveFile(file);
+
+			// Remove all removed folders
+			foreach (var directory in removeDirectories)
+				RemoveDirectory(directory);
 
 			return true;
 		}
@@ -67,71 +72,32 @@ namespace MonoDevelop.UnityMode
 			RootFolder = new Folder("");
 			folders = new Dictionary<string, Folder> {{RootFolder.RelativePath, RootFolder}};
 
-			// Build folder structure from files
+			// Build folder structure from folders
+			foreach (var directories in assetDatabase.Directories)
+				AddDirectory(directories);
+
+			// Add files to folders
 			foreach (var file in assetDatabase.Files)
 				AddFile(file);
-
-			// Build folder structure from empty folders
-			foreach (var emptyDirectory in assetDatabase.Directories)
-				AddEmptyDirectory(emptyDirectory);
-
 		}
 
 		void AddFile(string file)
 		{
-			var parentPath = GetParentDirectoryPath(file);
-			Folder childFolder = null;
-
-			while (!folders.ContainsKey(parentPath))
-			{
-				var newFolder = new Folder(parentPath);
-
-				if (childFolder != null)
-					newFolder.Add(childFolder);
-
-				folders.Add(parentPath, newFolder);
-
-				childFolder = newFolder;
-				parentPath = GetParentDirectoryPath(parentPath);
-			}
-
-			if (childFolder != null)
-				folders[parentPath].Add(childFolder);
-
 			var fileFolder = folders[GetParentDirectoryPath(file)];
 			fileFolder.Add(new File(file));
 		}
 
-		void RemoveFile(string file, string[] addEmptyDirectories)
+		void RemoveFile(string file)
 		{
-			var parentPath = GetParentDirectoryPath(file);
-			var parentFolder = folders[parentPath];
-
-			var fileEntry = parentFolder.GetFiles().Single(f => f.RelativePath == file);
-
-			parentFolder.Remove(fileEntry);
-
-			while (parentFolder != RootFolder && parentFolder.Empty() && !addEmptyDirectories.Contains(parentFolder.RelativePath))
-			{
-				var folder = parentFolder;
-
-				parentPath = GetParentDirectoryPath(parentPath);
-				parentFolder = folders[parentPath];
-
-				if (parentFolder != null)
-				{
-					parentFolder.Remove(folder);
-				}
-			}
+			var fileFolder = folders[GetParentDirectoryPath(file)];
+			var fileEntry = fileFolder.GetFiles().Single(f => f.RelativePath == file);
+			fileFolder.Remove(fileEntry);
 		}
 
-		void AddEmptyDirectory(string directory)
+		void AddDirectory(string directory)
 		{
 			Folder childFolder = null;
 
-			// Note: If there is a hierarchy of folders that only contain
-			// folders, then the folders will not be added as part of the
-			// files, therefore we need to add the entire hierarchy.
 			while (!folders.ContainsKey(directory))
 			{
 				var newFolder = new Folder(directory);
@@ -149,11 +115,11 @@ namespace MonoDevelop.UnityMode
 				folders[directory].Add(childFolder);
 		}
 
-		void RemoveEmptyDirectory(string directory, string[] addEmptyDirectories)
+		void RemoveDirectory(string directory)
 		{
 			var folder = folders[directory];
 
-			while (folder != RootFolder && folder.Empty() && !addEmptyDirectories.Contains(folder.RelativePath))
+			while (folder != RootFolder)
 			{
 				var parentPath = GetParentDirectoryPath(folder.RelativePath);
 				var parentFolder = folders[parentPath];
@@ -186,7 +152,7 @@ namespace MonoDevelop.UnityMode
 			}	
 		}
 
-		private string GetParentDirectoryPath(string path)
+		string GetParentDirectoryPath(string path)
 		{
 			if (path.Length == 0)
 				return RootFolder.RelativePath;
