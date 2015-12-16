@@ -122,16 +122,8 @@ namespace MonoDevelop.UnityMode
 		void RemoveDirectory(string directory)
 		{
 			var folder = folders[directory];
-
-			while (folder != RootFolder)
-			{
-				var parentPath = GetParentDirectoryPath(folder.RelativePath);
-				var parentFolder = folders[parentPath];
-
-				parentFolder.Remove(folder);
-
-				folder = parentFolder;
-			}
+			var parentFolder = folders[GetParentDirectoryPath(folder.RelativePath)];
+			parentFolder.Remove(folder);
 		}
 
 		void RenameFileOrDirectory(string oldPath, string newPath)
