@@ -15,7 +15,7 @@ namespace MonoDevelop.UnityMode.Tests
 
 		private Folder RootFolder { get { return folderUpdater.RootFolder; } }
 		private List<String> Files { get { return assetDatabase.Files; } }
-		private List<String> EmptyDirectories { get { return assetDatabase.Directories; } }
+		private List<String> Directories { get { return assetDatabase.Directories; } }
 
 		[SetUp]
 		public void Setup()
@@ -35,6 +35,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void SingleFileInSubfolder()
 		{
+			Directories.Add("sub");
 			Files.Add("sub/myfile.cs");
 			Create();
 
@@ -49,6 +50,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void TwoFilesInSubfolder()
 		{
+			Directories.Add("sub");
 			Files.Add("sub/myfile1.cs");
 			Files.Add("sub/myfile2.cs");
 			Create();
@@ -64,6 +66,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void FileInNestedSubfolder()
 		{
+			Directories.Add("sub1/sub2");
 			Files.Add("sub1/sub2/file.cs");
 			Create();
 
@@ -80,7 +83,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void EmptyFolder()
 		{
-			EmptyDirectories.Add("sub");
+			Directories.Add("sub");
 			Create();
 
 			var folder = RootFolder.GetFolders().Single();
@@ -91,7 +94,9 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void NestedEmptyFolder()
 		{
-			EmptyDirectories.Add("sub1/sub2/sub3");
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub2");
+			Directories.Add("sub1/sub2/sub3");
 			Create();
 
 			var sub1 = RootFolder.GetFolders().Single();
@@ -134,6 +139,8 @@ namespace MonoDevelop.UnityMode.Tests
 			Is("myfile.cs", RootFolder.GetFiles().Single());
 
 			NewAssetDatabase();
+
+			Directories.Add("sub1");
 			Files.Add("myfile.cs");
 			Files.Add("sub1/myfile2.cs");
 
@@ -148,6 +155,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void RemoveSingleFile()
 		{
+			Directories.Add("sub1");
 			Files.Add("sub1/myfile.cs");
 
 			Create();
@@ -156,7 +164,7 @@ namespace MonoDevelop.UnityMode.Tests
 			Is("sub1/myfile.cs", RootFolder.GetFolders().Single().GetFiles().Single());
 
 			NewAssetDatabase();
-			EmptyDirectories.Add("sub1");
+			Directories.Add("sub1");
 
 			Update();
 			Is("sub1", RootFolder.GetFolders().Single());
@@ -166,10 +174,11 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void RemoveFolder()
 		{
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub2");
 			Files.Add("myfile.cs");
 			Files.Add("sub1/myfile2.cs");
-			EmptyDirectories.Add("sub1/sub2");
-			
+
 			Create();
 
 			Is("myfile.cs", RootFolder.GetFiles().Single());
@@ -189,6 +198,8 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void RenameFolder()
 		{
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub2");
 			Files.Add("sub1/sub2/myfile.cs");
 			Files.Add("sub1/sub2/myfile2.cs");
 
@@ -207,6 +218,8 @@ namespace MonoDevelop.UnityMode.Tests
 
 			NewAssetDatabase();
 
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub4");
 			Files.Add("sub1/sub4/myfile.cs");
 			Files.Add("sub1/sub4/myfile2.cs");
 
@@ -227,6 +240,8 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void RenameFolderHint()
 		{
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub2");
 			Files.Add("sub1/sub2/myfile.cs");
 			Files.Add("sub1/sub2/myfile2.cs");
 
@@ -245,6 +260,8 @@ namespace MonoDevelop.UnityMode.Tests
 
 			NewAssetDatabase();
 
+			Directories.Add("sub1");
+			Directories.Add("sub1/sub4");
 			Files.Add("sub1/sub4/myfile.cs");
 			Files.Add("sub1/sub4/myfile2.cs");
 
@@ -262,6 +279,7 @@ namespace MonoDevelop.UnityMode.Tests
 		[Test]
 		public void RenameFileHint()
 		{
+			Directories.Add("sub1");
 			Files.Add("sub1/myfile.cs");
 
 			Create();

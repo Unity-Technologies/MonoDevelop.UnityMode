@@ -77,8 +77,8 @@ namespace MonoDevelop.UnityMode
 			folders = new Dictionary<string, Folder> {{RootFolder.RelativePath, RootFolder}};
 
 			// Build folder structure from folders
-			foreach (var directories in assetDatabase.Directories)
-				AddDirectory(directories);
+			foreach (var directory in assetDatabase.Directories)
+				AddDirectory(directory);
 
 			// Add files to folders
 			foreach (var file in assetDatabase.Files)
