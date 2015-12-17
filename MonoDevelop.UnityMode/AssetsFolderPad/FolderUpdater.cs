@@ -17,7 +17,7 @@ namespace MonoDevelop.UnityMode
 
 		public bool Update(UnityAssetDatabase database)
 		{
-			if (assetDatabase == null || assetDatabase == database)
+			if (assetDatabase == null || assetDatabase.Empty)
 			{
 				Create(database);
 				return false;

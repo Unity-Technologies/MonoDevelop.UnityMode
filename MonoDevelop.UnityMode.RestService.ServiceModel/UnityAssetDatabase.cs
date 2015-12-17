@@ -26,6 +26,11 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 		{
 			return Directories.Contains (path);
 		}
+
+		public bool Empty
+		{
+			get { return Files.Count() == 0 && Directories.Count() == 0; }
+		}
 	}
 
 	public abstract class Hint
