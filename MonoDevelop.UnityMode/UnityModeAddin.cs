@@ -77,7 +77,15 @@ namespace MonoDevelop.UnityMode
 
 		public static void OpenUnityProject(string projectPath)
 		{
-			InitializeAndPair (UnityRestServiceSettings.Load (projectPath).EditorRestServiceUrl);
+			var restServiceSettings = UnityRestServiceSettings.Load (projectPath);
+
+			if(restServiceSettings == null)
+			{
+				MessageService.GenericAlert(new GenericMessage("Unable to load Unity project. The project must be open in Unity", projectPath));
+				IdeApp.Workspace.Close();
+			}
+			else
+				InitializeAndPair (restServiceSettings.EditorRestServiceUrl);
 		}
 
 		internal static void InitializeAndPair(string unityRestServiceUrl)
@@ -109,7 +117,9 @@ namespace MonoDevelop.UnityMode
 				}
 				catch(Exception e)
 				{
-					LoggingService.LogInfo("Unity Pair Request Exception: " + e);
+					MessageService.GenericAlert(new GenericMessage("Unable to connect to Unity instance. Is Unity running?"));
+					LoggingService.LogInfo("Unity Pair Request (" + unityRestServiceUrl + ") Exception: " + e);
+					IdeApp.Workspace.Close();
 					return;
 				}
 				

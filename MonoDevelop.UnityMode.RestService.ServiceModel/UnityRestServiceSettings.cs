@@ -17,7 +17,12 @@ namespace MonoDevelop.UnityMode.ServiceModel
 
 		public static UnityRestServiceSettings Load(string projectPath)
 		{
-			var editorSettingsJson = File.ReadAllText(Path.Combine(projectPath, Path.Combine ("Library", "EditorRestService.json")));
+			var path = Path.Combine(projectPath, Path.Combine ("Library", "EditorRestService.json"));
+
+			if(!File.Exists(path))
+				return null;
+
+			var editorSettingsJson = File.ReadAllText(path);
 
 			var jsonObject = JsonObject.Parse (editorSettingsJson);
 
