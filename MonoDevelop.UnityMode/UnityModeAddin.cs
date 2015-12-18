@@ -31,6 +31,10 @@ namespace MonoDevelop.UnityMode
 				if (UnitySolution != null && e.State != null)
 					SolutionUpdater.Update (UnitySolution, e.State);
 			};
+
+			UnityProjectSettings = new UnityProjectSettings ();
+			UnitySolution = new UnitySolution { Name = "UnitySolution" };
+			UnityProjectState = new UnityProjectState ();
 		}
 
 		static UnityRestServiceSettings UnityRestServiceSettings { get; set; }
@@ -96,17 +100,10 @@ namespace MonoDevelop.UnityMode
 				InitializeAndPair (restServiceSettings.EditorRestServiceUrl);
 		}
 
-		static void Reset()
-		{
-			UnityProjectSettings = new UnityProjectSettings ();
-			UnitySolution = new UnitySolution { Name = "UnitySolution" };
-			UnityProjectState = new UnityProjectState ();
-			UnityAssetDatabase = new UnityAssetDatabase ();
-		}
-
 		internal static void InitializeAndPair(string unityRestServiceUrl)
 		{
-			Reset();
+			UnityAssetDatabase = new UnityAssetDatabase ();
+
 			// FIXME: Unable to connect to own IP, might be blocked by Mongoose in Unity.
 			var editorRestServiecUri = new Uri(unityRestServiceUrl);
 			Pair ("http://localhost:"+editorRestServiecUri.Port, restService.Url);
@@ -153,7 +150,7 @@ namespace MonoDevelop.UnityMode
 
 			savedUnityProjectPath = UnityProjectSettings.ProjectPath;
 
-			Reset();
+			UnityAssetDatabase = new UnityAssetDatabase ();
 			RestClient.SetServerUrl (null);
 		}
 
