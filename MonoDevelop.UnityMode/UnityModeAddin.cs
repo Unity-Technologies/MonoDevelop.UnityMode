@@ -18,6 +18,7 @@ namespace MonoDevelop.UnityMode
 		static UnityProjectState unityProjectState;
 		static UnityAssetDatabase unityAssetDatabase;
 		static UnitySolution unitySolution;
+		static string savedUnityProjectPath;
 
 		static UnityModeAddin ()
 		{
@@ -143,6 +144,8 @@ namespace MonoDevelop.UnityMode
 
 			LoggingService.LogInfo("Unpairing (" + UnityProjectSettings.ProjectPath + ")");
 
+			savedUnityProjectPath = UnityProjectSettings.ProjectPath;
+
 			Reset();
 			RestClient.SetServerUrl (null);
 		}
@@ -154,9 +157,22 @@ namespace MonoDevelop.UnityMode
 
 		static void UnityProjectRefreshImmediate (Hint hint = null)
 		{
-			if (!Paired || !IsUnityRunning())
+			if (!Paired && savedUnityProjectPath != null)
 			{
-				ShutdownAndUnpair ();
+				// Try to repair
+				var restServiceSettings = UnityRestServiceSettings.Load (savedUnityProjectPath);
+
+				if(restServiceSettings != null)
+				{
+					savedUnityProjectPath = null;
+					InitializeAndPair(restServiceSettings.EditorRestServiceUrl);
+					return;
+				}
+			}
+
+			if(!Paired || !IsUnityRunning())
+			{
+				ShutdownAndUnpair();
 				return;
 			}
 
