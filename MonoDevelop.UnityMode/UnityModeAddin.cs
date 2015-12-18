@@ -82,19 +82,23 @@ namespace MonoDevelop.UnityMode
 			if(restServiceSettings == null)
 			{
 				MessageService.GenericAlert(new GenericMessage("Unable to load Unity project. The project must be open in Unity", projectPath));
-				IdeApp.Workspace.Close();
+				ShutdownAndUnpair();
 			}
 			else
 				InitializeAndPair (restServiceSettings.EditorRestServiceUrl);
 		}
 
-		internal static void InitializeAndPair(string unityRestServiceUrl)
+		static void Reset()
 		{
 			UnityProjectSettings = new UnityProjectSettings ();
 			UnitySolution = new UnitySolution { Name = "UnitySolution" };
 			UnityProjectState = new UnityProjectState ();
 			UnityAssetDatabase = new UnityAssetDatabase ();
+		}
 
+		internal static void InitializeAndPair(string unityRestServiceUrl)
+		{
+			Reset();
 			// FIXME: Unable to connect to own IP, might be blocked by Mongoose in Unity.
 			var editorRestServiecUri = new Uri(unityRestServiceUrl);
 			Pair ("http://localhost:"+editorRestServiecUri.Port, restService.Url);
@@ -104,7 +108,7 @@ namespace MonoDevelop.UnityMode
 		{
 			RestClient.SetServerUrl(unityRestServiceUrl);
 
-			DispatchService.BackgroundDispatch(() =>
+			DispatchService.ThreadDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Pair request to Unity");
 				
@@ -119,7 +123,7 @@ namespace MonoDevelop.UnityMode
 				{
 					MessageService.GenericAlert(new GenericMessage("Unable to connect to Unity instance. Is Unity running?"));
 					LoggingService.LogInfo("Unity Pair Request (" + unityRestServiceUrl + ") Exception: " + e);
-					IdeApp.Workspace.Close();
+					ShutdownAndUnpair();
 					return;
 				}
 				
@@ -134,23 +138,23 @@ namespace MonoDevelop.UnityMode
 
 		static void ShutdownAndUnpair()
 		{
-			UnityProjectSettings = null;
-			UnitySolution = null;
-			UnityProjectState = null;
+			if(!RestClient.Available)
+				return;
+
+			LoggingService.LogInfo("Unpairing (" + UnityProjectSettings.ProjectPath + ")");
+
+			Reset();
 			RestClient.SetServerUrl (null);
 		}
 
 		public static void UnityProjectRefresh (Hint hint = null)
 		{
-			DispatchService.BackgroundDispatch(() => UnityProjectRefreshImmediate (hint));
+			DispatchService.ThreadDispatch( () => UnityProjectRefreshImmediate (hint));
 		}
 
 		static void UnityProjectRefreshImmediate (Hint hint = null)
 		{
-			if (!Paired)
-				return;
-
-			if (!IsUnityRunning()) 
+			if (!Paired || !IsUnityRunning())
 			{
 				ShutdownAndUnpair ();
 				return;
@@ -169,24 +173,20 @@ namespace MonoDevelop.UnityMode
 
 		static bool Paired
 		{
-			get { return UnityRestServiceSettings != null && UnityRestServiceSettings.EditorProcessID > 0 && RestClient.Available; }
+			get { return UnityRestServiceSettings.EditorProcessID > 0 && RestClient.Available; }
 		}
 
 		static bool IsUnityRunning()
 		{
-			if (UnityRestServiceSettings == null)
-				return false;
-
 			try
 			{
-				Process.GetProcessById(UnityRestServiceSettings.EditorProcessID);
+				var process = Process.GetProcessById(UnityRestServiceSettings.EditorProcessID);
+				if(!process.HasExited)
+					return true;
 			}
-			catch(Exception)
-			{
-				return false;
-			}
+			catch(Exception) {}
 
-			return true;
+			return false;
 		}
 	}
 }
