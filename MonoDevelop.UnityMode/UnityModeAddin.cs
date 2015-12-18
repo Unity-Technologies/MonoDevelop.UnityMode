@@ -41,8 +41,16 @@ namespace MonoDevelop.UnityMode
 			get { return unitySolution; }
 			set 
 			{
+				if(unitySolution == value)
+					return;
+
+				if(unitySolution != null)
+					IdeApp.Workspace.CloseWorkspaceItem(unitySolution, false);
+				else
+					IdeApp.Workspace.Items.Clear ();
+
 				unitySolution = value;
-				IdeApp.Workspace.Items.Clear ();
+
 				if(unitySolution != null)
 					IdeApp.Workspace.Items.Add (unitySolution);
 			}
