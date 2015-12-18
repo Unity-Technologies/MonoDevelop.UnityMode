@@ -29,7 +29,7 @@ namespace MonoDevelop.UnityMode
 
 			try
 			{
-				DispatchService.GuiSyncDispatch(() =>
+				DispatchService.GuiDispatch(() =>
 					{
 						if (workbench.Documents.Any(d => d.FileName == fileOpenInformation.FileName))
 						{
