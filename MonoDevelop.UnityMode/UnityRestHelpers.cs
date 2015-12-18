@@ -13,7 +13,7 @@ namespace MonoDevelop.UnityMode
 {
 	static class UnityRestHelpers
 	{
-		internal static void OpenFile(string filename, int line, OpenDocumentOptions options = OpenDocumentOptions.None)
+		internal static void OpenFile(string filename, int line = 0, OpenDocumentOptions options = OpenDocumentOptions.None)
 		{
 			if (filename == null || !System.IO.File.Exists(filename))
 				return;
@@ -60,16 +60,19 @@ namespace MonoDevelop.UnityMode
 		{
 			DispatchService.GuiDispatch (() => {
 				var documents = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
-
+				var activeDocument = IdeApp.Workbench.ActiveDocument != null ? IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/') : null;
 				var breakEvents = DebuggingService.Breakpoints.GetBreakevents ();
 				var breakpoints = breakEvents.OfType<Breakpoint> ().Select (bp => new UnityProjectSettings.Breakpoint (bp.FileName, bp.Line, bp.Column, bp.Enabled)).ToList ();
 				var functionBreakpoints = breakEvents.OfType<FunctionBreakpoint> ().Select (bp => new UnityProjectSettings.FunctionBreakpoint (bp.FunctionName, bp.Language, bp.Enabled)).ToList ();
 				var exceptionBreaks = breakEvents.OfType<Catchpoint> ().Select (cp => new UnityProjectSettings.ExceptionBreak (cp.ExceptionName, cp.IncludeSubclasses, cp.Enabled)).ToList ();
 
-				if (!documents.SequenceEqual (projectSettings.Documents) ||
+				if (activeDocument != projectSettings.ActiveDocument ||
+					!documents.SequenceEqual (projectSettings.Documents) ||
 				   !breakpoints.SequenceEqual (projectSettings.Breakpoints) ||
 				   !functionBreakpoints.SequenceEqual (projectSettings.FunctionBreakpoints) ||
-				   !exceptionBreaks.SequenceEqual (projectSettings.ExceptionBreaks)) {
+				   !exceptionBreaks.SequenceEqual (projectSettings.ExceptionBreaks)) 
+				{
+					projectSettings.ActiveDocument = activeDocument;
 					projectSettings.Documents = documents;
 					projectSettings.Breakpoints = breakpoints;
 					projectSettings.FunctionBreakpoints = functionBreakpoints;
@@ -107,9 +110,9 @@ namespace MonoDevelop.UnityMode
 			});
 
 			foreach(var document in projectSettings.Documents)
-				OpenFile(document, 0);
+				OpenFile(document);
 
-			OpenFile (projectSettings.Documents.FirstOrDefault(), 0, OpenDocumentOptions.BringToFront);
+			OpenFile (projectSettings.ActiveDocument != null ? projectSettings.ActiveDocument : projectSettings.Documents.FirstOrDefault(), 0, OpenDocumentOptions.BringToFront);
 
 			return projectSettings;
 		}

@@ -30,7 +30,10 @@ namespace MonoDevelop.UnityMode
 			if (solutionPad != null && solutionPad.Visible)
 				solutionPad.Visible = false;
 
+			IdeApp.Exiting += (object sender, ExitEventArgs args) => Exiting();
 			IdeApp.FocusIn += FocusInEvent;
+
+			workbench.ActiveDocumentChanged += UpdateAndSaveProjectSettings;
 			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
 
@@ -59,12 +62,14 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		~StartupHandler()
+		static void Exiting()
 		{
 			Workbench workbench = IdeApp.Workbench;
 			WorkbenchWindow workbenchWindow = workbench.RootWindow;
 
 			workbenchWindow.FocusInEvent -= FocusInEvent;
+
+			workbench.ActiveDocumentChanged -= UpdateAndSaveProjectSettings;
 			workbench.DocumentOpened -= UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed -= UpdateAndSaveProjectSettings;
 		}

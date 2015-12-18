@@ -52,6 +52,7 @@ namespace MonoDevelop.UnityMode.RestServiceModel
 
 		[IgnoreDataMember]
 		public string ProjectPath { get; set; }
+		public String ActiveDocument { get; set; }
 		public List<String> Documents { get; set; }
 		public List<Breakpoint> Breakpoints { get; set; }
 		public List<FunctionBreakpoint> FunctionBreakpoints { get; set; }
