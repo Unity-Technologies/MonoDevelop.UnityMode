@@ -10,44 +10,14 @@ namespace MonoDevelop.UnityMode
 {
 	public class StartupHandler : CommandHandler
 	{
-		EventHandler<BreakpointEventArgs> breakpointUpdatedHandler;
-		EventHandler<BreakpointEventArgs> breakpointRemovedHandler;
-		EventHandler<BreakpointEventArgs> breakpointAddedHandler;
-		EventHandler breakpointChangedHandler;
+		static EventHandler<BreakpointEventArgs> breakpointUpdatedHandler;
+		static EventHandler<BreakpointEventArgs> breakpointRemovedHandler;
+		static EventHandler<BreakpointEventArgs> breakpointAddedHandler;
+		static EventHandler breakpointChangedHandler;
 
 		protected override void Run ()
 		{
-			Workbench workbench = IdeApp.Workbench;
-			WorkbenchWindow workbenchWindow = workbench.RootWindow;
-
-			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
-
-			if (assetsFolderPad != null && !assetsFolderPad.Visible)
-				assetsFolderPad.Visible = true;
-
-			var solutionPad = workbench.Pads.SolutionPad;
-
-			if (solutionPad != null && solutionPad.Visible)
-				solutionPad.Visible = false;
-
-			IdeApp.Exiting += (object sender, ExitEventArgs args) => Exiting();
-			IdeApp.FocusIn += FocusInEvent;
-
-			workbench.ActiveDocumentChanged += UpdateAndSaveProjectSettings;
-			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
-			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
-
-
-			breakpointUpdatedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
-			breakpointRemovedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
-			breakpointAddedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
-			breakpointChangedHandler = DispatchService.GuiDispatch<EventHandler> (UpdateAndSaveProjectSettings);
-
-			var breakpoints = DebuggingService.Breakpoints;
-			breakpoints.BreakpointAdded += breakpointAddedHandler;
-			breakpoints.BreakpointRemoved += breakpointRemovedHandler;
-			breakpoints.Changed += breakpointChangedHandler;
-			breakpoints.BreakpointUpdated += breakpointUpdatedHandler;
+			Init();
 
 			var unityProjectPath = ParseUnityProjectPathFromArgs (Environment.GetCommandLineArgs ());
 
@@ -62,16 +32,54 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		static void Exiting()
+		static void Init()
 		{
 			Workbench workbench = IdeApp.Workbench;
-			WorkbenchWindow workbenchWindow = workbench.RootWindow;
 
-			workbenchWindow.FocusInEvent -= FocusInEvent;
+			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
 
+			if (assetsFolderPad != null && !assetsFolderPad.Visible)
+				assetsFolderPad.Visible = true;
+
+			var solutionPad = workbench.Pads.SolutionPad;
+
+			if (solutionPad != null && solutionPad.Visible)
+				solutionPad.Visible = false;
+
+			IdeApp.Exiting += (object sender, ExitEventArgs args) => Exit();
+			IdeApp.FocusIn += FocusInEvent;
+
+			workbench.ActiveDocumentChanged += UpdateAndSaveProjectSettings;
+			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
+			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
+
+			breakpointUpdatedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointRemovedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointAddedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
+			breakpointChangedHandler = DispatchService.GuiDispatch<EventHandler> (UpdateAndSaveProjectSettings);
+
+			var breakpoints = DebuggingService.Breakpoints;
+			breakpoints.BreakpointAdded += breakpointAddedHandler;
+			breakpoints.BreakpointRemoved += breakpointRemovedHandler;
+			breakpoints.Changed += breakpointChangedHandler;
+			breakpoints.BreakpointUpdated += breakpointUpdatedHandler;
+
+		}
+
+		static void Exit()
+		{
+			IdeApp.FocusIn -= FocusInEvent;
+
+			Workbench workbench = IdeApp.Workbench;
 			workbench.ActiveDocumentChanged -= UpdateAndSaveProjectSettings;
 			workbench.DocumentOpened -= UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed -= UpdateAndSaveProjectSettings;
+
+			var breakpoints = DebuggingService.Breakpoints;
+			breakpoints.BreakpointAdded -= breakpointAddedHandler;
+			breakpoints.BreakpointRemoved -= breakpointRemovedHandler;
+			breakpoints.Changed -= breakpointChangedHandler;
+			breakpoints.BreakpointUpdated -= breakpointUpdatedHandler;
 		}
 
 		static void FocusInEvent(object o, EventArgs args)
