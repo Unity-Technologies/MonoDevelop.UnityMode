@@ -36,7 +36,7 @@ namespace MonoDevelop.UnityMode
 			if (solutionPad != null && solutionPad.Visible)
 				solutionPad.Visible = false;
 
-			workbenchWindow.FocusInEvent += WorkbenchFocusInEvent;
+			IdeApp.FocusIn += FocusInEvent;
 			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
 
@@ -73,12 +73,12 @@ namespace MonoDevelop.UnityMode
 			Workbench workbench = IdeApp.Workbench;
 			WorkbenchWindow workbenchWindow = workbench.RootWindow;
 
-			workbenchWindow.FocusInEvent -= WorkbenchFocusInEvent;
+			workbenchWindow.FocusInEvent -= FocusInEvent;
 			workbench.DocumentOpened -= UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed -= UpdateAndSaveProjectSettings;
 		}
 
-		static void WorkbenchFocusInEvent(object o, Gtk.FocusInEventArgs args)
+		static void FocusInEvent(object o, EventArgs args)
 		{
 			UnityModeAddin.UnityProjectRefresh ();
 		}
