@@ -8,12 +8,6 @@ using Mono.Debugging.Client;
 
 namespace MonoDevelop.UnityMode
 {
-	public class UnityModeArgs
-	{
-		public string UnityProjectPath { get; set; }
-		public string OpenFile { get; set; }
-	}
-
 	public class StartupHandler : CommandHandler
 	{
 		EventHandler<BreakpointEventArgs> breakpointUpdatedHandler;
@@ -52,13 +46,10 @@ namespace MonoDevelop.UnityMode
 			breakpoints.Changed += breakpointChangedHandler;
 			breakpoints.BreakpointUpdated += breakpointUpdatedHandler;
 
-			var args = ParseArgs (Environment.GetCommandLineArgs ());
+			var unityProjectPath = ParseUnityProjectPathFromArgs (Environment.GetCommandLineArgs ());
 
-			if (args.OpenFile != null)
-				OpenFileFromArgument (args.OpenFile);
-
-			if (args.UnityProjectPath != null)
-				UnityModeAddin.OpenUnityProject (args.UnityProjectPath);
+			if (unityProjectPath != null)
+				UnityModeAddin.OpenUnityProject (unityProjectPath);
 			else 
 			{
 				// For development
@@ -88,15 +79,14 @@ namespace MonoDevelop.UnityMode
 			UnityRestHelpers.UpdateAndSaveProjectSettings (UnityModeAddin.UnityProjectSettings);
 		}
 
-		static UnityModeArgs ParseArgs(string[] args)
+		static string ParseUnityProjectPathFromArgs(string[] args)
 		{
 			LoggingService.Log (MonoDevelop.Core.Logging.LogLevel.Info, "UnityMode Args " + String.Join("!",args));
 
-			UnityModeArgs unityModeArgs = new UnityModeArgs ();
+			string unityProjectPath = null;
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityOpenFile=", "Unity Open File", f => unityModeArgs.OpenFile = f);
-			p.Add ("unityProjectPath=", "Unity Project Path", path => unityModeArgs.UnityProjectPath = path);
+			p.Add ("unityProjectPath=", "Unity Project Path", path => unityProjectPath = path);
 
 			try 
 			{
@@ -108,17 +98,7 @@ namespace MonoDevelop.UnityMode
 				return null;
 			}
 
-			return unityModeArgs;
-		}
-
-		static void OpenFileFromArgument(string openFileArg)
-		{
-			string[] fileLine = openFileArg.Split (';');
-
-			if (fileLine.Length == 2)
-				UnityRestHelpers.OpenFile (fileLine [0], int.Parse (fileLine [1]), OpenDocumentOptions.BringToFront);
-			else
-				UnityRestHelpers.OpenFile (openFileArg, 0, OpenDocumentOptions.BringToFront);
+			return unityProjectPath;
 		}
 	}
 }
