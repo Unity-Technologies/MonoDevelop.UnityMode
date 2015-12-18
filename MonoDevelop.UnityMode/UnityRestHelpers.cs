@@ -56,15 +56,6 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
-		internal static void QuitApplication(string unityProject)
-		{
-			if (unityProject == UnityModeAddin.UnityProjectSettings.ProjectPath)
-				DispatchService.GuiDispatch (() => IdeApp.Exit ());
-			else
-				LoggingService.LogInfo ("UnityMode: Could not Exit application because requested unityProject '"
-					+ unityProject + "' does not match '" + UnityModeAddin.UnityProjectSettings.ProjectPath + "'");
-		}
-
 		internal static void UpdateAndSaveProjectSettings(UnityProjectSettings projectSettings)
 		{
 			DispatchService.GuiDispatch (() => {
