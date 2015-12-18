@@ -83,7 +83,7 @@ namespace MonoDevelop.UnityMode
 					projectSettings.Breakpoints = breakpoints;
 					projectSettings.FunctionBreakpoints = functionBreakpoints;
 					projectSettings.ExceptionBreaks = exceptionBreaks;
-					DispatchService.BackgroundDispatch (() => RestClient.SaveUnityProjectSettings (projectSettings));
+					DispatchService.ThreadDispatch (() => RestClient.SaveUnityProjectSettings (projectSettings));
 				}
 			});
 		}
