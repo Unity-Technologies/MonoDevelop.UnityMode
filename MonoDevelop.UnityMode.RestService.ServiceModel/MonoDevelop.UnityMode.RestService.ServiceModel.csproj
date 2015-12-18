@@ -55,7 +55,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpenFileRequest.cs" />
     <Compile Include="UnityProjectState.cs" />
-    <Compile Include="QuitApplicationRequest.cs" />
     <Compile Include="UnityRestServiceSettings.cs" />
     <Compile Include="UnityProjectSettings.cs" />
     <Compile Include="UnityAssetDatabase.cs" />

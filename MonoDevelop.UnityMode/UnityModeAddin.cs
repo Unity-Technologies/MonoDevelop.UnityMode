@@ -24,8 +24,7 @@ namespace MonoDevelop.UnityMode
 		{
 			restService = new RestService 
 			(
-				fileOpenRequest => UnityRestHelpers.OpenFile(fileOpenRequest.File, fileOpenRequest.Line, OpenDocumentOptions.BringToFront),
-				quitRequest => UnityRestHelpers.QuitApplication(quitRequest.UnityProject)
+				fileOpenRequest => UnityRestHelpers.OpenFile(fileOpenRequest.File, fileOpenRequest.Line, OpenDocumentOptions.BringToFront)
 			);
 
 			UnityProjectStateChanged += (sender, e) => {
