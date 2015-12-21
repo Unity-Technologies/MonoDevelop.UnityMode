@@ -126,7 +126,7 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 
 		public static void CopyAsset(string oldpath, string newpath)
 		{
-			client.Post<IReturnVoid>("unity/assets/" + oldpath, new MoveAssetRequest { action = "move", newpath = newpath });
+			client.Post<IReturnVoid>("unity/assets/" + oldpath, new MoveAssetRequest { action = "copy", newpath = newpath });
 		}
 
 		public static void DeleteAsset(string path)
