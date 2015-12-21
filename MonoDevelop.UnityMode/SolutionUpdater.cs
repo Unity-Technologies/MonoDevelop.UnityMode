@@ -2,6 +2,7 @@ using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.RestServiceModel;
 using System.Linq;
 using MonoDevelop.CSharp.Project;
+using MonoDevelop.Ide;
 
 namespace MonoDevelop.UnityMode
 {
@@ -44,6 +45,13 @@ namespace MonoDevelop.UnityMode
 			var rootFolder = solution.RootFolder;
 			rootFolder.AddItem (p);
 			solution.DefaultConfiguration.AddItem (p).Build = true;
+
+			DispatchService.GuiDispatch(() => {
+				IdeApp.ProjectOperations.CurrentSelectedWorkspaceItem = solution;
+				IdeApp.ProjectOperations.CurrentSelectedSolutionItem = p;
+			});
+
+
 			return p;
 		}
 	}
