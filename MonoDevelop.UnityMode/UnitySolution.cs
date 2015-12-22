@@ -1,5 +1,6 @@
 using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.UnityRestClient;
+using System.IO;
 
 namespace MonoDevelop.UnityMode
 {
@@ -11,6 +12,12 @@ namespace MonoDevelop.UnityMode
 		public UnitySolution()
 		{
 			Singleton = this;
+
+			string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			Directory.CreateDirectory(tempDirectory);
+			Name = "UnitySolution";
+			FileName = Path.Combine(tempDirectory, "UnitySolution.sln");
+
 			var config = new UnitySolutionConfiguration {Id = "Unity"};
 			Configurations.Add (config);
 			DefaultConfiguration = config;
