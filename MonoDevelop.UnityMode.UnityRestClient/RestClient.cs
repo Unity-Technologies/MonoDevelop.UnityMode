@@ -60,7 +60,6 @@ namespace MonoDevelop.UnityMode.UnityRestClient
 			unityprocessid = -1;
 		}
 
-		public string result { get; set; }
 		public int unityprocessid { get; set; }
 		public string unityproject { get; set; }
 	}

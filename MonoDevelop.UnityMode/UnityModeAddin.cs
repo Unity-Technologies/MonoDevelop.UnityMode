@@ -89,6 +89,13 @@ namespace MonoDevelop.UnityMode
 
 		public static void OpenUnityProject(string projectPath)
 		{
+			if(!System.IO.Directory.Exists(System.IO.Path.Combine(projectPath, "Assets")))
+			{
+				MessageService.GenericAlert(new GenericMessage("Not a Unity project directory. Assets folder not found.", projectPath));
+				ShutdownAndUnpair();
+				return;
+			}
+
 			var restServiceSettings = UnityRestServiceSettings.Load (projectPath);
 
 			if(restServiceSettings == null)
@@ -116,18 +123,18 @@ namespace MonoDevelop.UnityMode
 			DispatchService.ThreadDispatch(() =>
 			{
 				LoggingService.LogInfo("Sending Pair request to Unity");
-				
+
 				PairResult pairResult = null;
 
 				try
 				{
 					pairResult = RestClient.Pair(monoDevelopRestServiceUrl, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
-					LoggingService.LogInfo("Unity Pair Request Result: " + pairResult.result);
+					LoggingService.LogInfo("Unity Pair response. Project:" + pairResult.unityproject + " Process ID: " + pairResult.unityprocessid);
 				}
 				catch(Exception e)
 				{
 					MessageService.GenericAlert(new GenericMessage("Unable to connect to Unity instance. Is Unity running?"));
-					LoggingService.LogInfo("Unity Pair Request (" + unityRestServiceUrl + ") Exception: " + e);
+					LoggingService.LogWarning("Unity Pair Request (" + unityRestServiceUrl + ")", e);
 					ShutdownAndUnpair();
 					return;
 				}
@@ -180,8 +187,9 @@ namespace MonoDevelop.UnityMode
 				return;
 			}
 
-			LoggingService.LogInfo("Sending Unity AssetDatabase request");
+			LoggingService.LogInfo("Starting Unity Project refresh");
 
+			LoggingService.LogInfo("Sending Unity AssetDatabase request");
 			var assetDatabase = RestClient.GetUnityAssetDatabase();
 			assetDatabase.Hint = hint;
 			UnityAssetDatabase = assetDatabase;
