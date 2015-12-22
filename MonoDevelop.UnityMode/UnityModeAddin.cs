@@ -6,6 +6,8 @@ using MonoDevelop.Ide.Gui;
 using MonoDevelop.UnityMode.RestServiceModel;
 using MonoDevelop.UnityMode.UnityRestClient;
 using MonoDevelop.UnityMode.ServiceModel;
+using MonoDevelop.Projects;
+using System.Linq;
 
 namespace MonoDevelop.UnityMode
 {
@@ -31,10 +33,18 @@ namespace MonoDevelop.UnityMode
 				if (UnitySolution != null && e.State != null)
 					SolutionUpdater.Update (UnitySolution, e.State);
 			};
-
+	
 			UnityProjectSettings = new UnityProjectSettings ();
-			UnitySolution = new UnitySolution { Name = "UnitySolution" };
+			UnitySolution = new UnitySolution ();
 			UnityProjectState = new UnityProjectState ();
+
+			IdeApp.Workspace.WorkspaceItemUnloaded += OnWorkspaceItemUnloaded;
+		}
+
+		static void OnWorkspaceItemUnloaded (object s, WorkspaceItemEventArgs args)
+		{
+			if(args.Item == UnitySolution)
+				ShutdownAndUnpair(true);
 		}
 
 		static UnityRestServiceSettings UnityRestServiceSettings { get; set; }
@@ -48,11 +58,27 @@ namespace MonoDevelop.UnityMode
 					return;
 
 				if(unitySolution != null)
-					IdeApp.Workspace.CloseWorkspaceItem(unitySolution, false);
+					IdeApp.Workspace.Items.Remove(unitySolution);
 				else
 					IdeApp.Workspace.Items.Clear ();
 
 				unitySolution = value;
+
+				unitySolution.SolutionItemAdded += (object sender, SolutionItemChangeEventArgs e) => 
+				{
+					var solution = e.Solution;
+					var firstProject = solution.Items.FirstOrDefault();
+
+					if(IdeApp.ProjectOperations.CurrentSelectedWorkspaceItem != solution || 
+						(firstProject != null && IdeApp.ProjectOperations.CurrentSelectedSolutionItem != firstProject))
+					{
+						DispatchService.GuiDispatch(() => {
+							IdeApp.ProjectOperations.CurrentSelectedWorkspaceItem = solution;
+							IdeApp.ProjectOperations.CurrentSelectedSolutionItem = firstProject;
+						});
+					}
+						
+				};
 
 				if(unitySolution != null)
 					IdeApp.Workspace.Items.Add (unitySolution);
@@ -148,16 +174,24 @@ namespace MonoDevelop.UnityMode
 			});
 		}
 
-		static void ShutdownAndUnpair()
+		static void ShutdownAndUnpair(bool closeProject = false)
 		{
 			if(!RestClient.Available)
 				return;
 
 			LoggingService.LogInfo("Unpairing (" + UnityProjectSettings.ProjectPath + ")");
 
-			savedUnityProjectPath = UnityProjectSettings.ProjectPath;
+			savedUnityProjectPath = closeProject ? null : UnityProjectSettings.ProjectPath;
 
 			UnityAssetDatabase = new UnityAssetDatabase ();
+			UnityProjectSettings = new UnityProjectSettings ();
+
+			if(closeProject)
+			{
+				UnitySolution = new UnitySolution ();
+				UnityProjectState = new UnityProjectState ();
+			}
+
 			RestClient.SetServerUrl (null);
 		}
 
