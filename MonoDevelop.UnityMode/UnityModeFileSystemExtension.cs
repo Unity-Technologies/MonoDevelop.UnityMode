@@ -126,7 +126,7 @@ namespace MonoDevelop.UnityMode
 
 		public override void RequestFileEdit (IEnumerable<FilePath> files)
 		{
-			throw new NotImplementedException ();
+			throw new NotSupportedException ();
 		}
 
 		public override void NotifyFilesChanged (IEnumerable<FilePath> file)
