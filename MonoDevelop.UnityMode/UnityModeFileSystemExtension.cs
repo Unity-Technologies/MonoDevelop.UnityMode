@@ -61,6 +61,9 @@ namespace MonoDevelop.UnityMode
 
 		public override void CopyFile (FilePath source, FilePath dest, bool overwrite)
 		{
+			if (source == dest)
+				return;
+
 			UnityRestClient.RestClient.CopyAsset(source, dest);
 			UnityModeAddin.UnityProjectRefresh ();
 		}
@@ -132,12 +135,17 @@ namespace MonoDevelop.UnityMode
 
 		static void MoveAsset(string oldPath, string newPath)
 		{
+			if (oldPath == newPath)
+				return;
 			UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
 			UnityModeAddin.UnityProjectRefresh ();
 		}
 
 		static void RenameAsset(string oldPath, string newPath)
 		{
+			if (oldPath == newPath)
+				return;
+
 			UnityRestClient.RestClient.MoveAsset(oldPath, newPath);
 			UnityModeAddin.UnityProjectRefresh (new RenameHint{ OldPath = oldPath, NewPath = newPath});
 		}
