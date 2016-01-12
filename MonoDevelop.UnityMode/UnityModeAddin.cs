@@ -73,15 +73,15 @@ namespace MonoDevelop.UnityMode
 						(firstProject != null && IdeApp.ProjectOperations.CurrentSelectedSolutionItem != firstProject))
 					{
 						DispatchService.GuiDispatch(() => {
+							if(!IdeApp.Workspace.Items.Contains(solution))
+								IdeApp.Workspace.Items.Add (solution);
+							
 							IdeApp.ProjectOperations.CurrentSelectedWorkspaceItem = solution;
 							IdeApp.ProjectOperations.CurrentSelectedSolutionItem = firstProject;
 						});
 					}
 						
 				};
-
-				if(unitySolution != null)
-					IdeApp.Workspace.Items.Add (unitySolution);
 			}
 		}
 
