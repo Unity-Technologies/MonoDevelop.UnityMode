@@ -9,10 +9,11 @@ namespace MonoDevelop.UnityMode
 		public override BuildResult RunTarget (IProgressMonitor monitor, IBuildTarget item, string target, ConfigurationSelector configuration)
 		{
 			var solutionItem = item as SolutionItem;
-			if (solutionItem == null)
-				return base.RunTarget (monitor, item, target, configuration);
 
-			return solutionItem.ParentSolution.Build (monitor, configuration);
+			if (solutionItem != null && (solutionItem.ParentSolution == UnityModeAddin.UnitySolution))
+				return solutionItem.ParentSolution.Build (monitor, configuration);
+
+			return base.RunTarget (monitor, item, target, configuration);
 		}
 	}
 }

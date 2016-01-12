@@ -53,10 +53,10 @@ namespace MonoDevelop.UnityMode
 
 		static UnityRestServiceSettings UnityRestServiceSettings { get; set; }
 
-		static UnitySolution UnitySolution 
+		public static UnitySolution UnitySolution 
 		{
 			get { return unitySolution; }
-			set 
+			private set 
 			{
 				if(unitySolution == value)
 					return;
