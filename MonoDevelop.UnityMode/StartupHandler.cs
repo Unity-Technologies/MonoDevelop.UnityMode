@@ -17,6 +17,8 @@ namespace MonoDevelop.UnityMode
 
 		protected override void Run ()
 		{
+			UnityModeAddin.UnityPaired += delegate { ShowAssetsPad(true); };
+			UnityModeAddin.UnityUnpaired += delegate { ShowAssetsPad(false); };
 			Init();
 
 			var unityProjectPath = ParseUnityProjectPathFromArgs (Environment.GetCommandLineArgs ());
@@ -35,16 +37,6 @@ namespace MonoDevelop.UnityMode
 		static void Init()
 		{
 			Workbench workbench = IdeApp.Workbench;
-
-			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
-
-			if (assetsFolderPad != null && !assetsFolderPad.Visible)
-				assetsFolderPad.Visible = true;
-
-			var solutionPad = workbench.Pads.SolutionPad;
-
-			if (solutionPad != null && solutionPad.Visible)
-				solutionPad.Visible = false;
 
 			IdeApp.Exiting += (object sender, ExitEventArgs args) => Exit();
 			IdeApp.FocusIn += FocusInEvent;
@@ -80,6 +72,21 @@ namespace MonoDevelop.UnityMode
 			breakpoints.BreakpointRemoved -= breakpointRemovedHandler;
 			breakpoints.Changed -= breakpointChangedHandler;
 			breakpoints.BreakpointUpdated -= breakpointUpdatedHandler;
+		}
+
+		static void ShowAssetsPad(bool assetPadVisible)
+		{
+			Workbench workbench = IdeApp.Workbench;
+
+			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
+
+			if (assetsFolderPad != null && assetsFolderPad.Visible != assetPadVisible)
+				assetsFolderPad.Visible = assetPadVisible;
+
+			var solutionPad = workbench.Pads.SolutionPad;
+
+			if (solutionPad != null && solutionPad.Visible == assetPadVisible)
+				solutionPad.Visible = !assetPadVisible;
 		}
 
 		static void FocusInEvent(object o, EventArgs args)

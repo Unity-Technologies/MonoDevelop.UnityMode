@@ -16,6 +16,10 @@ namespace MonoDevelop.UnityMode
 		public static event UnityProjectStateChangedHandler UnityProjectStateChanged;
 		public static event UnityAssetDatabaseChangedHandler UnityAssetDatabaseChanged;
 
+		public delegate void UnityPairedHandler();
+		public static event UnityPairedHandler UnityPaired;
+		public static event UnityPairedHandler UnityUnpaired;
+
 		static RestService restService;
 		static UnityProjectState unityProjectState;
 		static UnityAssetDatabase unityAssetDatabase;
@@ -171,6 +175,9 @@ namespace MonoDevelop.UnityMode
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
 				UnityProjectRefreshImmediate ();
+
+				if(UnityPaired != null)
+					UnityPaired();
 			});
 		}
 
@@ -190,6 +197,9 @@ namespace MonoDevelop.UnityMode
 			{
 				UnitySolution = new UnitySolution ();
 				UnityProjectState = new UnityProjectState ();
+
+				if(UnityUnpaired != null)
+					UnityUnpaired();
 			}
 
 			RestClient.SetServerUrl (null);
