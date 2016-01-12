@@ -58,6 +58,9 @@ namespace MonoDevelop.UnityMode
 
 		internal static void UpdateAndSaveProjectSettings(UnityProjectSettings projectSettings)
 		{
+			if (!RestClient.Available)
+				return;
+
 			DispatchService.GuiDispatch (() => {
 				var documents = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
 				var activeDocument = IdeApp.Workbench.ActiveDocument != null ? IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/') : null;

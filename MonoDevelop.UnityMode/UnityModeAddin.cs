@@ -235,7 +235,7 @@ namespace MonoDevelop.UnityMode
 
 		static bool Paired
 		{
-			get { return UnityRestServiceSettings.EditorProcessID > 0 && RestClient.Available; }
+			get { return UnityRestServiceSettings != null && UnityRestServiceSettings.EditorProcessID > 0 && RestClient.Available; }
 		}
 
 		static bool IsUnityRunning()

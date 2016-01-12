@@ -115,7 +115,7 @@ namespace MonoDevelop.UnityMode
 
 		void SelectActiveDocument()
 		{
-			if (IdeApp.Workbench.ActiveDocument == null)
+			if (IdeApp.Workbench.ActiveDocument == null || folderUpdater.RootFolder == null)
 				return;
 
 			var file = folderUpdater.RootFolder.FindEntry(IdeApp.Workbench.ActiveDocument.FileName) as File;
