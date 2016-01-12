@@ -73,9 +73,11 @@
     </Reference>
     <Reference Include="MonoDevelop.Debugger">
       <HintPath>..\..\monodevelop\main\build\AddIns\MonoDevelop.Debugger\MonoDevelop.Debugger.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Debugging">
       <HintPath>..\..\monodevelop\main\build\bin\Mono.Debugging.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
