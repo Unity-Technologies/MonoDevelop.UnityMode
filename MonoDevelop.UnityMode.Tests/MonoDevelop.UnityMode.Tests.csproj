@@ -36,18 +36,23 @@
     <Reference Include="System" />
     <Reference Include="nunit.framework">
       <HintPath>..\..\monodevelop\main\build\tests\nunit.framework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Core">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnitTests">
       <HintPath>..\..\monodevelop\main\build\tests\UnitTests.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.CSharpBinding">
       <HintPath>..\..\monodevelop\main\build\AddIns\BackendBindings\MonoDevelop.CSharpBinding.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MonoDevelop.Ide">
       <HintPath>..\..\monodevelop\main\build\bin\MonoDevelop.Ide.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +65,7 @@
     <ProjectReference Include="..\MonoDevelop.UnityMode\MonoDevelop.UnityMode.csproj">
       <Project>{54833F06-FF38-483A-A1F5-43DF9CE0375F}</Project>
       <Name>MonoDevelop.UnityMode</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\MonoDevelop.UnityMode.RestService.ServiceModel\MonoDevelop.UnityMode.RestService.ServiceModel.csproj">
       <Project>{4B361B33-3872-45B1-968A-3053C4ACB8FC}</Project>
