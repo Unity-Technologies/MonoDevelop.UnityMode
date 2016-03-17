@@ -46,7 +46,7 @@ namespace MonoDevelop.UnityMode
 			if (database == null)
 				return;
 
-			string title = "Unity Project: " + new DirectoryInfo (projectBaseDirectory).Name;
+			string title = "Unity Project: " + (string.IsNullOrEmpty (projectBaseDirectory) ? "" : new DirectoryInfo (projectBaseDirectory).Name);
 
 			if (Window.Title != title)
 				Window.Title = title;
@@ -96,7 +96,7 @@ namespace MonoDevelop.UnityMode
 
 		void SelectActiveDocument()
 		{
-			if (IdeApp.Workbench.ActiveDocument == null || folderUpdater.RootFolder == null)
+			if (IdeApp.Workbench.ActiveDocument == null || IdeApp.Workbench.ActiveDocument.FileName.IsNull || folderUpdater.RootFolder == null )
 				return;
 
 			var file = folderUpdater.RootFolder.FindEntry(IdeApp.Workbench.ActiveDocument.FileName) as File;

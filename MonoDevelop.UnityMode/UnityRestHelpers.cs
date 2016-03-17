@@ -72,8 +72,8 @@ namespace MonoDevelop.UnityMode
 				return;
 
 			DispatchService.GuiDispatch (() => {
-				var documents = IdeApp.Workbench.Documents.Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
-				var activeDocument = IdeApp.Workbench.ActiveDocument != null ? IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/') : null;
+				var documents = IdeApp.Workbench.Documents.Where(d => d.FileName != null).Select (d => d.FileName.ToString ().Replace ('\\', '/')).ToList ();
+				var activeDocument = IdeApp.Workbench.ActiveDocument != null && IdeApp.Workbench.ActiveDocument.FileName != null ? IdeApp.Workbench.ActiveDocument.FileName.ToString().Replace('\\', '/') : null;
 				var breakEvents = DebuggingService.Breakpoints.GetBreakevents ();
 				var breakpoints = breakEvents.OfType<Breakpoint> ().Select (bp => new UnityProjectSettings.Breakpoint (bp.FileName, bp.Line, bp.Column, bp.Enabled)).ToList ();
 				var functionBreakpoints = breakEvents.OfType<FunctionBreakpoint> ().Select (bp => new UnityProjectSettings.FunctionBreakpoint (bp.FunctionName, bp.Language, bp.Enabled)).ToList ();
