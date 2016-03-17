@@ -31,19 +31,11 @@ namespace MonoDevelop.UnityMode
 
 		static void ProcessReferences (DotNetAssemblyProject project, MonoIsland update)
 		{
-			var updateReferences = update.References;
-
-			updateReferences.Add ("System");
-			updateReferences.Add ("System.Core");
-			updateReferences.Add ("System.Runtime.Serialization");
-			updateReferences.Add ("System.Xml.Linq");
-			updateReferences.Sort ();
-
-			var referencesToAdd = updateReferences.Where (r => project.References.All(r2 => r2.Reference != r)).ToArray ();
+			var referencesToAdd = update.References.Where (r => project.References.All(r2 => r2.Reference != r)).ToArray ();
 			foreach (var reference in referencesToAdd)
 				project.References.Add (ProjectReferenceFor (reference));
 
-			var referencesToRemove = project.References.Where (r => updateReferences.All(r2 => r.Reference != r2)).ToArray ();
+			var referencesToRemove = project.References.Where (r => update.References.All(r2 => r.Reference != r2)).ToArray ();
 			project.References.RemoveRange (referencesToRemove);
 		}
 

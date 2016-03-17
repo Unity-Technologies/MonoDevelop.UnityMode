@@ -26,7 +26,7 @@ namespace MonoDevelop.UnityMode
 			{
 				var existing = existingProjects.OfType<DotNetAssemblyProject>().SingleOrDefault (p => p.Name == projectUpdate.Name);
 				if (existing == null)
-					existing = CreateMonoDevelopProjectFromProjectUpdate (s, projectUpdate);
+					existing = CreateMonoDevelopProjectFromProjectUpdate (s, projectUpdate, FrameworkVersionToMoniker(update.Framework));
 
 				ProjectUpdater.Update (existing, projectUpdate);
 			}
@@ -34,11 +34,11 @@ namespace MonoDevelop.UnityMode
 			s.BaseDirectory = update.BaseDirectory;
 		}
 
-		static DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate)
+		static DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate, TargetFrameworkMoniker moniker)
 		{
 			var p = new DotNetAssemblyProject (projectUpdate.Language);
 
-			p.TargetFramework = Runtime.SystemAssemblyService.GetTargetFramework (TargetFrameworkMoniker.NET_3_5);
+			p.TargetFramework = Runtime.SystemAssemblyService.GetTargetFramework (moniker);
 
 			// FIXME
 			switch (projectUpdate.Language)
@@ -55,6 +55,14 @@ namespace MonoDevelop.UnityMode
 			solution.DefaultConfiguration.AddItem (p).Build = true;
 
 			return p;
+		}
+
+		static TargetFrameworkMoniker FrameworkVersionToMoniker(string version)
+		{
+			if (version == "3.5")
+				return TargetFrameworkMoniker.NET_3_5;
+
+			throw new System.ArgumentException ("Unsupported framework version " + version);
 		}
 	}
 }
