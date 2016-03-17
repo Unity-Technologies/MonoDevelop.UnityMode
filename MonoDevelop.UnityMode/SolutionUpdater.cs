@@ -2,6 +2,8 @@ using MonoDevelop.Projects;
 using MonoDevelop.UnityMode.RestServiceModel;
 using System.Linq;
 using MonoDevelop.CSharp.Project;
+using MonoDevelop.Core;
+using MonoDevelop.Core.Assemblies;
 
 namespace MonoDevelop.UnityMode
 {
@@ -35,6 +37,8 @@ namespace MonoDevelop.UnityMode
 		static DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate)
 		{
 			var p = new DotNetAssemblyProject (projectUpdate.Language);
+
+			p.TargetFramework = Runtime.SystemAssemblyService.GetTargetFramework (TargetFrameworkMoniker.NET_3_5);
 
 			// FIXME
 			switch (projectUpdate.Language)
