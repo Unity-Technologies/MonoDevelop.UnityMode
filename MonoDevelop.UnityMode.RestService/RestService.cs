@@ -26,7 +26,7 @@ namespace MonoDevelop.UnityMode
 			{
 				appHost.Start(Url);
 			}
-			catch (Exception exception)
+			catch (Exception)
 			{
 				Url = null;
 			}
