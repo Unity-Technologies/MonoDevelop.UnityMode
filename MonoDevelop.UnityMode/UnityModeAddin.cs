@@ -119,7 +119,7 @@ namespace MonoDevelop.UnityMode
 				unityAssetDatabase = value;
 
 				if (UnityAssetDatabaseChanged != null)
-					UnityAssetDatabaseChanged(null, new UnityAssetDatabaseChangedEventArgs() { Database = unityAssetDatabase });
+					UnityAssetDatabaseChanged(null, new UnityAssetDatabaseChangedEventArgs() { Database = unityAssetDatabase, ProjectBaseDirectory = unityProjectState.BaseDirectory });
 			}
 		}
 

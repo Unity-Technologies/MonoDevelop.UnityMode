@@ -8,5 +8,6 @@ namespace MonoDevelop.UnityMode
 	public class UnityAssetDatabaseChangedEventArgs : EventArgs
 	{
 		public UnityAssetDatabase Database;
+		public string ProjectBaseDirectory;
 	}
 }

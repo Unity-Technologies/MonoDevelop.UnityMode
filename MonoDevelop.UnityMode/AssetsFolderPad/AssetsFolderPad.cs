@@ -31,20 +31,25 @@ namespace MonoDevelop.UnityMode
 			base.Initialize (builders, options, contextMenuPath);
 
 			UnityModeAddin.UnityAssetDatabaseChanged += Refresh;
-			Refresh (UnityModeAddin.UnityAssetDatabase);
+			Refresh (UnityModeAddin.UnityAssetDatabase, "Unity Project:");
 
 			TreeView.ShowSelectionPopupButton = true;
 		}
 
 		public void Refresh(object obj, UnityAssetDatabaseChangedEventArgs args)
 		{
-			Refresh (args.Database);
+			Refresh (args.Database, args.ProjectBaseDirectory);
 		}
 
-		public void Refresh(UnityAssetDatabase database)
+		void Refresh(UnityAssetDatabase database, string projectBaseDirectory)
 		{
 			if (database == null)
 				return;
+
+			string title = "Unity Project: " + new DirectoryInfo (projectBaseDirectory).Name;
+
+			if (Window.Title != title)
+				Window.Title = title;
 
 			Hint hint = database.Hint;
 			bool updated = folderUpdater.Update(database);
