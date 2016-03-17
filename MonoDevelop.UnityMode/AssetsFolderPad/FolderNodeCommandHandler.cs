@@ -29,12 +29,14 @@ namespace MonoDevelop.UnityMode
 
 		public override DragOperation CanDragNode()
 		{
-			return DragOperation.Copy | DragOperation.Move;
+			var folder = CurrentNode.DataItem as Folder;
+			return folder.IsRoot ? DragOperation.None : DragOperation.Copy | DragOperation.Move;
 		}
 
 		public override bool CanDeleteMultipleItems ()
 		{
-			return true;
+			var folder = CurrentNode.DataItem as Folder;
+			return !folder.IsRoot;
 		}
 
 		public override void DeleteMultipleItems ()
@@ -55,7 +57,7 @@ namespace MonoDevelop.UnityMode
 			var file = dataObjects as FileSystemEntry;
 
 			var src = new FilePath(file.RelativePath);
-			var dst = new FilePath(folder.RelativePath + "/" + file.Name);
+			var dst = new FilePath(folder.RelativePathCombine(file.Name));
 
 			if(operation == DragOperation.Move)
 				FileService.MoveFile(src, dst);
@@ -67,7 +69,7 @@ namespace MonoDevelop.UnityMode
 		public void AddNewFolder()
 		{
 			var folder = CurrentNode.GetParentDataItem(typeof(Folder), true) as Folder;
-			string directoryName = UnityModeFileSystemExtension.FindAvailableDirectoryName(folder.RelativePath + "/" +  "New Folder");
+			string directoryName = UnityModeFileSystemExtension.FindAvailableDirectoryName(folder.RelativePathCombine("New Folder"));
 			FileService.CreateDirectory (directoryName);
 		}
 
@@ -75,7 +77,7 @@ namespace MonoDevelop.UnityMode
 		public void AddNewCSharpScript ()
 		{
 			var folder = CurrentNode.GetParentDataItem(typeof(Folder), true) as Folder;
-			string filename =  UnityModeFileSystemExtension.FindAvailableFilename(folder.RelativePath + "/" + "NewBehaviourScript.cs");
+			string filename =  UnityModeFileSystemExtension.FindAvailableFilename(folder.RelativePathCombine("NewBehaviourScript.cs"));
 			UnityModeFileSystemExtension.CreateAsset (filename, "C#Script");
 		}
 	}

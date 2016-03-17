@@ -58,30 +58,7 @@ namespace MonoDevelop.UnityMode
 			{
 				if (updated && TreeView.GetRootNode() != null)
 				{
-					// Refresh root folders and remove any that no longer exist.
-					var node = TreeView.GetRootNode();
-					var refreshedFolders = new List<FileSystemEntry>();
-					var removeObjects = new List<object>();
-
-					do
-					{
-						var folder = folderUpdater.RootFolder.GetChild(node.NodeName);
-						if(folder != null)
-						{
-							TreeView.RefreshNode(node);
-							refreshedFolders.Add(folder);
-						}
-						else
-							removeObjects.Add(node.DataItem);
-					}
-					while(node.MoveNext());
-
-					foreach(var @object in removeObjects)
-						TreeView.RemoveChild(@object);
-
-					// Add new root folders
-					foreach (var child in folderUpdater.RootFolder.Children.Where(f => !refreshedFolders.Contains(f)))
-						TreeView.AddChild(child).Expanded = false;
+					TreeView.RefreshNode(TreeView.GetRootNode());
 
 					if(hint is NewFileHint)
 					{
@@ -105,8 +82,7 @@ namespace MonoDevelop.UnityMode
 				{
 					// Created a new folder structure, replace old tree
 					TreeView.Clear();
-					foreach (var child in folderUpdater.RootFolder.Children)
-						TreeView.AddChild(child).Expanded = false;
+					TreeView.AddChild(folderUpdater.RootFolder);
 
 					SelectActiveDocument();
 				}

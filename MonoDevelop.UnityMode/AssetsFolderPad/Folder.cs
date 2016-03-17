@@ -84,7 +84,12 @@ namespace MonoDevelop.UnityMode
 		}
 
 		public bool IsRoot {
-			get { return RelativePath.Length == 0; }
+			get { return Parent == null; }
+		}
+
+		public string RelativePathCombine(string path)
+		{
+			return IsRoot ? path : RelativePath + "/" + path;
 		}
 
 	}

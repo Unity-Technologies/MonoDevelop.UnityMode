@@ -25,10 +25,15 @@ namespace MonoDevelop.UnityMode
 			get { return typeof(FolderNodeCommandHandler); }
 		}
 
+		private string FolderName(Folder folder)
+		{
+			return folder.IsRoot ? "Assets" : folder.Name;
+		}
+
 		public override string GetNodeName (ITreeNavigator thisNode, object dataObject)
 		{
 			var folder = dataObject as Folder;
-			return folder.Name;
+			return FolderName (folder);
 		}
 
 		public override void BuildNode(ITreeBuilder treeBuilder, object dataObject, NodeInfo nodeInfo)
@@ -36,7 +41,7 @@ namespace MonoDevelop.UnityMode
 			base.BuildNode(treeBuilder, dataObject, nodeInfo);
 
 			var folder = dataObject as Folder;
-			nodeInfo.Label = folder.Name;
+			nodeInfo.Label = FolderName (folder);
 			nodeInfo.Icon = Context.GetIcon(Stock.OpenFolder);
 			nodeInfo.ClosedIcon = Context.GetIcon(Stock.ClosedFolder);
 		}
@@ -61,7 +66,10 @@ namespace MonoDevelop.UnityMode
 
 		public override void GetNodeAttributes (ITreeNavigator parentNode, object dataObject, ref NodeAttributes attributes)
 		{
-			attributes |= NodeAttributes.AllowRename;
+			var folder = dataObject as Folder;
+
+			if(!folder.IsRoot)
+				attributes |= NodeAttributes.AllowRename;
 		}
 
 		public override object GetParentObject (object dataObject)
