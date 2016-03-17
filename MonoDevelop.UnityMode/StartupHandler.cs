@@ -113,7 +113,7 @@ namespace MonoDevelop.UnityMode
 			string unityProjectPath = null;
 
 			var p = new Mono.Options.OptionSet ();
-			p.Add ("unityProjectPath=", "Unity Project Path", path => unityProjectPath = path);
+			p.Add ("unityProjectPath=", "Unity Project Path", path => unityProjectPath = path.Trim('"'));
 
 			try 
 			{
