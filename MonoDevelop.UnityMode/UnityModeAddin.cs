@@ -61,6 +61,8 @@ namespace MonoDevelop.UnityMode
 				if(unitySolution == value)
 					return;
 
+				// If the existing Solution is in the MonoDevelop workspace, remove it.
+				// Otherwise clear all solutions.
 				if(unitySolution != null)
 					IdeApp.Workspace.Items.Remove(unitySolution);
 				else
@@ -68,6 +70,10 @@ namespace MonoDevelop.UnityMode
 
 				unitySolution = value;
 
+				// When a project is added to the UnitySolution via the SolutionUpdater,
+				// make sure that a project is set as the current project in MonoDevelop.
+				// A project must be the current project (e.g. selected) in MonoDevelop 
+				// in order for project operations such as building and debugging to work.
 				unitySolution.SolutionItemAdded += (object sender, SolutionItemChangeEventArgs e) => 
 				{
 					var solution = e.Solution;
@@ -84,7 +90,7 @@ namespace MonoDevelop.UnityMode
 							IdeApp.ProjectOperations.CurrentSelectedSolutionItem = firstProject;
 						});
 					}
-						
+
 				};
 			}
 		}
@@ -117,6 +123,10 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		/// <summary>
+		/// Open Unity project from a file path.
+		/// </summary>
+		/// <param name="projectPath">Project path.</param>
 		public static void OpenUnityProject(string projectPath)
 		{
 			if(!System.IO.Directory.Exists(System.IO.Path.Combine(projectPath, "Assets")))
@@ -137,6 +147,12 @@ namespace MonoDevelop.UnityMode
 				InitializeAndPair (restServiceSettings.EditorRestServiceUrl);
 		}
 
+		/// <summary>
+		/// Connect to Unity Rest service and pair the MonoDevelop and Unity instance.
+		/// By pairing Unity registers which MonoDevelop instance to open files in and
+		/// MonoDevelop knows which Unity instance to talk to.
+		/// </summary>
+		/// <param name="unityRestServiceUrl">Unity rest service URL.</param>
 		internal static void InitializeAndPair(string unityRestServiceUrl)
 		{
 			UnityAssetDatabase = new UnityAssetDatabase ();
@@ -158,6 +174,7 @@ namespace MonoDevelop.UnityMode
 
 				try
 				{
+					// Pair with Unity, send our own REST service URL for opening files in MonoDevelop.
 					pairResult = RestClient.Pair(monoDevelopRestServiceUrl, BrandingService.ApplicationName + " " + BuildInfo.VersionLabel);
 					LoggingService.LogInfo("Unity Pair response. Project:" + pairResult.unityproject + " Process ID: " + pairResult.unityprocessid);
 				}
@@ -171,6 +188,8 @@ namespace MonoDevelop.UnityMode
 				
 				UnityRestServiceSettings = new UnityRestServiceSettings(unityRestServiceUrl, pairResult.unityprocessid);
 				
+				// Load the project specific settings stored in CodeEditorProjectSettings.json,
+				// such breakpoints and open documents.
 				UnityProjectSettings = UnityRestHelpers.LoadAndApplyProjectSettings();
 				UnityProjectSettings.ProjectPath = pairResult.unityproject;
 
@@ -188,11 +207,17 @@ namespace MonoDevelop.UnityMode
 
 			LoggingService.LogInfo("Unpairing (" + UnityProjectSettings.ProjectPath + ")");
 
+			// Save the Unity project path in case Unity is shut down and MonoDevleop is still
+			// running. If Unity is restarted with the same project again, we can automatically
+			// repair with Unity and the asset folder pad will be updated.
 			savedUnityProjectPath = closeProject ? null : UnityProjectSettings.ProjectPath;
 
+			// Clear the assets database and thereby also the Unity Asset Folder pad.
 			UnityAssetDatabase = new UnityAssetDatabase ();
 			UnityProjectSettings = new UnityProjectSettings ();
 
+			// We keep the MonoDevelop represtation of the solution open if we get disconnected
+			// from Unity, this is required for code completion etc. to work on the open source files.
 			if(closeProject)
 			{
 				UnitySolution = new UnitySolution ();
@@ -210,11 +235,26 @@ namespace MonoDevelop.UnityMode
 			DispatchService.ThreadDispatch( () => UnityProjectRefreshImmediate (hint));
 		}
 
+		/// <summary>
+		/// Refresh MonoDevelop state from Unity REST service state.
+		/// </summary>
+		/// <param name="hint">
+		/// Used for providing a hint about a change in the assetDatase. 
+		/// For instance, instead of updating the entire state of the 
+		/// Asset Folder pad when renaming a file and having to find
+		/// the renamed file in the Asset Folder pad hierarhcy so it can
+		/// be selected. We just send the rename to Unity and on success
+		/// we just rename one file in our own locol representation of
+		/// the Unity AssetDatabase. See FolderUpdater.Update.
+		/// </param>
 		static void UnityProjectRefreshImmediate (Hint hint = null)
 		{
+			// If we are no longer paired with Unity, check if Unity
+			// has been restarted and the same project is open when MonoDevelop
+			// gets window focus and if so, pair again with Unity.
 			if (!Paired && savedUnityProjectPath != null)
 			{
-				// Try to repair
+				// Try to pair again.
 				var restServiceSettings = UnityRestServiceSettings.Load (savedUnityProjectPath);
 
 				if(restServiceSettings != null)
@@ -225,6 +265,7 @@ namespace MonoDevelop.UnityMode
 				}
 			}
 
+			// Unpair (clear the asset folder pad) if the connection to Unity is lost.
 			if(!Paired || !IsUnityRunning())
 			{
 				ShutdownAndUnpair();

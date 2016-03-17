@@ -13,6 +13,12 @@ namespace MonoDevelop.UnityMode
 {
 	static class UnityRestHelpers
 	{
+		/// <summary>
+		/// Handle Unity open file request.
+		/// </summary>
+		/// <param name="filename">Filename.</param>
+		/// <param name="line">Line.</param>
+		/// <param name="options">Options.</param>
 		internal static void OpenFile(string filename, int line = 0, OpenDocumentOptions options = OpenDocumentOptions.None)
 		{
 			if (filename == null || !System.IO.File.Exists(filename))
@@ -56,6 +62,10 @@ namespace MonoDevelop.UnityMode
 			}
 		}
 
+		/// <summary>
+		/// Save changed settings in the Unity project's CodeEditorProjectSettings.json settings
+		/// </summary>
+		/// <param name="projectSettings">Project settings.</param>
 		internal static void UpdateAndSaveProjectSettings(UnityProjectSettings projectSettings)
 		{
 			if (!RestClient.Available)
@@ -71,9 +81,9 @@ namespace MonoDevelop.UnityMode
 
 				if (activeDocument != projectSettings.ActiveDocument ||
 					!documents.SequenceEqual (projectSettings.Documents) ||
-				   !breakpoints.SequenceEqual (projectSettings.Breakpoints) ||
-				   !functionBreakpoints.SequenceEqual (projectSettings.FunctionBreakpoints) ||
-				   !exceptionBreaks.SequenceEqual (projectSettings.ExceptionBreaks)) 
+					!breakpoints.SequenceEqual (projectSettings.Breakpoints) ||
+					functionBreakpoints.SequenceEqual (projectSettings.FunctionBreakpoints) ||
+					!exceptionBreaks.SequenceEqual (projectSettings.ExceptionBreaks)) 
 				{
 					projectSettings.ActiveDocument = activeDocument;
 					projectSettings.Documents = documents;
@@ -85,6 +95,10 @@ namespace MonoDevelop.UnityMode
 			});
 		}
 
+		/// <summary>
+		/// Loads the and apply Unity project's CodeEditorProjectSettings.json settings
+		/// </summary>
+		/// <returns>The and apply project settings.</returns>
 		internal static UnityProjectSettings LoadAndApplyProjectSettings()
 		{
 			var projectSettings =  RestClient.GetProjectSettings();

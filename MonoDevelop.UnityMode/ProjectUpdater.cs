@@ -8,6 +8,11 @@ using MonoDevelop.CSharp.Project;
 
 namespace MonoDevelop.UnityMode
 {
+	/// <summary>
+	/// Project updater.
+	/// Updates the MonoDevelop representations of a project (DotNetAssemblyProject) from 
+	/// the MonoIsland received from the Unity REST service.
+	/// </summary>
 	public class ProjectUpdater
 	{
 		public static void Update (DotNetAssemblyProject project, MonoIsland update)

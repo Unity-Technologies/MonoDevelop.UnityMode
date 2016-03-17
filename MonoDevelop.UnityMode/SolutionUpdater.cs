@@ -5,6 +5,11 @@ using MonoDevelop.CSharp.Project;
 
 namespace MonoDevelop.UnityMode
 {
+	/// <summary>
+	/// Solution updater.
+	/// Updates the Unity specific MonoDevelop representation of a Solution (UnitySolution)
+	/// from the UnityProjectState received from the Unity REST service.
+	/// </summary>
 	public class SolutionUpdater
 	{
 		public static void Update (UnitySolution s, UnityProjectState update)

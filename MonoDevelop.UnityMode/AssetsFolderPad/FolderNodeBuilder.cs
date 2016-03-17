@@ -10,7 +10,6 @@ using MonoDevelop.Ide.Gui.Pads;
 
 namespace MonoDevelop.UnityMode
 {
-
 	class FolderNodeBuilder: TypeNodeBuilder
 	{
 		public override string ContextMenuAddinPath

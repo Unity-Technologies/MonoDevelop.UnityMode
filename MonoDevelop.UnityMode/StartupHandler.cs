@@ -41,10 +41,12 @@ namespace MonoDevelop.UnityMode
 			IdeApp.Exiting += (object sender, ExitEventArgs args) => Exit();
 			IdeApp.FocusIn += FocusInEvent;
 
+			// Save changes to open documents in Unity's CodeEditorProjectSettings.json
 			workbench.ActiveDocumentChanged += UpdateAndSaveProjectSettings;
 			workbench.DocumentOpened += UpdateAndSaveProjectSettings;
 			workbench.DocumentClosed += UpdateAndSaveProjectSettings;
 
+			// Save changes to breakpoints in Unity's CodeEditorProjectSettings.json
 			breakpointUpdatedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
 			breakpointRemovedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
 			breakpointAddedHandler = DispatchService.GuiDispatch<EventHandler<BreakpointEventArgs>> (UpdateAndSaveProjectSettings);
@@ -78,17 +80,22 @@ namespace MonoDevelop.UnityMode
 		{
 			Workbench workbench = IdeApp.Workbench;
 
+			// Show the Unity Assets Folder Pad
 			var assetsFolderPad = workbench.GetPad<AssetsFolderPad>();
 
 			if (assetsFolderPad != null && assetsFolderPad.Visible != assetPadVisible)
 				assetsFolderPad.Visible = assetPadVisible;
 
+			// Hide the MonoDevelop Solution Pad.
+			// TODO: See if we can disable showing the solution pad by a setting.
 			var solutionPad = workbench.Pads.SolutionPad;
 
 			if (solutionPad != null && solutionPad.Visible == assetPadVisible)
 				solutionPad.Visible = !assetPadVisible;
 		}
 
+		// Refresh the project each time MonoDevelop gets focus, 
+		// in case the Unity project
 		static void FocusInEvent(object o, EventArgs args)
 		{
 			UnityModeAddin.UnityProjectRefresh ();

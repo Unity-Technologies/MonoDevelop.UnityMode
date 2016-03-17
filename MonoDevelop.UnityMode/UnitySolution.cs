@@ -13,9 +13,12 @@ namespace MonoDevelop.UnityMode
 		{
 			Singleton = this;
 
+			Name = "UnitySolution";
+
+			// FileName must be set otherwise add-ins such a version control
+			// start displaying error dialogs.
 			string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 			Directory.CreateDirectory(tempDirectory);
-			Name = "UnitySolution";
 			FileName = Path.Combine(tempDirectory, "UnitySolution.sln");
 
 			var config = new UnitySolutionConfiguration {Id = "Unity"};
@@ -28,6 +31,11 @@ namespace MonoDevelop.UnityMode
 			return DefaultConfiguration;
 		}
 
+		/// <summary>
+		/// Build project using Unity REST service and provide same build results as in Unity.
+		/// </summary>
+		/// <param name="monitor">Monitor.</param>
+		/// <param name="configuration">Configuration.</param>
 		protected override BuildResult OnBuild (MonoDevelop.Core.IProgressMonitor monitor, ConfigurationSelector configuration)
 		{
 			var result = new BuildResult ();

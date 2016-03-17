@@ -8,6 +8,10 @@ using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode
 {
+	/// <summary>
+	/// Maintains a hierarchical folder structure used by AssetsFolderPad,
+	/// updated from the UnityAssetDatabase received from Unity.
+	/// </summary>
 	public class FolderUpdater
 	{
 		UnityAssetDatabase assetDatabase;
