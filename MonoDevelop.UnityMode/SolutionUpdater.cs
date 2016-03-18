@@ -1,9 +1,11 @@
-using MonoDevelop.Projects;
-using MonoDevelop.UnityMode.RestServiceModel;
+using System.IO;
 using System.Linq;
-using MonoDevelop.CSharp.Project;
 using MonoDevelop.Core;
 using MonoDevelop.Core.Assemblies;
+using MonoDevelop.Core.ProgressMonitoring;
+using MonoDevelop.CSharp.Project;
+using MonoDevelop.Projects;
+using MonoDevelop.UnityMode.RestServiceModel;
 
 namespace MonoDevelop.UnityMode
 {
@@ -31,12 +33,16 @@ namespace MonoDevelop.UnityMode
 				ProjectUpdater.Update (existing, projectUpdate);
 			}
 
+			// Uncomment this line to save the solution to disk, in case it needs be inspected.
+			// s.Save (new NullProgressMonitor());
+
 			s.BaseDirectory = update.BaseDirectory;
 		}
 
 		static DotNetAssemblyProject CreateMonoDevelopProjectFromProjectUpdate (UnitySolution solution, MonoIsland projectUpdate, TargetFrameworkMoniker moniker)
 		{
 			var p = new DotNetAssemblyProject (projectUpdate.Language);
+			p.FileName = Path.Combine (solution.SolutionDirectory, projectUpdate.Name);
 
 			p.TargetFramework = Runtime.SystemAssemblyService.GetTargetFramework (moniker);
 

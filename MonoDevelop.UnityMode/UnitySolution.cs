@@ -8,6 +8,7 @@ namespace MonoDevelop.UnityMode
 	public class UnitySolution : Solution
 	{
 		public UnitySolution Singleton;
+		public string SolutionDirectory;
 
 		public UnitySolution()
 		{
@@ -17,9 +18,9 @@ namespace MonoDevelop.UnityMode
 
 			// FileName must be set otherwise add-ins such a version control
 			// start displaying error dialogs.
-			string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-			Directory.CreateDirectory(tempDirectory);
-			FileName = Path.Combine(tempDirectory, "UnitySolution.sln");
+			SolutionDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+			Directory.CreateDirectory(SolutionDirectory);
+			FileName = Path.Combine(SolutionDirectory, "UnitySolution.sln");
 
 			var config = new UnitySolutionConfiguration {Id = "Unity"};
 			Configurations.Add (config);
