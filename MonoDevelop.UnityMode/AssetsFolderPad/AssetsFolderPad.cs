@@ -31,7 +31,7 @@ namespace MonoDevelop.UnityMode
 			base.Initialize (builders, options, contextMenuPath);
 
 			UnityModeAddin.UnityAssetDatabaseChanged += Refresh;
-			Refresh (UnityModeAddin.UnityAssetDatabase, "Unity Project:");
+			Refresh (UnityModeAddin.UnityAssetDatabase, null);
 
 			TreeView.ShowSelectionPopupButton = true;
 		}
