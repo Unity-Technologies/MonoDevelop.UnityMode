@@ -41,7 +41,10 @@ namespace MonoDevelop.UnityMode
 
 		static ProjectReference ProjectReferenceFor (string reference)
 		{
-			return new ProjectReference (IsAssemblyReference(reference) ? ReferenceType.Assembly : ReferenceType.Project, reference, reference);
+			var projectRef = new ProjectReference (IsAssemblyReference(reference) ? ReferenceType.Assembly : ReferenceType.Project, reference, reference);
+			projectRef.LocalCopy = false;
+			projectRef.ExtendedProperties ["_OriginalMSBuildReferenceIsAbsolute"] = true; // Hint path is absolute
+			return projectRef;
 		}
 
 		static bool IsAssemblyReference(string reference)
