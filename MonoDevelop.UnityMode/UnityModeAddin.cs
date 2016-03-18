@@ -202,7 +202,7 @@ namespace MonoDevelop.UnityMode
 
 		static void ShutdownAndUnpair(bool closeProject = false)
 		{
-			if(!RestClient.Available)
+			if(!Paired)
 				return;
 
 			LoggingService.LogInfo("Unpairing (" + UnityProjectSettings.ProjectPath + ")");
